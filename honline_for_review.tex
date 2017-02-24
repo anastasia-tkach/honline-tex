@@ -1,0 +1,432 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{accent}{RGB}{179,81,109}
+
+\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,colorlinks,bookmarks=false]{hyperref}
+
+\def\cvprPaperID{****} 
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+\ifcvprfinal\pagestyle{empty}\fi
+\begin{document}
+
+\title{\LaTeX\ Author Guidelines for CVPR Proceedings}
+
+\author{First Author\\
+Institution1\\
+Institution1 address\\
+{\tt\small firstauthor@i1.org}
+\and
+Second Author\\
+Institution2\\
+First line of institution2 address\\
+{\tt\small secondauthor@i2.org}
+}
+
+\maketitle
+
+
+\begin{abstract}
+   The ABSTRACT is to be in fully-justified italicized text, at the top
+   of the left-hand column, below the author and affiliation
+   information. Use the word ``Abstract'' as the title, in 12-point
+   Times, boldface type, centered relative to the column, initially
+   capitalized. The abstract is to be in 10-point, single-spaced type.
+   Leave two blank lines after the Abstract, then begin the main text.
+   Look at previous CVPR abstracts to get a feel for style and length.
+\end{abstract}
+
+\section{Settings}
+A hand in motion can be described by two types of parameters.
+\begin{itemize}
+\item Pose parameters \textit{(joint angles and rigid rotation and translation of the hand)} $\theta \in \mathbb{R}^{N_{\theta}}$ change with time. 
+\item Shape parameters \textit{(length and thickness of fingers phalanges, position of finger bases, shape of the palm)} $\beta \in \mathbb{R}^{N_{\beta}}$ vary between different people while staying constant for each person. 
+\end{itemize}
+Given a sequence of depth sensor images $\mathcal{D}_n$, the goal of our system is to get best possible estimate of shape parameters $\hat{\beta}_n$ from the input available so far.
+
+How much information do we need to have a good guess of $\beta$? A trivial lower bound would finding $\beta$ from a single sensor image. This scenario could be conceived for palm shape and fingers thickness, since they are ``visible'' in any hand pose. However, the phalanges length cannot be estimated when the fingers are straight and the locations of finger bases are hidden under the skin and can only be inferred after seeing a range of hand poses. Sensor noise and $2,5 D$ nature of the data further aggravate the problem. 
+Previous authors [ADD REFERENCES] suggested to find hand shape from a set of manually picked hand poses. \textbf{\color{accent} Explain why this is not good enough}.
+
+\subsection {Posterior distribution of the parameters} \label{sec:posterior}
+
+Denote the vector of all hand parameters as $x_n = [\theta_n; \beta_n]$ and the segmented hand point cloud in vectorized form as $d_n$. The function $F(x_n)$ applies shape and pose parameters to the hand model and computes the closest model points to sensor data points.  Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters 
+
+\begin{equation}
+x^*_1 = \operatorname{argmin}_{x_1} \underbrace{\log  P(d_1|x_1)}_{L(x_1)} 
+\end{equation}
+
+with $P(d_1|x_1) = \exp \left( - (d_1 - F(x_1))^T (d_1 - F(x_1)) \right)$.
+
+Expanding the log-likelihood of the data $L(x_1)$ around $x_1^*$ we get
+\begin{align}
+\begin{split}
+ L(x_1) \approx L(x_1^*) + \underbrace{\frac{\partial L}{\partial x_1}(x_1^*)}_{= 0 \text{ at extremum}}(x_1 - x_1^*) - \\
+- 0.5(x_1 - x_1^*)^T \underbrace{\frac{\partial \partial L}{\partial x_1 \partial x_1}(x_1^*) }_{\text{positive definite}}  (x_1 - x_1^*) \\
+\end{split}
+\end{align}
+
+with $\frac{\partial L}{\partial x_1}(x_1^*) = - 2 F(x_1^*)^T + 2 F(x_1)^T \frac{\partial F}{\partial x_1}(x_1^*)  $ and 
+$\frac{\partial \partial L}{\partial x_1 \partial x_1}(x_1^*) = 2  \frac{\partial F}{\partial x_1}(x_1^*)^T  \frac{\partial F}{\partial x_1}(x_1^*) + 2 F(x_1^*)^T  \frac{\partial \partial F}{\partial \partial x_1}(x_1^*)  \approx  \frac{\partial F}{\partial x_1}(x_1^*)^T  \frac{\partial F}{\partial x_1}(x_1^*)$. Denoting $\frac{\partial \partial L^{-1}}{\partial x_n \partial x_n}(x_n^*) $ as $\Sigma_n$ and taking an exponential of both sides gives:
+\vspace{-2em}
+
+\begin{equation}
+P(d_1|x_1) \propto \exp\left(- 0.5(x_1 - x_1^*)^T \Sigma_1^{-1}  (x_1 - x_1^*) \right)\\
+\end{equation}
+
+Thus, after processing the information from the first frame $d_1$, the quadratic approximation of posterior distribution of hand parameters is a normal distribution $\mathcal{N}\left(\hat{x}_1 = x_1^*,  \hat{\Sigma}_1 = \Sigma_1 \right)$ [ADD REFERENCE].
+
+\subsection {Combining two measurements}
+
+Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form 
+
+\begin{equation}
+\mathcal{N}(\hat{x}_2, \hat{\Sigma}_2) = \mathcal{N}(\hat{x}_1, \hat{\Sigma}_1) \mathcal{N}(x_2^*, \Sigma_2)
+\end{equation}
+
+Applying the product of Gaussians rule presented in \cite{petersen2008matrix}, we get 
+\begin{align}
+\begin{split}
+\hat{x}_2 = \Sigma_2 (\hat{\Sigma}_1 + \Sigma_2)^{-1} \hat{x}_1 + 
+\hat{\Sigma}_1 (\hat{\Sigma}_1 + \Sigma_2)^{-1} x_2^*\\
+\hat{\Sigma}_2 = \hat{\Sigma}_1 (\hat{\Sigma}_1 + \Sigma_2)^{-1} \Sigma_2
+\end{split} \label{eq:gaussians-product}
+\end{align}
+
+In Appendix \ref{app:kalman} it is shown that this is equivalent to Kalman filter update with measurement $x_n^*$ and measurement noise covariance $\Sigma_n$. This is important, because, according to P. Maybeck [ADD REFERENCE], under the assumptions presented in Appendix \ref{app:kalman} ''... the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it. ''
+
+\subsection{Regularizing optimization}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[!h] 
+\centering
+\caption{Regularizing optimization\label{tab:regularizing}} 
+\resizebox{0.45\textwidth}{!}{
+\begin{tabular}{|c|}
+\hline
+
+$\hat{x}_n^* = \operatorname{argmax}_{x_n} \log P(d_n|x_n) P(x_n |\hat{x}_{n - 1})$ \\
+\\
+with $P(x_n |\hat{x}_{n - 1}) = \exp \left( - (x_n - \hat{x}_{n - 1} )^T (x_n - \hat{x}_{n - 1} )\right)$ \\
+\\
+$\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) = \mathcal{N}(\hat{x}_{n - 1}, \hat{\Sigma}_{n - 1}) \mathcal{N}(x_n^*, \Sigma_n)$ \\
+	
+\hline
+\end{tabular}
+}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Another regularization}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[!h] 
+\centering
+\caption{Objective function of IEKF \label{tab:lm}} 
+\resizebox{0.48\textwidth}{!}{
+\begin{tabular}{|c|}
+
+\hline
+
+$\hat{x}_n = \operatorname{argmax}_{x_n} 
+\underbrace{\log \left( P(d_n|x_n) P(x_n |\hat{x}_{n - 1}) \right)}_{L(x_n)}$\\ 
+with \\
+$P(x_n |\hat{x}_{n - 1}) = \exp \left( -(x_n - \hat{x}_{n - 1})^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1})\right)$ \\
+\\
+$\hat{\Sigma}_n^{-1} = \frac{\partial \partial L}{\partial x_n \partial x_n}(\hat{x}_n) \approx $ \\
+\\
+$\left[
+	\begin{array}{cc}
+		- \frac{\partial F} {\partial x_n} (\hat{x}_n) \\
+		\left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		- \frac{\partial F} {\partial x_n} (\hat{x}_n) \\
+		\left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
+	\end{array}
+\right] = $\\
+\\
+$ = \hat{\Sigma}_{n-1}^{-1} + \frac{\partial F} {\partial x_n} (\hat{x}_n)^T \frac{\partial F} {\partial x_n} (\hat{x}_n)$ \\
+	
+\hline
+\end{tabular}
+}
+\end{table}
+
+In Appendix \ref{app:ieif-lm} we demonstrate that measurement update of IEKF (Table \ref{tab:ekf-iekf}) is equivalent to optimizing the below objective function using Levenberg-Marquardt algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+
+\section{Kalman Filter} \label{app:kalman}
+
+Using the definitions from ~\cite{welch1995introduction}, Kalman Filter (KF) estimates the state $x_n \in \mathbb{R}^N$ of a linear system driven by the below equations, given the measurement $z_n \in \mathbb{R}^M$:
+\begin{align}
+x_n = A x_{n - 1} +  w_{n - 1} \\
+z_n = J x_n + v_n
+\end{align}
+
+where $w_n$ is process noise, $v_n$ is measurement noise with $p(w) \sim \mathcal{N}(0, Q)$ and $p(v) \sim \mathcal{N}(0, R)$. 
+The matrix $A$ maps the state at the previous time step to the state at current time step. The matrix $J$ maps the state $x_n$ to the measurement $z_n$.
+
+We assume that while  there is no new measurements, an estimate of the current hand parameters are the previous known parameters up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$. We also assume for now that depth sensor noise is normally distributed, which actually is not the case. Thus, the states of our system can be approximated as following:
+\begin{align}
+x_n = x_{n - 1} + w_{n - 1} \\
+z_n = J x_n + v_n
+\end{align}
+
+Define $\hat{x}_n^0$ to be initial state estimate at step $n$ and $\hat{x}_n$ to be a state estimate after updating on the measurement $z_n$.
+
+Then the covariance before and after the measurement is then 
+\begin{align}
+P_n^0=\mathbb{E}[(x_n - \hat{x}_n^0)^T(x_n - \hat{x}_n^0)]\\
+P_n =\mathbb{E}[(x_n - \hat{x}_n)^T(x_n - \hat{x}_n)]
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[!h] 
+\centering
+\caption{Time and measurement update for KF with $A$ equal to identity} 
+\resizebox{0.41\textwidth}{!}{
+\begin{tabular}{|c|c|}
+\hline
+Time Update & Measurement Update \\
+\hline
+
+$\hat{x}_n^0 = \hat{x}_{n - 1}$ & 
+$K_n = P_n^0 J^T (J P_n^0 J^T + R)^{-1}$ \\
+
+$P_n^0 = P_{n - 1} + Q$ &
+$\hat{x}_n = \hat{x}_n^0 + K_n (z_n - J \hat{x}_n^0)$ \\
+
+ & 
+$P_n = (I - K_n J) P_n^0$ \\
+
+\hline
+\end{tabular}
+}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Let us consider the special case when the measurement $z_n = x_n^*$ is in the same space at the estimated state $\hat{x}_n$, thus $J$ is equal to identity.
+
+\begin{align*}
+\hat{x}_n = \hat{x}_n^0 + P_n^0  (P_n^0 + R)^{-1}(z_n - \hat{x}_n^0) = \\
+= (P_n^0 + R)(P_n^0 + R)^{-1}\hat{x}_n^0 + P_n^0  (P_n^0 + R)^{-1}(z_n - \hat{x}_n^0) = \\
+= R(P_n^0 + R)^{-1}\hat{x}_n^0 + P_n^0  (P_n^0 + R)^{-1}z_n 
+ \end{align*}
+
+\begin{align*}
+P_n = ((P_n^0 + R) (P_n^0 + R)^{-1} - P_n^0  (P_n^0 + R)^{-1}) P_n^0\\
+P_n = R (P_n^0 + R)^{-1} P_n^0
+\end{align*}
+
+The expressions for $\hat{x}_n$ and $P_n$ coincide with expressions \ref{eq:gaussians-product} for product of two Gaussians  with $z_n = x_n^*$, $P_n^0 = \hat{\Sigma}_{n - 1}$ and $R = \Sigma_{n}$.
+
+\section{Extended Kalman Filter}
+
+Following ~\cite{welch1995introduction}, Extended Kalman Filter (EKF) estimates the state $x_n$  of a non-linear system given the measurement $z_n$.
+\begin{align}
+x_n = \tilde{F}(x_{n - 1},  w_{n - 1}) \\
+z_n = F(x_n, v_n)
+\end{align}
+
+The function $F(\cdot)$ that maps the state $x_n$ to the measurement $z_n$ applies shape and pose parameters to the hand model and computes the closest model points to sensor data points. 
+The function $\tilde{F}(\cdot)$ relates the state at the previous time step to the state at current time step, in our case it is an identity mapping.
+\begin{align}
+x_n = x_{n - 1} + w_{n - 1} \\
+z_n = F(x_n) + v_n 
+\end{align}
+
+Thus, $\frac{ \partial \tilde{F}_{[i]}}{ \partial x_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$, 
+$\frac{ \partial \tilde{F}_{[i]}}{ \partial w_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$ and $\frac{ \partial F_{[i]}}{ \partial v_{[j]}}(\hat{x}_n^0, 0) \equiv I$, where $I$ is an identity matrix of the corresponding size.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[!h] 
+\centering
+\caption{Time and measurement update for EKF with $\tilde{F}(\cdot)$ being an identity mapping} 
+\resizebox{0.42\textwidth}{!}{
+\begin{tabular}{|c|c|}
+\hline
+Time Update & Measurement Update \\
+\hline
+
+$\hat{x}_n^0=\hat{x}_{n-1}$ &
+$K_n = P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}$ \\
+
+$P_n^0 = P_{n-1} + Q$ &
+$\hat{x}_n = \hat{x}_n^0 + K_n(z_n - F_n)$ \\
+
+ &
+$P_n = (I - K_n J_n)P_n^0$ \\
+
+\hline
+\end{tabular}
+}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+with $F_n = F(\hat{x}_n^0)$ and ${J_n}_{[i, j]} = \frac{ \partial F_{[i]}}{ \partial x_{[j]}}(\hat{x}_n^0)$.
+
+\section{Iterated Extended Kalman Filter}
+
+In our case the measurement function $F(\cdot)$ is nonlinear such that the Levenberg-Marquardt algorithm
+$\hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)$ takes several iterations to converge. Thus we perform measurement update in several steps each time linearizing measurement function  $F(\cdot)$ around the updated value $\hat{x}_n^i$. We use the equations of Iterated Extended Kalman Filter (IEKF) presented in ~\cite{havlik2015performance}. The measurement update equations respectively for EKF and IEKF are presented in Table \ref{tab:ekf-iekf}. The time update equations remain the same as before.
+
+\begin{table}[!h] 
+\centering
+\caption{EKF vs IEKF measurement update \label{tab:ekf-iekf}}
+\resizebox{0.48\textwidth}{!}{
+\begin{tabular}{|l|l|}
+\hline
+Extended Kalman Filter & Iterated Extended Kalman Filter \\
+\hline
+
+  &
+for $i = 1...$ \\
+  
+$F_n = F(\hat{x}_n^0)$ &
+$\:\:\: F_n^\textit{\color{accent}$i$} = F( \hat{x}_n^\textit{\color{accent}$i$})$ \\
+
+${J_n}_{[u, v]} = \frac{ \partial F_{[u]}}{ \partial x_{[v]}}(\hat{x}_n^0)$ & 
+$\:\:\: {J_n}_{[u, v]}^\textit{\color{accent}$i$} = \frac{ \partial F_{[u]}^\textit{\color{accent}$i$}}{ \partial x_{[v]}}(\hat{x}_n^\textit{\color{accent}$i$})$\\
+
+$K_n = P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}$ &
+$\:\:\: K_n^\textit{\color{accent}$i$} = P_n^0 {J^\textit{\color{accent}$i$}_n}^T(J_n^\textit{\color{accent}$i$} P_n^0 {J^\textit{\color{accent}$i$}_n}^T + R)^{-1}$ \\
+
+$\hat{x}_n = \hat{x}_n^0 + K_n(z_n - F_n)$ &
+$\:\:\: \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - $\\
+
+ &$\:\:\:\:\:\:\:\:\:\:\:\: - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$})$ \\
+
+ &
+end \\
+ 
+ & $\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}$ \\
+ 
+$P_n = (I - K_n J_n)P_n^0$ &
+$P_n = (I - K_n^\textit{\color{accent}$i$} J_n^\textit{\color{accent}$i$})P_n^0$ \\
+
+\hline
+\end{tabular}
+}
+\end{table}
+
+\section{Equivalence of IEIF and Optimization \ref{tab:lm}} \label{app:ieif-lm}
+
+To show that the optimizing the objective  \ref{tab:lm} with LM algorithm is equivalent to IEKF, we first rewrite IEKF in information form as shown in \cite{anderson1979optimal}. The two algorithms presented in Table \ref{tab:ekf-eif} yield the same result.
+
+\begin{table}[!h] 
+\centering
+\caption{EKF vs EIF measurement update \label{tab:ekf-eif}} 
+\resizebox{0.48\textwidth}{!}{
+\begin{tabular}{|l|l|}
+\hline
+Extended Kalman Filter & Extended Information Filter \\
+\hline
+ 
+ & $H_n = \left(P_n\right)^{-1}$ \\
+
+$K_n = P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}$ &
+$H_n = H_n^0 + J_n^T R^{-1} J_n$  \\
+
+$\hat{x}_n = \hat{x}_n^0 + K_n(z_n - F_n)$ &
+$K_n = {H_n}^{-1} J_n^T R^{-1}$\\
+ 
+$P_n = (I - K_n J_n)P_n^0$ &
+$\hat{x}_n = \hat{x}_n^0 + K_n (z_n - F_n)$ \\
+
+\hline
+\end{tabular}
+}
+\end{table}
+
+Table \ref{tab:ieif} presents the measurement update for Iterated Extended Information Filter, which is equivalent to Iterated Extended Kalman Filter. We assume that measurement noise is i.i.d. for each sensor sample, thus $R = \operatorname{diag}(r)$ with $r$ a positive scalar.
+
+\begin{table}[!h] 
+\centering
+\caption{Iterated Extended Information Filter} \label{tab:ieif}
+\begin{tabular}{|l|}
+\hline
+
+for $i = 1...$ \\
+
+$\:\:\:\:\: H_n^\textit{\color{accent}$i$} = \frac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$})$  \\
+  
+$\:\:\:\:\: K_n^\textit{\color{accent}$i$} =\frac{r}{r} {H_n^\textit{\color{accent}$i$}}^{-1} {J_n^\textit{\color{accent}$i$}}^T$  \\
+
+$\:\:\:\:\: \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$})$ \\
+
+end \\
+ 
+$\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}$ \\
+
+\hline
+\end{tabular}
+\end{table}
+
+ The LM update in Optimization \label{eq:kalman-like} is equal to 
+ 
+ \begin{equation}
+ x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
+\end{equation}
+ 
+ with $\bar{J}_n$ and $\bar{F}_n$ expanded below, $F_n^i = F(x_n^i)$, 
+ $J_n^i = \frac{\partial F}{\partial x_n}(x_n^i)$, the measurement $z_n = d_n$ and $\hat{\Sigma}_n^{-1} = r H_{n - 1}$.
+ 
+ \begin{align*}
+x_n^{i + 1}= x_n^{i} - \left(
+\left[
+	\begin{array}{cc}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]
+\right)^{-1} \times\\
+\times \left[
+	\begin{array}{cc}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		z_n - F_n^i \\
+		\left(r H_{n - 1}\right)^{1/2}(x_n^i - \hat{x}_{n - 1}) \\
+	\end{array}
+\right] = \\
+= x_n^{i} - \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1}}_{A} \times \\
+\times \left( - {J_n^i}^T(z_n - F_n^i) + r H_{n - 1}(x_n^i - \hat{x}_{n - 1})\right)  = \\
+= x_n^i +\underbrace{A {J_n^i}^T(z_n - F_n^i)}_B - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1})  = \\
+= \hat{x}_{n - 1} + B  - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1}) + A A^{-1}( x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + B + A(- r H_{n - 1} + {J_n^i}^T J_n^i + r H_{n - 1})(x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + B + A {J_n^i}^T J_n^i (x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1} {J_n^i}^T}_{K_n^i} \times \\
+\times (z_n - F_n^i - J_n^i (\hat{x}_{n - 1} - x_n^i)),
+ \end{align*}
+ 
+ which is equivalent to the measurement update of IEIF from Table \ref{tab:ieif}, with $H_n^0 = H_{n-1}$ and $x_n^0 = \hat{x}_{n - 1}$.
+
+{\small
+\bibliographystyle{ieee}
+\bibliography{egbib}
+}
+
+
+
+\end{document}

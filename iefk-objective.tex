@@ -1,0 +1,48 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[!h] 
+\centering
+\caption{Objective function of IEKF \label{tab:lm}} 
+\resizebox{0.48\textwidth}{!}{
+\begin{tabular}{|c|}
+
+\hline
+
+$\bar{F}(x_n) =
+\left[
+	\begin{array}{c}
+		z_n - F(x_n) \\
+		\left(r H_{n - 1}\right)^{1/2}(x_n - \hat{x}_{n - 1}) \\
+	\end{array}
+\right] $\\ 
+
+\\
+
+$\hat{x}_n = \operatorname{argmax}_{x_n}\bar{F}(x_n)^T \bar{F}(x_n) $ \\
+
+\\
+
+$ H_n = \frac{1}{r} \bar{J}_n^T \bar{J}_n = 
+	\frac{1}{r} \left[
+	\begin{array}{cc}
+		- J_n \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		- J_n \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right] = $\\
+	
+$ = H_{n-1} + \frac{1}{r} J_n^T J_n =  \frac{1}{r} \sum_{i = 1}^{n} J_i^T J_i $ \\
+	
+\hline
+\end{tabular}
+}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+with 
+$ {J_n}_{[u, v]} = \frac{ \partial F_{[u]}}{ \partial x_{[v]}}(\hat{x}_n)$ and  
+${\bar{J_n}}_{[u, v]} = \frac{ \partial \bar{F}_{[u]}}{ \partial x_{[v]}}(\hat{x}_n)$
