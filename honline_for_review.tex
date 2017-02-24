@@ -52,14 +52,16 @@ A hand in motion can be described by two types of parameters.
 Given a sequence of depth sensor images $\mathcal{D}_n$, the goal of our system is to get best possible estimate of shape parameters $\hat{\beta}_n$ from the input available so far.
 
 How much information do we need to have a good guess of $\beta$? A trivial lower bound would finding $\beta$ from a single sensor image. This scenario could be conceived for palm shape and fingers thickness, since they are ``visible'' in any hand pose. However, the phalanges length cannot be estimated when the fingers are straight and the locations of finger bases are hidden under the skin and can only be inferred after seeing a range of hand poses. Sensor noise and $2,5 D$ nature of the data further aggravate the problem. 
-Previous authors [ADD REFERENCES] suggested to find hand shape from a set of manually picked hand poses. \textbf{\color{accent} Explain why this is not good enough}.
+Previous authors \cite{joseph2016fits} and \cite{tkach2016sphere} suggested to find hand shape from a set of manually picked hand poses. \textbf{\color{accent} Explain why this is not good enough}.
+
+\subsection {Independent Solve} \label{sec:independent-solve}
 
 \subsection {Posterior distribution of the parameters} \label{sec:posterior}
 
-Denote the vector of all hand parameters as $x_n = [\theta_n; \beta_n]$ and the segmented hand point cloud in vectorized form as $d_n$. The function $F(x_n)$ applies shape and pose parameters to the hand model and computes the closest model points to sensor data points.  Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters 
+Denote the vector of all hand parameters as $x_n = [\theta_n; \beta_n]$ and the segmented hand point cloud in vectorized form as $d_n$. The function $F(x_n)$ applies shape and pose parameters to the hand model and computes the closest model points to sensor data points.  Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters (see Section \ref{sec:independent-solve})
 
 \begin{equation}
-x^*_1 = \operatorname{argmin}_{x_1} \underbrace{\log  P(d_1|x_1)}_{L(x_1)} 
+x^*_1 = \operatorname{argmin}_{x_1} \underbrace{\log  P(d_1|x_1)}_{L(x_1)} \label{eq:independent}
 \end{equation}
 
 with $P(d_1|x_1) = \exp \left( - (d_1 - F(x_1))^T (d_1 - F(x_1)) \right)$.
@@ -82,7 +84,7 @@ P(d_1|x_1) \propto \exp\left(- 0.5(x_1 - x_1^*)^T \Sigma_1^{-1}  (x_1 - x_1^*) \
 
 Thus, after processing the information from the first frame $d_1$, the quadratic approximation of posterior distribution of hand parameters is a normal distribution $\mathcal{N}\left(\hat{x}_1 = x_1^*,  \hat{\Sigma}_1 = \Sigma_1 \right)$ [ADD REFERENCE].
 
-\subsection {Combining two measurements}
+\subsection {Combining independent measurements} \label{sec:combining}
 
 Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form 
 
@@ -99,31 +101,47 @@ Applying the product of Gaussians rule presented in \cite{petersen2008matrix}, w
 \end{split} \label{eq:gaussians-product}
 \end{align}
 
-In Appendix \ref{app:kalman} it is shown that this is equivalent to Kalman filter update with measurement $x_n^*$ and measurement noise covariance $\Sigma_n$. This is important, because, according to P. Maybeck [ADD REFERENCE], under the assumptions presented in Appendix \ref{app:kalman} ''... the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it. ''
+In Appendix \ref{app:kalman} it is shown that the Equations \ref{eq:gaussians-product} are equivalent to Kalman filter update with measurement $x_n^*$ and measurement noise covariance $\Sigma_n$. This is important, because, according to P. Maybeck \cite{maybeck1979stochastic}, under the assumptions presented in Appendix \ref{app:kalman} ''... the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it. ''
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[!h] 
+\centering
+\caption{KF: Combining independent measurements\label{tab:combining}} 
+\begin{tabular}{|c|}
+\hline
+$x_n^* = \operatorname{argmax}_{x_n} \log P(d_n|x_n)$ \\
+$\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) = \mathcal{N}(\hat{x}_{n - 1}, \hat{\Sigma}_{n - 1}) \mathcal{N}(x_n^*, \Sigma_n)$ \\
+	
+\hline
+\end{tabular}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Regularizing optimization}
+
+Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computing using local LM optimization. This, it is crucial that optimization starts in a sensible region of parameters space. The optimization presented in Table \ref{tab:combining} does not provided any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve from Section \ref{sec:independent-solve}. One way to remedy this is to add a term that attracts $x_n$ to the current best estimate $\hat{x}_n$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{table}[!h] 
 \centering
 \caption{Regularizing optimization\label{tab:regularizing}} 
-\resizebox{0.45\textwidth}{!}{
 \begin{tabular}{|c|}
 \hline
 
-$\hat{x}_n^* = \operatorname{argmax}_{x_n} \log P(d_n|x_n) P(x_n |\hat{x}_{n - 1})$ \\
-\\
+$x_n^* = \operatorname{argmax}_{x_n} \log \left( P(d_n|x_n) P(x_n |\hat{x}_{n - 1})\right)$ \\
+
 with $P(x_n |\hat{x}_{n - 1}) = \exp \left( - (x_n - \hat{x}_{n - 1} )^T (x_n - \hat{x}_{n - 1} )\right)$ \\
-\\
+
 $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) = \mathcal{N}(\hat{x}_{n - 1}, \hat{\Sigma}_{n - 1}) \mathcal{N}(x_n^*, \Sigma_n)$ \\
 	
 \hline
 \end{tabular}
-}
 \end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Another regularization}
+
+Alternatively,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{table}[!h] 
@@ -161,10 +179,11 @@ $ = \hat{\Sigma}_{n-1}^{-1} + \frac{\partial F} {\partial x_n} (\hat{x}_n)^T \fr
 }
 \end{table}
 
-In Appendix \ref{app:ieif-lm} we demonstrate that measurement update of IEKF (Table \ref{tab:ekf-iekf}) is equivalent to optimizing the below objective function using Levenberg-Marquardt algorithm.
+In Appendix \ref{app:ieif-lm} we demonstrate that optimizing the objective function presented in Table \label{tab:lm} using Levenberg-Marquardt algorithm is equivalent to easurement update of Iterated Extended Kalman Filter.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newpage
 \appendix
 
 \section{Kalman Filter} \label{app:kalman}
@@ -217,6 +236,7 @@ $P_n = (I - K_n J) P_n^0$ \\
 \end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection{Special case from the Section  \ref{sec:combining}}
 Let us consider the special case when the measurement $z_n = x_n^*$ is in the same space at the estimated state $\hat{x}_n$, thus $J$ is equal to identity.
 
 \begin{align*}
@@ -230,7 +250,7 @@ P_n = ((P_n^0 + R) (P_n^0 + R)^{-1} - P_n^0  (P_n^0 + R)^{-1}) P_n^0\\
 P_n = R (P_n^0 + R)^{-1} P_n^0
 \end{align*}
 
-The expressions for $\hat{x}_n$ and $P_n$ coincide with expressions \ref{eq:gaussians-product} for product of two Gaussians  with $z_n = x_n^*$, $P_n^0 = \hat{\Sigma}_{n - 1}$ and $R = \Sigma_{n}$.
+The expressions for $\hat{x}_n$ and $P_n$ coincide with Equations \ref{eq:gaussians-product} for product of two Gaussians  with $z_n = x_n^*$, $P_n^0 = \hat{\Sigma}_{n - 1}$ and $R = \Sigma_{n}$.
 
 \section{Extended Kalman Filter}
 
@@ -241,14 +261,14 @@ z_n = F(x_n, v_n)
 \end{align}
 
 The function $F(\cdot)$ that maps the state $x_n$ to the measurement $z_n$ applies shape and pose parameters to the hand model and computes the closest model points to sensor data points. 
-The function $\tilde{F}(\cdot)$ relates the state at the previous time step to the state at current time step, in our case it is an identity mapping.
+The function $\tilde{F}(\cdot)$ relates the state at the previous time step to the state at current time step, in our case $\tilde{F}(\cdot)$ is an identity mapping. Thus, $\frac{ \partial \tilde{F}_{[i]}}{ \partial x_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$, 
+$\frac{ \partial \tilde{F}_{[i]}}{ \partial w_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$ and $\frac{ \partial F_{[i]}}{ \partial v_{[j]}}(\hat{x}_n^0, 0) \equiv I$, where $I$ is an identity matrix of the corresponding size.
 \begin{align}
 x_n = x_{n - 1} + w_{n - 1} \\
 z_n = F(x_n) + v_n 
 \end{align}
 
-Thus, $\frac{ \partial \tilde{F}_{[i]}}{ \partial x_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$, 
-$\frac{ \partial \tilde{F}_{[i]}}{ \partial w_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$ and $\frac{ \partial F_{[i]}}{ \partial v_{[j]}}(\hat{x}_n^0, 0) \equiv I$, where $I$ is an identity matrix of the corresponding size.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{table}[!h] 
@@ -374,7 +394,7 @@ $\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}$ \\
 \end{tabular}
 \end{table}
 
- The LM update in Optimization \label{eq:kalman-like} is equal to 
+ The LM update in Optimization \ref{tab:lm} has the following form: 
  
  \begin{equation}
  x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
