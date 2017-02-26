@@ -1,0 +1,17 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[!h] 
+\centering
+\caption{Regularizing optimization\label{tab:regularizing}} 
+\begin{tabular}{|c|}
+\hline
+
+$x_n^* = \operatorname{argmax}_{x_n} \log \left( P(d_n|x_n) P(x_n |\hat{x}_{n - 1})\right)$ \\
+
+with $P(x_n |\hat{x}_{n - 1}) = \exp \left( - (x_n - \hat{x}_{n - 1} )^T (x_n - \hat{x}_{n - 1} )\right)$ \\
+
+$\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) = \mathcal{N}(\hat{x}_{n - 1}, \hat{\Sigma}_{n - 1}) \mathcal{N}(x_n^*, \Sigma_n)$ \\
+	
+\hline
+\end{tabular}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
