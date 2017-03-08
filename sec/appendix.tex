@@ -1,55 +1,28 @@
-\newpage
 \appendix
-
-\section{Kalman Filter} \label{app:kalman}
-
-Using the definitions from ~\cite{welch1995introduction}, Kalman Filter (KF) estimates the state $x_n \in \mathbb{R}^N$ of a linear system driven by the below equations, given the measurement $z_n \in \mathbb{R}^M$:
+\section{Kalman Filter} 
+\label{app:kalman}
+Following the notation in~\cite{welch1995introduction}, given the measurements $z_n \in \mathbb{R}^M$, the Kalman Filter (KF) latent state $x_n \in \mathbb{R}^N$ update equations are:
+% 
 \begin{align}
-x_n = A x_{n - 1} +  w_{n - 1} \\
-z_n = J x_n + v_n
+x_n &= A x_{n - 1} +  w_{n - 1} \\
+z_n &= J x_n + v_n
 \end{align}
-
-where $w_n$ is process noise, $v_n$ is measurement noise with $p(w) \sim \mathcal{N}(0, Q)$ and $p(v) \sim \mathcal{N}(0, R)$. 
-The matrix $A$ maps the state at the previous time step to the state at current time step. The matrix $J$ maps the state $x_n$ to the measurement $z_n$.
-
-We assume that while  there is no new measurements, an estimate of the current hand parameters are the previous known parameters up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$. We also assume for now that depth sensor noise is normally distributed, which actually is not the case. Thus, the states of our system can be approximated as following:
+% 
+where $w_n$ is a normally distributed process noise $p(w) \sim \mathcal{N}(0, Q)$, and $v_n$ is a normally distributed measurement noise $p(v) \sim \mathcal{N}(0, R)$. The matrix $A$ provides a linear estimate for state updates, while $J$ maps the state $x_n$ to the measurement $z_n$. As we are estimating a the shape of a single individual, we assume $A$ to be identity. Note that sensor noise is not normally distributed, thus our choice of $w$ is an approximation we make \AT{not sure I buy this.. wouldn't sensor noise be accounted in \emph{measurement} noise?}: 
+% 
 \begin{align}
-x_n = x_{n - 1} + w_{n - 1} \\
-z_n = J x_n + v_n
+x_n &= x_{n - 1} + w_{n - 1} \\
+z_n &= J x_n + v_n
 \end{align}
-
-Define $\hat{x}_n^0$ to be initial state estimate at step $n$ and $\hat{x}_n$ to be a state estimate after updating on the measurement $z_n$.
-
-Then the covariance before and after the measurement is then 
+% 
+In frame $n$, we provide an initial state estimate $\hat{x}_n^0$, while $\hat{x}_n$ is an improved estimate that accounts for the measurement $z_n$.
+We define their corresponding covariances as follows, from which the update equations of Table~\ref{kalman} can be derived:
+% 
 \begin{align}
 P_n^0=\mathbb{E}[(x_n - \hat{x}_n^0)^T(x_n - \hat{x}_n^0)]\\
 P_n =\mathbb{E}[(x_n - \hat{x}_n)^T(x_n - \hat{x}_n)]
 \end{align}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{table}[!h] 
-\centering
-\caption{Time and measurement update for KF with $A$ equal to identity} 
-\resizebox{0.41\textwidth}{!}{
-\begin{tabular}{|c|c|}
-\hline
-Time Update & Measurement Update \\
-\hline
-
-$\hat{x}_n^0 = \hat{x}_{n - 1}$ & 
-$K_n = P_n^0 J^T (J P_n^0 J^T + R)^{-1}$ \\
-
-$P_n^0 = P_{n - 1} + Q$ &
-$\hat{x}_n = \hat{x}_n^0 + K_n (z_n - J \hat{x}_n^0)$ \\
-
- & 
-$P_n = (I - K_n J) P_n^0$ \\
-
-\hline
-\end{tabular}
-}
-\end{table}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{fig/kalman.tex}
 
 \subsection{Special case from the Section  \ref{sec:combining}}
 Let us consider the special case when the measurement $z_n = x_n^*$ is in the same space at the estimated state $\hat{x}_n$, thus $J$ is equal to identity.
@@ -86,9 +59,8 @@ z_n = F(x_n) + v_n
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{table}[!h] 
+\begin{table}[t] 
 \centering
-\caption{Time and measurement update for EKF with $\tilde{F}(\cdot)$ being an identity mapping} 
 \resizebox{0.42\textwidth}{!}{
 \begin{tabular}{|c|c|}
 \hline
@@ -107,6 +79,7 @@ $P_n = (I - K_n J_n)P_n^0$ \\
 \hline
 \end{tabular}
 }
+\caption{Extended Kalman Filter (with $\tilde{F}(\cdot)$ identity)}
 \end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
