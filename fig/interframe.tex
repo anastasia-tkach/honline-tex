@@ -1,0 +1,34 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{equation*}
+\begin{aligned}
+x_n^* &= \argmax_{x_n} \: \log p(d_n|x_n) 
+\\
+\hat{x}_n &= \argmax_{x_n} \: \underbrace{\log \left( p(x_n|x_n^*) p(x_n |\hat{x}_{n - 1}) \right)}_{L(x_n)}    
+\\
+p(x_n |x_n^*) &= \mathcal{N}(x_n^*,\Sigma_n) 
+\\
+p(x_n |\hat{x}_{n - 1}) &= \mathcal{N}(\hat{x}_{n - 1}, \hat{\Sigma}_{n-1})
+\\
+\hat{\Sigma}_n^{-1} &= \left.\tfrac{\partial^2 L}{\partial x_n^2}\right|_{\hat{x}_n} \approx \hat{\Sigma}_{n-1}^{-1}  + \Sigma_{n}^{-1}
+\end{aligned}
+\end{equation*}
+\caption{Inter-frame Kalman regression}    
+\label{fig:interframe}
+\end{figure}
+% \begin{equation}
+% \hat{\Sigma}_n^{-1} =
+% \left[
+%     \begin{array}{cc}
+%         \left(\Sigma_n^{-1}\right)^{1/2} \\
+%         \left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
+%     \end{array}
+% \right]^T
+% \left[
+%     \begin{array}{c}
+%         \left(\Sigma_n^{-1}\right)^{1/2} \\
+%         \left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
+%     \end{array}
+% \right]
+% \end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

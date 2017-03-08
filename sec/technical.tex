@@ -1,9 +1,12 @@
 \section{Technical}
-Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters, and then derive a quadratic approximation of their posterior distribution $\mathcal{N}(\hat x_1, \hat \Sigma_1)$; see Section \ref{sec:independent-solve}.
+Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters, and then derive a quadratic approximation of their posterior distribution $\mathcal{N}(\hat x_1, \hat \Sigma_1)$; see Section \ref{sec:independent}.
 \TODO{describe how to combine}
 
+\AN{The shape prior should only be used in the first frame, because afterwards it will be incorporated inside of Kalman prior}.
+\AT{This can be discussed when the shape prior term is discussed?}
+
 \subsection{Intra-frame regression \todo{(independent)}}
-\label{sec:independent-solve}
+\label{sec:independent}
 % 
 Denote the vector of all hand parameters as $x_n = [\theta_n; \beta_n]$ and the segmented hand point cloud in vectorized form as $d_n$. Given $d_n$ and initialization of hand pose from previous frame $x_n^0 = x_{n - 1}^*$ we find an independent estimate of $x_n^*$ by local Gauss-Newton optimization of the multi-objective energy function:
 % 
@@ -45,7 +48,7 @@ P(d_1|x_1) &= \mathcal{N}(F(x_1), I)
 \paragraph{Posterior quadratic approximation} 
 \label{sec:posterior}
 % 
-Following~\todo{[??]}, we expand the log-likelihood of the data $L(x_1)$ around the optimal solution $x_1^*$ to the second order:
+Following~\todo{[??]}, we expand the log-likelihood of the data $L(x_1)$ around the optimal solution $x_1^*$ to the second order \AT{I think we can omit the index 1, as this is completely generic?}:
 % 
 \begin{align}
 L(x_1) \approx L(x_1^*)   
@@ -54,7 +57,7 @@ L(x_1) \approx L(x_1^*)
 + \text{h.o.t.}
 \end{align}
 %
-where $\Delta x=x_1 - x_1^*$ and Jacobian and Hessian are:
+where $\Delta x=x_1 - x_1^*$ and Jacobian and Hessian are respectively zero and positive definite at our critical point $x_1^*$:
 \begin{align*}
 J_{x_1} &= 
 \left.\tfrac{\partial L}{\partial x_1} \right|_{x_1^*} = - 2 F(x_1^*)^T + 2 F(x_1)^T 
@@ -80,60 +83,27 @@ P(d_1|x_1)
 
 \subsection{Inter-frame regression \todo{(combining)}} 
 \label{sec:combining}
-\AN{The shape prior should only be used in the first frame, because afterwards it will be incorporated inside of Kalman prior}.
-
-Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form 
-
+Given the probabilistic interpretation in \Section{independent}, a \emph{joint} optimization over parameters can simply be obtained by cumulating the distributions over the set of frames. For the simple scenario where only two frames are available \AT{we have to pick better names here! we need to differentiate between the per-frame estimates, and the cumulation. Right now the name is overloaded}:
+% 
 \begin{equation}
-\mathcal{N}(\hat{x}_2, \hat{\Sigma}_2) = \mathcal{N}(\hat{x}_1, \hat{\Sigma}_1) \mathcal{N}(x_2^*, \Sigma_2)
+\mathcal{N}(\hat{x}_2, \hat{\Sigma}_2) = \mathcal{N}(\hat{x}_1, \hat{\Sigma}_1) \mathcal{N}(x_2^*, \Sigma_2) \quad\quad
 \end{equation}
-
-Applying the product of Gaussians rule presented in \cite{petersen2008matrix}, we get 
+and through simple algebraic manipulation~\cite{petersen2008matrix}, we obtain:
 \begin{align}
-\begin{split}
-\hat{x}_2 = \Sigma_2 (\hat{\Sigma}_1 + \Sigma_2)^{-1} \hat{x}_1 + 
-\hat{\Sigma}_1 (\hat{\Sigma}_1 + \Sigma_2)^{-1} x_2^*\\
-\hat{\Sigma}_2 = \hat{\Sigma}_1 (\hat{\Sigma}_1 + \Sigma_2)^{-1} \Sigma_2
-\end{split} \label{eq:gaussians-product}
-\end{align}
-
-In Appendix \ref{app:kalman} it is shown that the Equations \ref{eq:gaussians-product} are equivalent to Kalman filter update with measurement $x_n^*$ and measurement noise covariance $\Sigma_n$. This is important, because, according to P. Maybeck \cite{maybeck1979stochastic}, under the assumptions presented in Appendix \ref{app:kalman} ''... the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it. ''
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{table}[!h] 
-\centering
-\caption{KF: Combining independent measurements\label{tab:kf-like}} 
-\begin{tabular}{|c|}
-\hline
-$x_n^* = \argmax_{x_n} \log P(d_n|x_n)$ \\
-$\hat{x}_n = \operatorname{argmax}_{x_n} \underbrace{\log \left( P(x_n|x_n^*) P(x_n |\hat{x}_{n - 1}) \right)}_{L(x_n)}$\\
-with \\
-$P(x_n |x_n^*) = \exp \left( - (x_n - x_n^* )^T \Sigma_n^{-1}(x_n - x_n^* )\right)$ \\
-$P(x_n |\hat{x}_{n - 1}) = \exp \left( - (x_n - \hat{x}_{n - 1} )^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1} )\right)$ \\	
-
-$\hat{\Sigma}_n^{-1} = \frac{\partial \partial L}{\partial x_n \partial x_n}(\hat{x}_n) \approx $ \\
+\hat{x}_2 &= \Sigma_2 (\hat{\Sigma}_1 + \Sigma_2)^{-1} \hat{x}_1 + 
+\hat{\Sigma}_1 (\hat{\Sigma}_1 + \Sigma_2)^{-1} x_2^*
 \\
-$\left[
-	\begin{array}{cc}
-		\left(\Sigma_n^{-1}\right)^{1/2} \\
-		\left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
-	\end{array}
-\right]^T 
-\left[
-	\begin{array}{c}
-		\left(\Sigma_n^{-1}\right)^{1/2} \\
-		\left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
-	\end{array}
-\right] = \hat{\Sigma}_{n-1}^{-1}  + \Sigma_{n}^{-1}$ \\
+\hat{\Sigma}_2 &= \hat{\Sigma}_1 (\hat{\Sigma}_1 + \Sigma_2)^{-1} \Sigma_2
+\label{eq:combining}
+\end{align}
+% Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form
+In Appendix \ref{app:kalman}, we shown how \Equation{combining} are equivalent to Kalman filter update with measurement $x_n^*$ and measurement noise covariance $\Sigma_n$ summarized in \Figure{interframe}.
 
-\hline
-\end{tabular}
-\end{table}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{fig/interframe}
 
 \subsection{Regularizing optimization}
 
-Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space. The optimization presented in Table \ref{tab:kf-like} does not provided any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve from Section \ref{sec:independent-solve}. One way to remedy this is include the term $P(x_n |\hat{x}_{n - 1})$ directly in the independent solve.
+Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space. The optimization presented in Table \ref{tab:kf-like} does not provided any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve from Section \ref{sec:independent}. One way to remedy this is include the term $P(x_n |\hat{x}_{n - 1})$ directly in the independent solve.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{table}[!h] 

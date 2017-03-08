@@ -18,7 +18,6 @@ Previous authors \cite{joseph2016fits} and \cite{tkach2016sphere} suggested to f
 \item \textit{result quality:} this claim will be /*hopefully*/ proven experimentally. 
 
 \begin{itemize}
-\vspace{-1em}
 \item By default performance of batch algorithm is an upper bound for online algorithm running on the same data. However, in practice online algorithm can use any amount of data and batch algorithm is limited by the available memory and computational power.
 \item  Also, it is important that to take into account that the problem is solved with local optimization. If each frame of batch optimization is initialized far away from the true hand parameters, the solver can get stack in bad local optimum. (Shape prior should help in this case, but a good prior is difficult to learn). Online optimization, if it works properly, can have better and better initialization with every frame.
 \end{itemize}
@@ -74,3 +73,6 @@ m_i'(\beta', \theta') = \kappa_1 c_{j1}' + \kappa_2 c_{j1}' + \kappa_3 c_{j3}' +
 \end{align}
 
 with $c_{j1}' = c_{j1}'(\beta', \theta')$,  $r_{j1}' = r_{j1}'(\beta', \theta')$, $G_j' =G_j'(\theta')$.
+
+\subsection{Why kalman?}
+\AT{This is important, because, according to P. Maybeck \cite{maybeck1979stochastic}, under the assumptions presented in Appendix \ref{app:kalman} ``the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it.''}
