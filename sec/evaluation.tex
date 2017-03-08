@@ -1,0 +1,3 @@
+\subsection{Comparing the two optimizations}
+The optimization presented in Table \ref{tab:kf-like} will be used as a baseline. It treats the results of the independent solve $x_n^*$ as a measurement, which, arguably can be considered as the simplest way to maintain an online estimate of the parameters. 
+The optimization presented in Table \ref{tab:iekf-like} represents the hand tracking system as an Iterated Extended Kalman Filter. It directly outputs the estimated value of the parameters $\hat{x}_n$, using $d_n$ as a measurement.

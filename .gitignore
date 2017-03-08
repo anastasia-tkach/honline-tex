@@ -45,3 +45,16 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+/.honline_for_review.lb
+/.honline_for_review.watcher_pid
+/honline_for_review.aux
+/honline_for_review.bbl
+/honline_for_review.blg
+/honline_for_review.brf
+/honline_for_review.fdb_latexmk
+/honline_for_review.fls
+/honline_for_review.latexmk.log
+/honline_for_review.log
+/honline_for_review.pdf
+/honline_for_review.synctex.gz
