@@ -1,18 +1,19 @@
 \clearpage
 \section{Iterated Extended Kalman Filter (IEKF)}
-In our case the measurement function $F(\cdot)$ is nonlinear such that the Levenberg-Marquardt algorithm
-$\hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)$ takes several iterations to converge. Thus we perform measurement update in several steps each time linearizing measurement function  $F(\cdot)$ around the updated value $\hat{x}_n^i$. We use the equations of Iterated Extended Kalman Filter (IEKF) presented in ~\cite{havlik2015performance}. The measurement update equations respectively for EKF and IEKF are presented in Table \ref{tab:ekf-iekf}. The time update equations remain the same as before.
-
+\label{app:iekf}
+As the measurement function $F(\cdot)$ is nonlinear, the following LM optimization takes several iterations to converge: 
+\begin{equation}
+\hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)   
+\end{equation}
+To address this problem, we can perform measurement updates in several steps. In each step, we linearize the measurement function $F$ around the updated value $\hat{x}_n^i$, leading to the Iterated Extended Kalman Filter (IEKF) formulation~\cite{havlik2015performance}. The time update equations for EKF and IEKF are analogous to the ones in \Equation{extended}, while the measurement update equations are respectively:
 \begin{table}[!h] 
 \centering
-\caption{EKF vs IEKF measurement update \label{tab:ekf-iekf}}
 \resizebox{0.48\textwidth}{!}{
 \begin{tabular}{|l|l|}
 \hline
 Extended Kalman Filter & Iterated Extended Kalman Filter \\
 \hline
-
-  &
+&
 for $i = 1...$ \\
   
 $F_n = F(\hat{x}_n^0)$ &
@@ -40,66 +41,58 @@ $P_n = (I - K_n^\textit{\color{accent}$i$} J_n^\textit{\color{accent}$i$})P_n^0$
 \hline
 \end{tabular}
 }
+\caption{EKF vs. IEKF measurement update equations \label{tab:ekf-iekf}}
 \end{table}
 
 \section{Equivalence of IEIF and \Table{iekf-like}}
 \label{app:ieif-lm}
 
-To show that the optimizing the objective  \ref{tab:iekf-like} with LM algorithm is equivalent to IEKF, we first rewrite IEKF in information form as shown in \cite{anderson1979optimal}. The two algorithms presented in Table \ref{tab:ekf-eif} yield the same result.
+To show that the optimizing the objective in \Table{iekf-like} with LM is equivalent to the IEKF, we first rewrite our EKF measurement updates in the completely equivalent \emph{Extended Information Filter}~\cite{anderson1979optimal} form:
+% 
+\begin{gather*}
+\small
+\begin{aligned}
+&\text{Ex. Kalman Filter}                           &       &\text{Ex. Information Filter} \\
+&                                                   &       H_n &= \left(P_n\right)^{-1} \\
+K_n &= P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}        &       H_n &= H_n^0 + J_n^T R^{-1} J_n \\
+\hat{x}_n &= \hat{x}_n^0 + K_n(z_n - F_n)           &       K_n &= {H_n}^{-1} J_n^T R^{-1} \\
+P_n &= (I - K_n J_n)P_n^0                           &       \hat{x}_n &= \hat{x}_n^0 + K_n (z_n - F_n)
+\end{aligned}
+\label{eq:ekf-eif}
+\end{gather*}
+%  
+We assume that measurement noise is i.i.d. across sensor samples, therefore $R=rI$ where $r\in \mathbb{R}^+$. Similarly to \Appendix{iekf}, we can now write the IEIF, the iterated version of the EIF:
+\begin{gather}
+\small
+\begin{aligned}
+&\text{for } i=1 \dots \todo{N?} \\
+&\quad H_n^\textit{\color{accent}$i$} = \tfrac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$}) \\
+&\quad K_n^\textit{\color{accent}$i$} =\tfrac{r}{r} {H_n^\textit{\color{accent}$i$}}^{-1} {J_n^\textit{\color{accent}$i$}}^T \\
+&\quad \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$}) \\
+&\text{end} \\
+&\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}
+\end{aligned}
+\end{gather}
 
+% 
 \begin{table}[!h] 
 \centering
-\caption{EKF vs EIF measurement update \label{tab:ekf-eif}} 
-\resizebox{0.48\textwidth}{!}{
-\begin{tabular}{|l|l|}
-\hline
-Extended Kalman Filter & Extended Information Filter \\
-\hline
- 
- & $H_n = \left(P_n\right)^{-1}$ \\
-
-$K_n = P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}$ &
-$H_n = H_n^0 + J_n^T R^{-1} J_n$  \\
-
-$\hat{x}_n = \hat{x}_n^0 + K_n(z_n - F_n)$ &
-$K_n = {H_n}^{-1} J_n^T R^{-1}$\\
- 
-$P_n = (I - K_n J_n)P_n^0$ &
-$\hat{x}_n = \hat{x}_n^0 + K_n (z_n - F_n)$ \\
-
-\hline
-\end{tabular}
-}
-\end{table}
-
-Table \ref{tab:ieif} presents the measurement update for Iterated Extended Information Filter, which is equivalent to Iterated Extended Kalman Filter. We assume that measurement noise is i.i.d. for each sensor sample, thus $R = \operatorname{diag}(r)$ with $r$ a positive scalar.
-
-\begin{table}[!h] 
-\centering
-\caption{Iterated Extended Information Filter} \label{tab:ieif}
 \begin{tabular}{|l|}
 \hline
-
 for $i = 1...$ \\
-
 $\:\:\:\:\: H_n^\textit{\color{accent}$i$} = \frac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$})$  \\
-  
 $\:\:\:\:\: K_n^\textit{\color{accent}$i$} =\frac{r}{r} {H_n^\textit{\color{accent}$i$}}^{-1} {J_n^\textit{\color{accent}$i$}}^T$  \\
-
-$\:\:\:\:\: \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$})$ \\
-
+$\:\:\:\:\: $ \\
 end \\
- 
-$\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}$ \\
-
+$$ \\
 \hline
 \end{tabular}
+\caption{Iterated Extended Information Filter} \label{tab:ieif}
 \end{table}
 
- The LM update in Optimization \ref{tab:lm} has the following form: 
- 
- \begin{equation}
- x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
+The LM update in Optimization \ref{tab:lm} has the following form: 
+\begin{equation}
+    x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
 \end{equation}
  
  with $\bar{J}_n$ and $\bar{F}_n$ expanded below, $F_n^i = F(x_n^i)$, 
