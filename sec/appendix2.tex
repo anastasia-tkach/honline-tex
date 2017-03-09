@@ -1,0 +1,138 @@
+\clearpage
+\section{Iterated Extended Kalman Filter (IEKF)}
+\label{app:iekf}
+As the measurement function $F(\cdot)$ is nonlinear, the following LM optimization takes several iterations to converge: 
+\begin{equation}
+\hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)   
+\end{equation}
+To address this problem, we can perform measurement updates in several steps. In each step, we linearize the measurement function $F$ around the updated value $\hat{x}_n^i$, leading to the Iterated Extended Kalman Filter (IEKF) formulation~\cite{havlik2015performance}. The time update equations for EKF and IEKF are analogous to the ones in \Equation{extended}, while the measurement update equations are respectively:
+\begin{table}[!h] 
+\centering
+\resizebox{0.48\textwidth}{!}{
+\begin{tabular}{|l|l|}
+\hline
+Extended Kalman Filter & Iterated Extended Kalman Filter \\
+\hline
+&
+for $i = 1...$ \\
+  
+$F_n = F(\hat{x}_n^0)$ &
+$\:\:\: F_n^\textit{\color{accent}$i$} = F( \hat{x}_n^\textit{\color{accent}$i$})$ \\
+
+${J_n}_{[u, v]} = \frac{ \partial F_{[u]}}{ \partial x_{[v]}}(\hat{x}_n^0)$ & 
+$\:\:\: {J_n}_{[u, v]}^\textit{\color{accent}$i$} = \frac{ \partial F_{[u]}^\textit{\color{accent}$i$}}{ \partial x_{[v]}}(\hat{x}_n^\textit{\color{accent}$i$})$\\
+
+$K_n = P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}$ &
+$\:\:\: K_n^\textit{\color{accent}$i$} = P_n^0 {J^\textit{\color{accent}$i$}_n}^T(J_n^\textit{\color{accent}$i$} P_n^0 {J^\textit{\color{accent}$i$}_n}^T + R)^{-1}$ \\
+
+$\hat{x}_n = \hat{x}_n^0 + K_n(z_n - F_n)$ &
+$\:\:\: \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - $\\
+
+ &$\:\:\:\:\:\:\:\:\:\:\:\: - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$})$ \\
+
+ &
+end \\
+ 
+ & $\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}$ \\
+ 
+$P_n = (I - K_n J_n)P_n^0$ &
+$P_n = (I - K_n^\textit{\color{accent}$i$} J_n^\textit{\color{accent}$i$})P_n^0$ \\
+
+\hline
+\end{tabular}
+}
+\caption{EKF vs. IEKF measurement update equations \label{tab:ekf-iekf}}
+\end{table}
+
+\section{Equivalence of IEIF and \Table{iekf-like}}
+\label{app:ieif-lm}
+
+To show that the optimizing the objective in \Table{iekf-like} with LM is equivalent to the IEKF, we first rewrite our EKF measurement updates in the completely equivalent \emph{Extended Information Filter}~\cite{anderson1979optimal} form:
+% 
+\begin{gather*}
+\small
+\begin{aligned}
+&\text{Ex. Kalman Filter}                           &       &\text{Ex. Information Filter} \\
+&                                                   &       H_n &= \left(P_n\right)^{-1} \\
+K_n &= P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}        &       H_n &= H_n^0 + J_n^T R^{-1} J_n \\
+\hat{x}_n &= \hat{x}_n^0 + K_n(z_n - F_n)           &       K_n &= {H_n}^{-1} J_n^T R^{-1} \\
+P_n &= (I - K_n J_n)P_n^0                           &       \hat{x}_n &= \hat{x}_n^0 + K_n (z_n - F_n)
+\end{aligned}
+\label{eq:ekf-eif}
+\end{gather*}
+%  
+We assume that measurement noise is i.i.d. across sensor samples, therefore $R=rI$ where $r\in \mathbb{R}^+$. Similarly to \Appendix{iekf}, we can now write the IEIF, the iterated version of the EIF:
+\begin{gather}
+\small
+\begin{aligned}
+&\text{for } i=1 \dots \todo{N?} \\
+&\quad H_n^\textit{\color{accent}$i$} = \tfrac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$}) \\
+&\quad K_n^\textit{\color{accent}$i$} =\tfrac{r}{r} {H_n^\textit{\color{accent}$i$}}^{-1} {J_n^\textit{\color{accent}$i$}}^T \\
+&\quad \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$}) \\
+&\text{end} \\
+&\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}
+\end{aligned}
+\end{gather}
+
+% 
+\begin{table}[!h] 
+\centering
+\begin{tabular}{|l|}
+\hline
+for $i = 1...$ \\
+$\:\:\:\:\: H_n^\textit{\color{accent}$i$} = \frac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$})$  \\
+$\:\:\:\:\: K_n^\textit{\color{accent}$i$} =\frac{r}{r} {H_n^\textit{\color{accent}$i$}}^{-1} {J_n^\textit{\color{accent}$i$}}^T$  \\
+$\:\:\:\:\: $ \\
+end \\
+$$ \\
+\hline
+\end{tabular}
+\caption{Iterated Extended Information Filter} \label{tab:ieif}
+\end{table}
+
+The LM update in Optimization \ref{tab:lm} has the following form: 
+\begin{equation}
+    x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
+\end{equation}
+ 
+ with $\bar{J}_n$ and $\bar{F}_n$ expanded below, $F_n^i = F(x_n^i)$, 
+ $J_n^i = \frac{\partial F}{\partial x_n}(x_n^i)$, the measurement $z_n = d_n$ and $\hat{\Sigma}_n^{-1} = r H_{n - 1}$.
+ 
+ \begin{align*}
+x_n^{i + 1}= x_n^{i} - \left(
+\left[
+	\begin{array}{cc}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]
+\right)^{-1} \times\\
+\times \left[
+	\begin{array}{cc}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		z_n - F_n^i \\
+		\left(r H_{n - 1}\right)^{1/2}(x_n^i - \hat{x}_{n - 1}) \\
+	\end{array}
+\right] = \\
+= x_n^{i} - \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1}}_{A} \times \\
+\times \left( - {J_n^i}^T(z_n - F_n^i) + r H_{n - 1}(x_n^i - \hat{x}_{n - 1})\right)  = \\
+= x_n^i +\underbrace{A {J_n^i}^T(z_n - F_n^i)}_B - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1})  = \\
+= \hat{x}_{n - 1} + B  - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1}) + A A^{-1}( x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + B + A(- r H_{n - 1} + {J_n^i}^T J_n^i + r H_{n - 1})(x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + B + A {J_n^i}^T J_n^i (x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1} {J_n^i}^T}_{K_n^i} \times \\
+\times (z_n - F_n^i - J_n^i (\hat{x}_{n - 1} - x_n^i)),
+ \end{align*}
+ 
+ which is equivalent to the measurement update of IEIF from Table \ref{tab:ieif}, with $H_n^0 = H_{n-1}$ and $x_n^0 = \hat{x}_{n - 1}$.
