@@ -1,0 +1,145 @@
+\clearpage
+\section{Iterated Extended Kalman Filter (IEKF)}
+In our case the measurement function $F(\cdot)$ is nonlinear such that the Levenberg-Marquardt algorithm
+$\hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)$ takes several iterations to converge. Thus we perform measurement update in several steps each time linearizing measurement function  $F(\cdot)$ around the updated value $\hat{x}_n^i$. We use the equations of Iterated Extended Kalman Filter (IEKF) presented in ~\cite{havlik2015performance}. The measurement update equations respectively for EKF and IEKF are presented in Table \ref{tab:ekf-iekf}. The time update equations remain the same as before.
+
+\begin{table}[!h] 
+\centering
+\caption{EKF vs IEKF measurement update \label{tab:ekf-iekf}}
+\resizebox{0.48\textwidth}{!}{
+\begin{tabular}{|l|l|}
+\hline
+Extended Kalman Filter & Iterated Extended Kalman Filter \\
+\hline
+
+  &
+for $i = 1...$ \\
+  
+$F_n = F(\hat{x}_n^0)$ &
+$\:\:\: F_n^\textit{\color{accent}$i$} = F( \hat{x}_n^\textit{\color{accent}$i$})$ \\
+
+${J_n}_{[u, v]} = \frac{ \partial F_{[u]}}{ \partial x_{[v]}}(\hat{x}_n^0)$ & 
+$\:\:\: {J_n}_{[u, v]}^\textit{\color{accent}$i$} = \frac{ \partial F_{[u]}^\textit{\color{accent}$i$}}{ \partial x_{[v]}}(\hat{x}_n^\textit{\color{accent}$i$})$\\
+
+$K_n = P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}$ &
+$\:\:\: K_n^\textit{\color{accent}$i$} = P_n^0 {J^\textit{\color{accent}$i$}_n}^T(J_n^\textit{\color{accent}$i$} P_n^0 {J^\textit{\color{accent}$i$}_n}^T + R)^{-1}$ \\
+
+$\hat{x}_n = \hat{x}_n^0 + K_n(z_n - F_n)$ &
+$\:\:\: \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - $\\
+
+ &$\:\:\:\:\:\:\:\:\:\:\:\: - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$})$ \\
+
+ &
+end \\
+ 
+ & $\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}$ \\
+ 
+$P_n = (I - K_n J_n)P_n^0$ &
+$P_n = (I - K_n^\textit{\color{accent}$i$} J_n^\textit{\color{accent}$i$})P_n^0$ \\
+
+\hline
+\end{tabular}
+}
+\end{table}
+
+\section{Equivalence of IEIF and \Table{iekf-like}}
+\label{app:ieif-lm}
+
+To show that the optimizing the objective  \ref{tab:iekf-like} with LM algorithm is equivalent to IEKF, we first rewrite IEKF in information form as shown in \cite{anderson1979optimal}. The two algorithms presented in Table \ref{tab:ekf-eif} yield the same result.
+
+\begin{table}[!h] 
+\centering
+\caption{EKF vs EIF measurement update \label{tab:ekf-eif}} 
+\resizebox{0.48\textwidth}{!}{
+\begin{tabular}{|l|l|}
+\hline
+Extended Kalman Filter & Extended Information Filter \\
+\hline
+ 
+ & $H_n = \left(P_n\right)^{-1}$ \\
+
+$K_n = P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}$ &
+$H_n = H_n^0 + J_n^T R^{-1} J_n$  \\
+
+$\hat{x}_n = \hat{x}_n^0 + K_n(z_n - F_n)$ &
+$K_n = {H_n}^{-1} J_n^T R^{-1}$\\
+ 
+$P_n = (I - K_n J_n)P_n^0$ &
+$\hat{x}_n = \hat{x}_n^0 + K_n (z_n - F_n)$ \\
+
+\hline
+\end{tabular}
+}
+\end{table}
+
+Table \ref{tab:ieif} presents the measurement update for Iterated Extended Information Filter, which is equivalent to Iterated Extended Kalman Filter. We assume that measurement noise is i.i.d. for each sensor sample, thus $R = \operatorname{diag}(r)$ with $r$ a positive scalar.
+
+\begin{table}[!h] 
+\centering
+\caption{Iterated Extended Information Filter} \label{tab:ieif}
+\begin{tabular}{|l|}
+\hline
+
+for $i = 1...$ \\
+
+$\:\:\:\:\: H_n^\textit{\color{accent}$i$} = \frac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$})$  \\
+  
+$\:\:\:\:\: K_n^\textit{\color{accent}$i$} =\frac{r}{r} {H_n^\textit{\color{accent}$i$}}^{-1} {J_n^\textit{\color{accent}$i$}}^T$  \\
+
+$\:\:\:\:\: \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$})$ \\
+
+end \\
+ 
+$\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}$ \\
+
+\hline
+\end{tabular}
+\end{table}
+
+ The LM update in Optimization \ref{tab:lm} has the following form: 
+ 
+ \begin{equation}
+ x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
+\end{equation}
+ 
+ with $\bar{J}_n$ and $\bar{F}_n$ expanded below, $F_n^i = F(x_n^i)$, 
+ $J_n^i = \frac{\partial F}{\partial x_n}(x_n^i)$, the measurement $z_n = d_n$ and $\hat{\Sigma}_n^{-1} = r H_{n - 1}$.
+ 
+ \begin{align*}
+x_n^{i + 1}= x_n^{i} - \left(
+\left[
+	\begin{array}{cc}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]
+\right)^{-1} \times\\
+\times \left[
+	\begin{array}{cc}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		z_n - F_n^i \\
+		\left(r H_{n - 1}\right)^{1/2}(x_n^i - \hat{x}_{n - 1}) \\
+	\end{array}
+\right] = \\
+= x_n^{i} - \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1}}_{A} \times \\
+\times \left( - {J_n^i}^T(z_n - F_n^i) + r H_{n - 1}(x_n^i - \hat{x}_{n - 1})\right)  = \\
+= x_n^i +\underbrace{A {J_n^i}^T(z_n - F_n^i)}_B - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1})  = \\
+= \hat{x}_{n - 1} + B  - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1}) + A A^{-1}( x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + B + A(- r H_{n - 1} + {J_n^i}^T J_n^i + r H_{n - 1})(x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + B + A {J_n^i}^T J_n^i (x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1} {J_n^i}^T}_{K_n^i} \times \\
+\times (z_n - F_n^i - J_n^i (\hat{x}_{n - 1} - x_n^i)),
+ \end{align*}
+ 
+ which is equivalent to the measurement update of IEIF from Table \ref{tab:ieif}, with $H_n^0 = H_{n-1}$ and $x_n^0 = \hat{x}_{n - 1}$.
