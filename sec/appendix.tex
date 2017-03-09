@@ -8,7 +8,9 @@ x_n &= A x_{n - 1} +  w_{n - 1} \\
 z_n &= J x_n + v_n
 \end{align}
 % 
-where $w_n$ is a normally distributed process noise $p(w) \sim \mathcal{N}(0, Q)$, and $v_n$ is a normally distributed measurement noise $p(v) \sim \mathcal{N}(0, R)$. The matrix $A$ provides a linear estimate for state updates, while $J$ maps the state $x_n$ to the measurement $z_n$. As we are estimating a the shape of a single individual, we assume $A$ to be identity. Note that sensor noise is not normally distributed, thus our choice of $w$ can be considered an approximation \AT{not sure.. wouldn't sensor noise be accounted in \emph{measurement} noise?}:
+where $w_n$ is a normally distributed process noise $p(w) \sim \mathcal{N}(0, Q)$, and $v_n$ is a normally distributed measurement noise $p(v) \sim \mathcal{N}(0, R)$. The matrix $A$ provides a linear estimate for state updates, while $J$ maps the state $x_n$ to the measurement $z_n$.
+We assume that while  there is no new measurements, an estimate of the current hand parameters are the previous known parameters up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$. We also assume for now that depth sensor noise is normally distributed, which actually is not the case. Thus, the states of our system can be approximated as following:
+\AT{not sure.. wouldn't sensor noise be accounted in \emph{measurement} noise?}:
 % 
 \begin{align}
 x_n &= x_{n - 1} + w_{n - 1} \\
@@ -61,7 +63,11 @@ x_n &= \tilde{F}(x_{n - 1},  w_{n - 1}) \\
 z_n &= F(x_n, v_n)
 \end{align}
 % 
-The state $x_n$ captures parameters representing the pose and shape of our hand, and $F$ accounts for the correspondences to the measurements $z_n$, and their \emph{non-linear} characteristics with respect to hand pose and shape. In its general form, the function $\tilde{F}(\cdot)$ relates the non-linear state update, but analogously to what was done before, we assume it to be a \todo{linear} \AT{not an identity, as that is an unary operation} mapping:
+The function $F(\cdot)$ that maps the state $x_n$ to the measurement $z_n$ applies shape and pose parameters to the hand model and computes the closest model points to sensor data points. 
+The function $\tilde{F}(\cdot)$ relates the state at the previous time step to the state at current time step, in our case $\tilde{F}(\cdot)$ is an identity mapping. \AT{not an identity, as that is an unary operation} Thus, $\frac{ \partial \tilde{F}_{[i]}}{ \partial x_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$, 
+$\frac{ \partial \tilde{F}_{[i]}}{ \partial w_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$ and $\frac{ \partial F_{[i]}}{ \partial v_{[j]}}(\hat{x}_n^0, 0) \equiv I$, where $I$ is an identity matrix of the corresponding size.
+\AT{where is this chunk needed for? }
+\AN{If these experssions are plugged in in the general IEFK equations, we get the below time and measurement update}
 % 
 \begin{align}
 x_n &= x_{n - 1} + w_{n - 1} \\
@@ -81,10 +87,8 @@ P_n^0 &= P_{n-1} + Q                 &       \hat{x}_n &= \hat{x}_n^0 + K_n(z_n 
 \label{eq:extended}
 \end{gather}
 % 
-\AT{where is this chunk needed for? To derive the equations in \Table{extended}?}
-\begin{DRAFT}
-Thus, ${ \partial \tilde{F}_{[i]}}/{ \partial x_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$, ${ \partial \tilde{F}_{[i]}}/{ \partial w_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I$ and ${ \partial F_{[i]}}/{ \partial v_{[j]}}(\hat{x}_n^0, 0) \equiv I$, where $I$ is an identity matrix of the corresponding size.    
-\end{DRAFT}
+
+
 
 
 

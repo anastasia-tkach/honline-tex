@@ -65,7 +65,7 @@ We assume that measurement noise is i.i.d. across sensor samples, therefore $R=r
 \begin{gather}
 \small
 \begin{aligned}
-&\text{for } i=1 \dots \todo{N?} \\
+&\text{for } i=1 \dots  \\
 &\quad H_n^\textit{\color{accent}$i$} = \tfrac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$}) \\
 &\quad K_n^\textit{\color{accent}$i$} =\tfrac{r}{r} {H_n^\textit{\color{accent}$i$}}^{-1} {J_n^\textit{\color{accent}$i$}}^T \\
 &\quad \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$}) \\
@@ -74,23 +74,7 @@ We assume that measurement noise is i.i.d. across sensor samples, therefore $R=r
 \end{aligned}
 \end{gather}
 
-% 
-\begin{table}[!h] 
-\centering
-\begin{tabular}{|l|}
-\hline
-for $i = 1...$ \\
-$\:\:\:\:\: H_n^\textit{\color{accent}$i$} = \frac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$})$  \\
-$\:\:\:\:\: K_n^\textit{\color{accent}$i$} =\frac{r}{r} {H_n^\textit{\color{accent}$i$}}^{-1} {J_n^\textit{\color{accent}$i$}}^T$  \\
-$\:\:\:\:\: $ \\
-end \\
-$$ \\
-\hline
-\end{tabular}
-\caption{Iterated Extended Information Filter} \label{tab:ieif}
-\end{table}
-
-The LM update in Optimization \ref{tab:lm} has the following form: 
+The LM update in Optimization from Table \ref{tab:iekf-like} has the following form: 
 \begin{equation}
     x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
 \end{equation}

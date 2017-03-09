@@ -1,11 +1,8 @@
 \section{Technical}
-Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters, and then derive a quadratic approximation of their posterior distribution $\mathcal{N}(\hat x_1, \hat \Sigma_1)$; see Section \ref{sec:independent}.
-\TODO{describe how to combine}
 
 \AN{The shape prior should only be used in the first frame, because afterwards it will be incorporated inside of Kalman prior}.
-\AT{This can be discussed when the shape prior term is discussed?}
 
-\subsection{Intra-frame regression \todo{(independent)}}
+\subsection{Independent Solve}
 \label{sec:independent}
 % 
 Denote the vector of all hand parameters as $x_n = [\theta_n; \beta_n]$ and the segmented hand point cloud in vectorized form as $d_n$. Given $d_n$ and initialization of hand pose from previous frame $x_n^0 = x_{n - 1}^*$ we find an independent estimate of $x_n^*$ by local Gauss-Newton optimization of the multi-objective energy function:
@@ -30,76 +27,106 @@ Where $\mathcal{T}$ is the following set:
 \end{equation*}
 With the exception of \emph{shape-prior}, \todo{see \Section{shapeprior}}, the energy terms in the objective function are defined in~\cite{tkach2016sphere}.
 
-\paragraph{Probabilistic interpretation of least-squares}
-\begin{DRAFT}
+\subsection{Posterior distribution of parameters after taking a measurement into account} \label{sec:posterior}
+
 All the energy term $E_{\tau}(d_n, x_n)$ can be rewritten in a form $\|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2$ with $I_{d2m}$ an identity matrix, $I_{m2d}$ a permutation(/reduction?) matrix that removes from $d_n$ the entries that are not the closest for any model point and the remaining $I_{\tau}$ all zeros matrices. 
 Denote $\left[F_{d2m}^T(x_n), ..., F_{pose}^T(x_n)\right]^T$ as $F(x_n)$ and overload $d_n$ as  $\left[(I_{d2m} d_n)^T, ..., (I_{pose} d_n)^T\right]^T$  for brevity of notation.
-\end{DRAFT}
-% 
-\begin{align}
-x^*_1 &= \argmin_{x_1} \underbrace{\log  P(d_1|x_1)}_{L(x_1)} 
-\\
-P(d_1|x_1) &= \mathcal{N}(F(x_1), I) 
-% \exp \left( - (d_1 - F(x_1))^T (d_1 - F(x_1)) \right)
-\label{eq:independent}
-\end{align}
-% 
 
-\paragraph{Posterior quadratic approximation} 
-\label{sec:posterior}
-% 
-Following~\todo{[??]}, we expand the log-likelihood of the data $L(x_1)$ around the optimal solution $x_1^*$ to the second order \AT{I think we can omit the index 1, as this is completely generic?}:
-% 
+Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters, see Section \ref{sec:independent}.  We omit the index $1$ of $x$ in the below derivation.
+ %
+\begin{equation}
+x^* = \argmin_{x} \underbrace{\log  P(d|x)}_{L(x)} \label{eq:independent}. 
+\end{equation}
+%
+with $P(d|x) = \exp \left( - \tfrac{1}{2}(d - F(x))^T (d - F(x)) \right)$.
+
+Following~\todo{[add reference on Laplace Approximation]}, we expand the log-likelihood of the data $L(x)$ around the optimal solution $x^*$ to the second order.
+%
 \begin{align}
-L(x_1) \approx L(x_1^*)   
-+ J_{x_1} \Delta x
-+ \tfrac{1}{2} \Delta x^T H_{x_1} \Delta x 
-+ \text{h.o.t.}
+L(x) \approx L(x^*)   
++ \left. \tfrac{\partial L(x) }{\partial x}\right|_{x^*}  \Delta x 
++ \left. \tfrac{1}{2} \Delta x^T\tfrac{\partial \partial L(x)}{\partial x \partial x} \right|_{x^*} \Delta x 
 \end{align}
 %
-where $\Delta x=x_1 - x_1^*$ and Jacobian and Hessian are respectively zero and positive definite at our critical point $x_1^*$:
+where $\Delta x=x - x^*$ and Jacobian and Hessian are respectively zero and positive definite at our critical point $x^*$:
+%
 \begin{align*}
-J_{x_1} &= 
-\left.\tfrac{\partial L}{\partial x_1} \right|_{x_1^*} = - 2 F(x_1^*)^T + 2 F(x_1)^T 
-\left.\tfrac{\partial F}{\partial x_1}\right|_{x_1^*} = 0
+\left.\tfrac{\partial L(x)}{\partial x} \right|_{x^*} = - 2 F(x^*)^T 
+\left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} = 0 
 \\
-H_{x_1} &= 
-\left.\tfrac{\partial^2 L}{\partial x_1^2}\right|_{x_1^*} 
+\left. \tfrac{\partial \partial L(x)}{\partial x \partial x}  \right|_{x^*}  = 
+2 \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*}^T 
+\left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} + \\
+2 F(x^*)^T  \left. \tfrac{\partial \partial F (x^*) }{\partial \partial x} \right|_{x^*}
 \approx 2
-\left.\tfrac{\partial F}{\partial x_1}\right|_{x_1^*}^T  
-\left.\tfrac{\partial F}{\partial x_1}\right|_{x_1^*}
-% + 2 F(x_1^*)^T \left.\frac{\partial^2 F}{\partial x_1^2}\right|_{x_1^*}
+\left.\tfrac{\partial F}{\partial x}\right|_{x^*}^T  
+\left.\tfrac{\partial F}{\partial x}\right|_{x^*}
 \succ 0
 \end{align*}
 % 
-Converting the likelihood back into a probability form, we can therefore see that our posterior follows a normal distribution:
-% 
+Denoting $\left. \tfrac{\partial \partial L(x)}{\partial x \partial x}  \right|_{x^*}  $ as $\Sigma$ and taking an exponential of both sides gives:
+%
 \begin{equation}
-P(d_1|x_1) 
-\propto \mathcal{N}(x_1^*, H_{x_1}^{-1}) 
-= \mathcal{N}(\hat x_1, \hat \Sigma_1)
-% \exp\left(- 0.5(x_1 - x_1^*)^T \Sigma_1^{-1}  (x_1 - x_1^*) \right)\\
+P(d|x) \propto \exp\left(- \tfrac{1}{2}(x - x^*)^T \Sigma^{-1}  (x - x^*) \right)\\
 \end{equation}
-
-\subsection{Inter-frame regression \todo{(combining)}} 
-\label{sec:combining}
-Given the probabilistic interpretation in \Section{independent}, a \emph{joint} optimization over parameters can simply be obtained by cumulating the distributions over the set of frames. For the simple scenario where only two frames are available \AT{we have to pick better names here! we need to differentiate between the per-frame estimates, and the cumulation. Right now the name is overloaded}:
 % 
+Thus, after processing the information from the first frame $d_1$, the quadratic approximation of posterior distribution of hand parameters is a normal distribution $\mathcal{N}\left(\hat{x}_1 = x_1^*,  \hat{\Sigma}_1 = \Sigma_1 \right)$.
+%
+
+\subsection{Merging independent measurements} 
+\label{sec:combining}
+
+Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form 
+ 
 \begin{equation}
 \mathcal{N}(\hat{x}_2, \hat{\Sigma}_2) = \mathcal{N}(\hat{x}_1, \hat{\Sigma}_1) \mathcal{N}(x_2^*, \Sigma_2) \quad\quad
 \end{equation}
-and through simple algebraic manipulation~\cite{petersen2008matrix}, we obtain:
+applying the product of Gaussians rule ~\cite{petersen2008matrix}, we obtain:
 \begin{align}
+\begin{split}
 \hat{x}_2 &= \Sigma_2 (\hat{\Sigma}_1 + \Sigma_2)^{-1} \hat{x}_1 + 
 \hat{\Sigma}_1 (\hat{\Sigma}_1 + \Sigma_2)^{-1} x_2^*
 \\
 \hat{\Sigma}_2 &= \hat{\Sigma}_1 (\hat{\Sigma}_1 + \Sigma_2)^{-1} \Sigma_2
 \label{eq:combining}
+\end{split}
 \end{align}
-% Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form
-In Appendix \ref{app:kalman}, we shown how \Equation{combining} are equivalent to Kalman filter update with measurement $x_n^*$ and measurement noise covariance $\Sigma_n$ summarized in \Figure{interframe}.
 
-\input{fig/interframe}
+In Appendix \ref{app:kalman}, we shown how \Equation{combining} is equivalent to Kalman filter update with measurement $x_n^*$ and measurement noise covariance $\Sigma_n$ summarized in \Figure{interframe}.
+
+This is important, because, according to P. Maybeck \cite{maybeck1979stochastic}, under the assumptions presented in Appendix \ref{app:kalman} ``the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it.''
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[!h] 
+\centering
+\caption{KF: Combining independent measurements\label{tab:kf-like}} 
+\begin{tabular}{|c|}
+\hline
+$x_n^* = \argmax_{x_n} \log P(d_n|x_n)$ \\
+$\hat{x}_n = \argmax_{x_n} \underbrace{\log \left( P(x_n|x_n^*) P(x_n |\hat{x}_{n - 1}) \right)}_{L(x_n)}$\\
+with \\
+$P(x_n |x_n^*) = \exp \left( - (x_n - x_n^* )^T \Sigma_n^{-1}(x_n - x_n^* )\right)$ \\
+$P(x_n |\hat{x}_{n - 1}) = \exp \left( - (x_n - \hat{x}_{n - 1} )^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1} )\right)$ \\	
+
+$\hat{\Sigma}_n^{-1} = \left. \tfrac{\partial \partial L(x_n)}{\partial x_n \partial x_n}\right|_{\hat{x}_n} \approx $ \\
+\\
+$\left[
+	\begin{array}{cc}
+		\left(\Sigma_n^{-1}\right)^{1/2} \\
+		\left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		\left(\Sigma_n^{-1}\right)^{1/2} \\
+		\left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
+	\end{array}
+\right] = \hat{\Sigma}_{n-1}^{-1}  + \Sigma_{n}^{-1}$ \\
+
+\hline
+\end{tabular}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Regularizing optimization}
 
@@ -117,28 +144,33 @@ Note that the best-fitting parameters $x_n^*$ for the given the single input fra
 $\hat{x}_n = \operatorname{argmax}_{x_n} 
 \underbrace{\log \left( P(d_n|x_n) P(x_n |\hat{x}_{n - 1}) \right)}_{L(x_n)}$\\ 
 with \\
-$P(d_n|x_n) = \exp \left( - (d_n - F(x_n))^T (d_n - F(x_n)) \right)$ \\
-$P(x_n |\hat{x}_{n - 1}) = \exp \left( -(x_n - \hat{x}_{n - 1})^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1})\right)$ \\
+$P(d_n|x_n) = \exp \left( \tfrac{1}{2} - (d_n - F(x_n))^T (d_n - F(x_n)) \right)$ \\
+$P(x_n |\hat{x}_{n - 1}) = \exp \left( \tfrac{1}{2} -(x_n - \hat{x}_{n - 1})^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1})\right)$ \\
 \\
-$\hat{\Sigma}_n^{-1} = \frac{\partial \partial L}{\partial x_n \partial x_n}(\hat{x}_n) \approx $ \\
+$\hat{\Sigma}_n^{-1} =  \left. \tfrac{\partial \partial L(x_n)}{\partial x_n \partial x_n}\right|_{\hat{x}_n} \approx $ \\
 \\
 $\left[
 	\begin{array}{cc}
-		- \frac{\partial F} {\partial x_n} (\hat{x}_n) \\
+		- \left. \tfrac{\partial F(x_n)} {\partial x_n} \right|_{\hat{x}_n} \\
 		\left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
 	\end{array}
 \right]^T 
 \left[
 	\begin{array}{c}
-		- \frac{\partial F} {\partial x_n} (\hat{x}_n) \\
+		-\left. \tfrac{\partial F(x_n)} {\partial x_n} \right|_{\hat{x}_n} \\
 		\left(\hat{\Sigma}_{n - 1}^{-1}\right)^{1/2} \\
 	\end{array}
 \right] = $\\
 \\
-$ = \hat{\Sigma}_{n-1}^{-1} + \frac{\partial F} {\partial x_n} (\hat{x}_n)^T \frac{\partial F} {\partial x_n} (\hat{x}_n) = \hat{\Sigma}_{n-1}^{-1}  + \Sigma_{n}^{-1}$	\\
+$ = \hat{\Sigma}_{n-1}^{-1} + \left. \tfrac{\partial F(x_n)} {\partial x_n} \right|_{\hat{x}_n}^T
+\left. \tfrac{\partial F(x_n)} {\partial x_n} \right|_{\hat{x}_n} = \hat{\Sigma}_{n-1}^{-1}  + \Sigma_{n}^{-1}$	\\
 \hline
 \end{tabular}
 }
 \end{table}
 
 In Appendix \ref{app:ieif-lm} we demonstrate that optimizing the objective function presented in Table \ref{tab:iekf-like} using Levenberg-Marquardt algorithm is equivalent to measurement update of Iterated Extended Kalman Filter.
+
+\subsection{Comparing the two optimizations}
+The optimization presented in Table \ref{tab:kf-like} will be used as a baseline. It treats the results of the independent solve $x_n^*$ as a measurement. This approach, arguably can be considered to be the simplest way of maintaining an online parameters estimate. 
+The optimization shown in Table \ref{tab:iekf-like} represents the entire hand tracking system as an Iterated Extended Kalman Filter. Given the next measurement $d_n$, the estimated value of the parameters $\hat{x}_n$,  is directly output by the hand tracking system.
