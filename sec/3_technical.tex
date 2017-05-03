@@ -28,12 +28,18 @@ Where $\mathcal{T}$ is the following set:
 \end{equation*}
 With the exception of \emph{shape-prior}, \todo{see \Section{shapeprior}}, the energy terms in the objective function are defined in~\cite{tkach2016sphere}.
 
-\subsection{Posterior distribution of parameters after taking a measurement into account} \label{sec:posterior}
-
-All the energy term $E_{\tau}(d_n, x_n)$ can be rewritten in a form $\|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2$ with $I_{d2m}$ an identity matrix, $I_{m2d}$ a permutation(/reduction?) matrix that removes from $d_n$ the entries that are not the closest for any model point, and the remaining $I_{\tau}$ all zeros matrices.
+\subsection{Posterior distribution}
+% \subsection{Posterior distribution of parameters after taking a measurement into account}
+\label{sec:posterior}
+All the energy terms $E_{\tau}(d_n, x_n)$ can be rewritten in a form $\|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2$ with $I_{d2m}$ an identity matrix, $I_{m2d}$ a permutation(/reduction?) matrix that removes from $d_n$ the entries that are not the closest for any model point \AT{meaning?}, and the remaining $I_{\tau}$ all zeros matrices.
 % 
-Denote $\left[F_{d2m}^T(x_n), ..., F_{pose}^T(x_n)\right]^T$ as $F(x_n)$ and overload $d_n$ as  $\left[(I_{d2m} d_n)^T, ..., (I_{pose} d_n)^T\right]^T$  for brevity of notation.
-
+For brevity of notation, we introduce this notation:
+% 
+\begin{align}
+F(x_n) &= \left[F_{d2m}^T(x_n), ..., F_{pose}^T(x_n)\right]^T \\
+d_n &= \left[(I_{d2m} d_n)^T, ..., (I_{pose} d_n)^T\right]^T
+\end{align}
+% 
 Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters, see Section \ref{sec:independent}.  We omit the index $1$ of $x$ in the below derivation.
  %
 \begin{equation}
@@ -77,6 +83,7 @@ Thus, after processing the information from the first frame $d_1$, the quadratic
 
 \subsection{Merging independent measurements} 
 \label{sec:combining}
+\input{fig/merging/item}
 
 Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form:
 % 
