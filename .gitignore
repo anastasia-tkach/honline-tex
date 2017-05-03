@@ -73,3 +73,7 @@ Temporary Items
 
 /.paper.lb
 /.paper.watcher_pid
+
+/paper.brf
+
+/paper.synctex.gz(busy)
