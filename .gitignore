@@ -60,3 +60,16 @@ Temporary Items
 /honline_for_review.synctex.gz
 
 /paper.pdf
+
+/paper.aux
+/paper.bbl
+/paper.blg
+/paper.fdb_latexmk
+/paper.fls
+/paper.latexmk.log
+/paper.log
+/paper.out
+/paper.synctex.gz
+
+/.paper.lb
+/.paper.watcher_pid

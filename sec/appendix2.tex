@@ -50,7 +50,6 @@ $P_n = (I - K_n^\textit{\color{accent}$i$} J_n^\textit{\color{accent}$i$})P_n^0$
 To show that the optimizing the objective in \Table{iekf-like} with LM is equivalent to the IEKF, we first rewrite our EKF measurement updates in the completely equivalent \emph{Extended Information Filter}~\cite{anderson1979optimal} form:
 % 
 \begin{gather*}
-\small
 \begin{aligned}
 &\text{Ex. Kalman Filter}                           &       &\text{Ex. Information Filter} \\
 &                                                   &       H_n &= \left(P_n\right)^{-1} \\
@@ -63,7 +62,6 @@ P_n &= (I - K_n J_n)P_n^0                           &       \hat{x}_n &= \hat{x}
 %  
 We assume that measurement noise is i.i.d. across sensor samples, therefore $R=rI$ where $r\in \mathbb{R}^+$. Similarly to \Appendix{iekf}, we can now write the IEIF, the iterated version of the EIF:
 \begin{gather}
-\small
 \begin{aligned}
 &\text{for } i=1 \dots  \\
 &\quad H_n^\textit{\color{accent}$i$} = \tfrac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$}) \\

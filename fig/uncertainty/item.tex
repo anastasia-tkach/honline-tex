@@ -3,9 +3,16 @@
 \begin{overpic} 
 [width=\linewidth]
 % [width=\linewidth,grid,tics=10]
-{\currfiledir/item.pdf}
+{\currfiledir/item.png}
 \myfigurename{}
+\put(15,-3){straight finger}
+\put(65,-3){bent finger}
 \end{overpic}
-% \caption{}
-% \label{fig:}
+\caption{
+We abstract the hand shape/pose estimation problem into the one of a simpler 2D stick-figure.  When the finger is straight (left), it is difficult to estimate finger length as the optimization problem is ill-posed, while with a bent finger (right) the problem is better conditioned.
+% 
+We analyze the energy landscape of the registration problem $E(\shape_1)$, and observe how estimation uncertainty relates to the width of the local minima valley. This certainty can be estimated through a quadratic approximation to $E(\shape_1)$, derived from the Jacobians of the registration energies.
+%  
+}
+\label{fig:uncertainty}
 \end{figure}

@@ -2,6 +2,7 @@
 
 \AN{The shape prior should only be used in the first frame, because afterwards it will be incorporated inside of Kalman prior}.
 
+\input{fig/uncertainty/item}
 \subsection{Independent Solve}
 \label{sec:independent}
 % 
@@ -97,10 +98,10 @@ applying the product of Gaussians rule ~\cite{petersen2008matrix}, we obtain:
 
 In Appendix \ref{app:kalman}, we shown how \Equation{combining} is equivalent to Kalman filter update with measurement $x_n^*$ and measurement noise covariance $\Sigma_n$ summarized in \Figure{interframe}.
 
-This is important, because, according to P. Maybeck \cite{maybeck1979stochastic}, under the assumptions presented in Appendix \ref{app:kalman} ``the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it.''
+\AN{This is important, because, according to P. Maybeck \cite{maybeck1979stochastic}, under the assumptions presented in Appendix \ref{app:kalman} ``the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it.''}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{table}[!h] 
+\begin{table}[ht] 
 \centering
 \caption{KF: Combining independent measurements\label{tab:kf-like}} 
 \begin{tabular}{|c|}
@@ -136,7 +137,7 @@ $\left[
 Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space. The optimization presented in Table \ref{tab:kf-like} does not provided any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve from Section \ref{sec:independent}. One way to remedy this is include the term $P(x_n |\hat{x}_{n - 1})$ directly in the independent solve.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{table}[!h] 
+\begin{table}[ht] 
 \centering
 \caption{Objective function of IEKF \label{tab:iekf-like}} 
 \resizebox{0.48\textwidth}{!}{
