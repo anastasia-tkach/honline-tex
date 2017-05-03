@@ -29,7 +29,8 @@ With the exception of \emph{shape-prior}, \todo{see \Section{shapeprior}}, the e
 
 \subsection{Posterior distribution of parameters after taking a measurement into account} \label{sec:posterior}
 
-All the energy term $E_{\tau}(d_n, x_n)$ can be rewritten in a form $\|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2$ with $I_{d2m}$ an identity matrix, $I_{m2d}$ a permutation(/reduction?) matrix that removes from $d_n$ the entries that are not the closest for any model point and the remaining $I_{\tau}$ all zeros matrices. 
+All the energy term $E_{\tau}(d_n, x_n)$ can be rewritten in a form $\|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2$ with $I_{d2m}$ an identity matrix, $I_{m2d}$ a permutation(/reduction?) matrix that removes from $d_n$ the entries that are not the closest for any model point, and the remaining $I_{\tau}$ all zeros matrices.
+% 
 Denote $\left[F_{d2m}^T(x_n), ..., F_{pose}^T(x_n)\right]^T$ as $F(x_n)$ and overload $d_n$ as  $\left[(I_{d2m} d_n)^T, ..., (I_{pose} d_n)^T\right]^T$  for brevity of notation.
 
 Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters, see Section \ref{sec:independent}.  We omit the index $1$ of $x$ in the below derivation.
@@ -76,12 +77,14 @@ Thus, after processing the information from the first frame $d_1$, the quadratic
 \subsection{Merging independent measurements} 
 \label{sec:combining}
 
-Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form 
- 
+Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form:
+% 
 \begin{equation}
 \mathcal{N}(\hat{x}_2, \hat{\Sigma}_2) = \mathcal{N}(\hat{x}_1, \hat{\Sigma}_1) \mathcal{N}(x_2^*, \Sigma_2) \quad\quad
 \end{equation}
+% 
 applying the product of Gaussians rule ~\cite{petersen2008matrix}, we obtain:
+% 
 \begin{align}
 \begin{split}
 \hat{x}_2 &= \Sigma_2 (\hat{\Sigma}_1 + \Sigma_2)^{-1} \hat{x}_1 + 

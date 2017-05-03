@@ -2,11 +2,12 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{mathrsfs}
+\usepackage[dvipsnames]{xcolor}
 
 %%
 %% general comments
 %% 
-\usepackage{color}
+% \usepackage{color}
 \definecolor{turquoise}{cmyk}{0.65,0,0.1,0.3}
 \definecolor{purple}{rgb}{0.65,0,0.65}
 \definecolor{dark_green}{rgb}{0, 0.5, 0}
@@ -15,6 +16,7 @@
 \definecolor{blueish}{rgb}{0.0, 0.7, 1}
 \definecolor{light_gray}{rgb}{0.7, 0.7, .7}
 \definecolor{pink}{rgb}{1, 0, 1}
+\definecolor{accent}{rgb}{179,81,109}
 
 %%
 %% general comments
@@ -33,10 +35,8 @@
 %%
 %% personal comments
 %% 
-\newcommand{\AN}[1]{{\color{JungleGreen}[Anastasia: #1]}} % anastasia 
-% (don't want to be sexist, but if you don't like pink, change it!)
+\newcommand{\AN}[1]{{\color{green}[Anastasia: #1]}} % anastasia 
 \newcommand{\AT}[1]{{\color{pink}[Andrea: #1]}} % andrea
-% (andrea, if you do not mind pink - here you go)
 \newcommand{\MP}[1]{{\color{blueish}[MP: #1]}} % mark
 \newcommand{\AF}[1]{{\color{blueish}[AF: #1]}} % andrew
 
@@ -82,26 +82,7 @@
 %%
 \renewcommand{\paragraph}[1]{{\textbf{#1.}}}
 
-
 %%
-%% MATH STUFF
-%% 
-\newcommand{\bs}{\boldsymbol}
-\let\vec=\mathbf
-\let\mat=\vec
-\newcommand{\F}{F} % dataframe
-\newcommand{\normal}{\mathcal{N}}
-\newcommand{\vertex}{\mathbf{v}}
-\newcommand{\abs}[1]{\left| #1 \right|}
-\newcommand{\norm}[1]{\left\Vert {#1} \right\Vert}
-% hack to use computer modern font for bold greek letters
-\SetSymbolFont{letters}{bold}{OML}{cmm}{b}{it}
-\SetSymbolFont{operators}{bold}{OT1}{cmr}{bx}{n}
-% Small math symbols
-\newcommand{\unaryminus}{\scalebox{0.5}[1.0]{\( - \)}} % small "-"
-\newcommand{\smallless}{\scalebox{0.5}[.5]{\(<\)}} % small "<"
-% \underset{x}{\operatorname{argmin}} 
-\DeclareMathOperator*{\argmin}{arg\,min}
-\DeclareMathOperator*{\argmax}{arg\,max}
-% 2x2 matrix block
-\newcommand{\matblocktwo}[4]{ \left[ \begin{array}{c|c} #1 & #2 \\ \hline #3 & #4 \end{array} \right]}
+%% figure labels
+%%
+\newcommand{\myfigurename}{\put(-3,0){\vertical{\todo{\currfiledir}}}}
