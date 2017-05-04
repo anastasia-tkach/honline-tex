@@ -1,87 +1,114 @@
 \section{Technical}
+Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ we represent vector of coalesced pose and shape parameters at frame $n$. To achieve online joint calibration and tracking, our algorithm presents two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression.
+
+\paragraph{Intra-frame}
+Given a proper initialization $x_n^0$ and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, as well as estimates the \emph{uncertainty} in the given solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. In~\Section{independent}, following the ideas in ~\todo{\cite{?}}, we derive how this distribution can be approximated by a gaussian $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$, and how the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking optimization. \todo{The intuition is in... \Figure{uncertainty}}.
+
+\paragraph{Inter-frame}
+\TODO{describe how to combine}
+
+\todo{Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters, and then derive a quadratic approximation of their posterior distribution; see Section \ref{sec:independent}.} 
 
 \AN{The shape prior should only be used in the first frame, because afterwards it will be incorporated inside of Kalman prior}.
+\AT{As this is quite advanced, this can be discussed at the very end of the section}
 
-\input{fig/uncertainty/item}
-\subsection{Independent Solve}
+
+\subsection{Intra-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$}
 \label{sec:independent}
 % 
-Denote the vector of all hand parameters as $x_n = [\theta_n; \beta_n]$ and the segmented hand point cloud in vectorized form as $d_n$. Given $d_n$ and initialization of hand pose from previous frame $x_n^0 = x_{n - 1}^*$ we find an independent estimate of $x_n^*$ by local Gauss-Newton optimization of the multi-objective energy function:
+Given $d_n$ the point cloud at frame $n$, and an initialization of hand pose from the previous frame $x_n^0 = x_{n - 1}^*$ we find an independent estimate of $x_n^*$ by local iterative optimization (a-la Levenberg) of the multi-objective energy function:
 % 
 \begin{equation}
-x_n^* = \argmin_{x_n} \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, x_n) \label{eq:energies}
+x_n^* = \argmin_{x_n} \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, x_n) 
+\label{eq:energies}
 \end{equation}
 % 
-Where $\mathcal{T}$ is the following set:
+Where the terms $\mathcal{T}$ ensure that:
 %
-\vspace{-.5\parskip}
+% \vspace{-.5\parskip}
 \begin{equation*}
 \setlength{\jot}{0pt}
 \begin{aligned}
 \text{\textbf{d2m}} & \quad \text{data points are explained by the model} \\ 
 \text{\textbf{m2d}} & \quad \text{the model lies in the sensor visual-hull} \\
-\text{\textbf{shape-prior}} & \quad \text{model shape should be plausible} \\
-\text{\textbf{pose-prior}} & \quad \text{model pose should be plausible} \\
-\text{\textbf{limits}} & \quad \text{joint limits should hold} \\
-\text{\textbf{collision}} & \quad \text{fingers should not interpenetrate} 
+\text{\textbf{shape-prior}} & \quad \text{the model shape should be plausible} \\
+\text{\textbf{pose-prior}} & \quad \text{the model pose should be plausible} \\
+\text{\textbf{collision}} & \quad \text{fingers do not interpenetrate} \\
+\text{\textbf{limits}} & \quad \text{joint limits are satisfied}
 \end{aligned}
 \end{equation*}
-With the exception of \emph{shape-prior}, \todo{see \Section{shapeprior}}, the energy terms in the objective function are defined in~\cite{tkach2016sphere}.
+The energy terms in the objective function are detailed in~\cite{tkach2016sphere} and~\cite{htrack}, with the exception of \emph{shape-prior} that is discussed in \Section{shapeprior}.
 
-\subsection{Posterior distribution}
 % \subsection{Posterior distribution of parameters after taking a measurement into account}
+\input{fig/uncertainty/item}
+\paragraph{Laplace approximation}
 \label{sec:posterior}
-All the energy terms $E_{\tau}(d_n, x_n)$ can be rewritten in a form $\|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2$ with $I_{d2m}$ an identity matrix, $I_{m2d}$ a permutation(/reduction?) matrix that removes from $d_n$ the entries that are not the closest for any model point \AT{meaning?}, and the remaining $I_{\tau}$ all zeros matrices.
 % 
-For brevity of notation, we introduce this notation:
-% 
+\TODO{mention why we do this, and refer to \Figure{uncertainty} to explain, and mention \todo{\cite{laplace}} was the first to do this}
+We rewrite each energy term as: 
+% in \Equation{energies} as:
 \begin{align}
+E_{\tau}(d_n, x_n) = \|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2,
+\end{align} 
+where most $I_{\tau}$ are zero matrices, $I_{d2m}$ and $I_{m2d}$ are identity matrices, and $I_{m2d}(i,i)=0$ if the rasterized 2D template pixel $\mathbf{p}_i$ lies within the sensor silhouette image \AT{correct?}; see \cite{htrack}.
+% energy terms  can be rewritten in a form $$ with ,  a permutation(/reduction?) matrix that removes from $d_n$ the \todo{entries that are not the closest for any model point} \AT{meaning?},
+For brevity of notation, we also denote:
+% 
+\begin{align*}
 F(x_n) &= \left[F_{d2m}^T(x_n), ..., F_{pose}^T(x_n)\right]^T \\
 d_n &= \left[(I_{d2m} d_n)^T, ..., (I_{pose} d_n)^T\right]^T
+\end{align*}
+% 
+leading to a compact posterior distribution representation:
+% 
+\begin{align}
+P(d_n|x_n) &= \exp \left( - \tfrac{1}{2}(d_n - F(x_n))^T (d_n - F(x_n)) \right)
+\label{eq:posterior}
 \end{align}
 % 
-Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters, see Section \ref{sec:independent}.  We omit the index $1$ of $x$ in the below derivation.
- %
-\begin{equation}
-x^* = \argmin_{x} \underbrace{\log  P(d|x)}_{L(x)} \label{eq:independent}. 
-\end{equation}
-%
-with $P(d|x) = \exp \left( - \tfrac{1}{2}(d - F(x))^T (d - F(x)) \right)$.
-
-Following~\todo{[add reference on Laplace Approximation]}, we expand the log-likelihood of the data $L(x)$ around the optimal solution $x^*$ to the second order.
+\Equation{energies} is then rewritten in probabilistic form, where we temporarily omit the frame index $n$ for conveniency:
 %
 \begin{align}
-L(x) \approx L(x^*)   
-+ \left. \tfrac{\partial L(x) }{\partial x}\right|_{x^*}  \Delta x 
-+ \left. \tfrac{1}{2} \Delta x^T\tfrac{\partial \partial L(x)}{\partial x \partial x} \right|_{x^*} \Delta x 
+x^* &= \argmin_{x} \underbrace{\log  P(d|x)}_{L(x)}
+\label{eq:independent}
 \end{align}
 %
-where $\Delta x=x - x^*$ and Jacobian and Hessian are respectively zero and positive definite at our critical point $x^*$:
+We then perform a second-order Taylor expansion of the log-likelihood of the data $L(x)$ around the \emph{optimal} solution $x^*$:
 %
 \begin{align*}
-\left.\tfrac{\partial L(x)}{\partial x} \right|_{x^*} = - 2 F(x^*)^T 
+L(x) \approx \tilde{L}(x) = L(x^*)   
++ \left. \tfrac{\partial L(x) }{\partial x}\right|_{x^*}  \Delta x 
++ \left. \tfrac{1}{2} \Delta x^T\tfrac{\partial \partial L(x)}{\partial x \partial x} \right|_{x^*} \Delta x + \text{h.o.t.}
+\end{align*}
+%
+where $\Delta x=x - x^*$, and Jacobian and Hessian are respectively zero and positive definite at our critical point $x^*$:
+%
+\begin{align}
+\left.\tfrac{\partial L(x)}{\partial x} \right|_{x^*} &= - 2 F(x^*)^T 
 \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} = 0 
+\label{eq:taylor-jacobian}
 \\
-\left. \tfrac{\partial \partial L(x)}{\partial x \partial x}  \right|_{x^*}  = 
-2 \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*}^T 
-\left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} + \\
-2 F(x^*)^T  \left. \tfrac{\partial \partial F (x^*) }{\partial \partial x} \right|_{x^*}
-\approx 2
+\Sigma = \left. \tfrac{\partial \partial L(x)}{\partial x \partial x}  \right|_{x^*}  
+% = 2 \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*}^T \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} + \\ 2 F(x^*)^T  \left. \tfrac{\partial \partial F (x^*) }{\partial \partial x} \right|_{x^*}
+& \approx 2
 \left.\tfrac{\partial F}{\partial x}\right|_{x^*}^T  
 \left.\tfrac{\partial F}{\partial x}\right|_{x^*}
 \succ 0
-\end{align*}
+\label{eq:taylor-hessian}
+\end{align}
 % 
-Denoting $\left. \tfrac{\partial \partial L(x)}{\partial x \partial x}  \right|_{x^*}  $ as $\Sigma$ and taking an exponential of both sides gives:
+Remembering that $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then derive the \emph{approximated} posterior distribution:
 %
-\begin{equation}
-P(d|x) \propto \exp\left(- \tfrac{1}{2}(x - x^*)^T \Sigma^{-1}  (x - x^*) \right)\\
-\end{equation}
-% 
-Thus, after processing the information from the first frame $d_1$, the quadratic approximation of posterior distribution of hand parameters is a normal distribution $\mathcal{N}\left(\hat{x}_1 = x_1^*,  \hat{\Sigma}_1 = \Sigma_1 \right)$.
+\begin{align}
+\tilde{P}(d|x) = \exp\left(- \tfrac{1}{2}(x - x^*)^T \Sigma^{-1}  (x - x^*) \right) = \mathcal{N}\left(\hat{x}^*, \Sigma \right)
+\end{align}
 %
+That is, after processing the information in a frame $d_n$, the desired quadratic approximation of posterior distribution of model parameters is a \emph{normal} distribution $\mathcal{N}\left(\hat{x}_n, \hat{\Sigma}_n\right)$.
+Its mean $\hat{x}_n = x^*$ is the (final) solution of the (iterative) optimization problem in \Equation{energies}; its variance $\hat{\Sigma}_n = \Sigma$ is computed according to \Equation{taylor-jacobian}, that is, from the Jacobian computed in the last iteration of~\Equation{energies}. \AT{we might have to also write the iterative version of \Equation{energies} as I did in Edoardo's paper to make this clear}.
 
-\subsection{Merging independent measurements} 
+\newpage
+% \subsection{Merging independent measurements}
+\subsection{Inter-frame regression} 
 \label{sec:combining}
 \input{fig/merging/item}
 
@@ -185,3 +212,7 @@ In Appendix \ref{app:ieif-lm} we demonstrate that optimizing the objective funct
 \subsection{Comparing the two optimizations}
 The optimization presented in Table \ref{tab:kf-like} will be used as a baseline. It treats the results of the independent solve $x_n^*$ as a measurement. This approach, arguably can be considered to be the simplest way of maintaining an online parameters estimate. 
 The optimization shown in Table \ref{tab:iekf-like} represents the entire hand tracking system as an Iterated Extended Kalman Filter. Given the next measurement $d_n$, the estimated value of the parameters $\hat{x}_n$,  is directly output by the hand tracking system.
+
+\subsection{Shape prior}
+\label{sec:shapeprior}
+\TODO{Anastasia?}
