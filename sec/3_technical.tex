@@ -1,19 +1,22 @@
 \section{Technical}
-Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ we represent vector of coalesced pose and shape parameters at frame $n$. To achieve online joint calibration and tracking, our algorithm presents two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression.
+Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ we represent vector of coalesced pose and shape parameters at frame $n$. To achieve online \emph{joint} calibration and tracking, our algorithm presents two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (intra), while the latter integrates this knowlege across frames (inter). \TODO{now describe the hand model, or perhaps that can be done in the intro?} 
+% 
 
-\paragraph{Intra-frame}
-Given a proper initialization $x_n^0$ and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, as well as estimates the \emph{uncertainty} in the given solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. In~\Section{independent}, following the ideas in ~\todo{\cite{?}}, we derive how this distribution can be approximated by a gaussian $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$, and how the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking optimization. \todo{The intuition is in... \Figure{uncertainty}}.
+\input{fig/intra/item}
+\paragraph{Intra-frame regression}
+Given a proper initialization $x_n^0$ and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, as well as estimates the \emph{uncertainty} in the given solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$.
+Estimating uncertainty in the solution is essential for shape estimation. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
+Rather than deriving this relationship from data, in~\Section{independent} we follow the ideas in ~\todo{\cite{?}} and derive how this distribution can be approximated by a gaussian $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. A fundamental observation is that the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking energies.
 
-\paragraph{Inter-frame}
-\TODO{describe how to combine}
+\input{fig/inter/item}
+\paragraph{Inter-frame regression}
+Differently from pose parameters shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. Moreover, in certain frames sufficient information to estimate certain shape parameters is simply not available. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx, therefore knowledge must be gathered from a \emph{collection} of frames. Rather than collecting a persistent model from a set of pre-recorded calibration data as in~\cite{taylor_sig16}, we approach the problem from a online-modeling point of view. In \Section{combining}, we detail a principled method to \emph{temporally integrate} parameter estimates in a way that also accounts for their confidence.
 
-\todo{Given the hand point cloud at the first frame $d_1$, we find the best-fitting parameters, and then derive a quadratic approximation of their posterior distribution; see Section \ref{sec:independent}.} 
-
-\AN{The shape prior should only be used in the first frame, because afterwards it will be incorporated inside of Kalman prior}.
-\AT{As this is quite advanced, this can be discussed at the very end of the section}
+ 
 
 
-\subsection{Intra-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$}
+
+\subsection{Intra-frame regression -- $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$}
 \label{sec:independent}
 % 
 Given $d_n$ the point cloud at frame $n$, and an initialization of hand pose from the previous frame $x_n^0 = x_{n - 1}^*$ we find an independent estimate of $x_n^*$ by local iterative optimization (a-la Levenberg) of the multi-objective energy function:
@@ -39,24 +42,21 @@ Where the terms $\mathcal{T}$ ensure that:
 \end{equation*}
 The energy terms in the objective function are detailed in~\cite{tkach2016sphere} and~\cite{htrack}, with the exception of \emph{shape-prior} that is discussed in \Section{shapeprior}.
 
-% \subsection{Posterior distribution of parameters after taking a measurement into account}
-\input{fig/uncertainty/item}
 \paragraph{Laplace approximation}
+% \subsection{Posterior distribution of parameters after taking a measurement into account}
 \label{sec:posterior}
+While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To retrieve this information, we first convert the \Equation{energies} in a probabilistic format, and from this formulation we then derive our uncertainties. Towards this goal, we first rewrite the energy terms in \Eq{energies} as:
 % 
-\TODO{mention why we do this, and refer to \Figure{uncertainty} to explain, and mention \todo{\cite{laplace}} was the first to do this}
-We rewrite each energy term as: 
-% in \Equation{energies} as:
 \begin{align}
 E_{\tau}(d_n, x_n) = \|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2,
 \end{align} 
-where most $I_{\tau}$ are zero matrices, $I_{d2m}$ and $I_{m2d}$ are identity matrices, and $I_{m2d}(i,i)=0$ if the rasterized 2D template pixel $\mathbf{p}_i$ lies within the sensor silhouette image \AT{correct?}; see \cite{htrack}.
+where $I_{d2m}$ and $I_{m2d}$ are identity matrices, and $I_{m2d}(i,i)=0$ if the rasterized 2D template pixel $\mathbf{p}_i$ lies within the sensor silhouette image \AT{correct?} (see \cite{htrack}), and the remaining $I_{\tau}$ are zero matrices.
 % energy terms  can be rewritten in a form $$ with ,  a permutation(/reduction?) matrix that removes from $d_n$ the \todo{entries that are not the closest for any model point} \AT{meaning?},
 For brevity of notation, we also denote:
 % 
 \begin{align*}
-F(x_n) &= \left[F_{d2m}^T(x_n), ..., F_{pose}^T(x_n)\right]^T \\
-d_n &= \left[(I_{d2m} d_n)^T, ..., (I_{pose} d_n)^T\right]^T
+F(x_n) &= \left[F_{d2m}^T(x_n), \quad ..., \quad F_{pose}^T(x_n)\right]^T \\
+d_n &= \left[(I_{d2m} d_n)^T, \quad ..., \quad (I_{pose} d_n)^T\right]^T
 \end{align*}
 % 
 leading to a compact posterior distribution representation:
@@ -100,25 +100,25 @@ where $\Delta x=x - x^*$, and Jacobian and Hessian are respectively zero and pos
 Remembering that $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then derive the \emph{approximated} posterior distribution:
 %
 \begin{align}
-\tilde{P}(d|x) = \exp\left(- \tfrac{1}{2}(x - x^*)^T \Sigma^{-1}  (x - x^*) \right) = \mathcal{N}\left(\hat{x}^*, \Sigma \right)
+\tilde{P}(d|x) = \exp\left(- \tfrac{1}{2}(x - x^*)^T \Sigma^{-1}  (x - x^*) \right) = \mathcal{N}\left(\star{x}, \Sigma \right)
 \end{align}
 %
-That is, after processing the information in a frame $d_n$, the desired quadratic approximation of posterior distribution of model parameters is a \emph{normal} distribution $\mathcal{N}\left(\hat{x}_n, \hat{\Sigma}_n\right)$.
-Its mean $\hat{x}_n = x^*$ is the (final) solution of the (iterative) optimization problem in \Equation{energies}; its variance $\hat{\Sigma}_n = \Sigma$ is computed according to \Equation{taylor-jacobian}, that is, from the Jacobian computed in the last iteration of~\Equation{energies}. \AT{we might have to also write the iterative version of \Equation{energies} as I did in Edoardo's paper to make this clear}.
+\AT{can we rename $\Sigma$ into $\star{\Sigma}$ for clarity of notation?}
+That is, after processing the information in a frame $d_n$, the desired quadratic approximation of posterior distribution of model parameters is a \emph{normal} distribution $\mathcal{N}\left(x_n^*, \Sigma_n \right)$.
+Its mean is the (final) solution of the (iterative) optimization problem in \Equation{energies}; its variance is computed according to \Equation{taylor-jacobian}, that is, from the Jacobian computed in the last iteration of~\Equation{energies}. \AT{we might have to also write the iterative version of \Equation{energies} as I did in Edoardo's paper to make this clear. Right now it sounds a bit... hand-wavy, ahahehehjaja}.
 
-\newpage
-% \subsection{Merging independent measurements}
 \subsection{Inter-frame regression} 
+% \subsection{Merging independent measurements}
 \label{sec:combining}
 \input{fig/merging/item}
-
+\AT{EDITING HERE NOW}
 Given the second frame $d_2$, we compute the corresponding value of the parameters $x_2^*$ and their variance $\Sigma_2$ the same way as in \ref{sec:posterior}. The posterior distribution of the parameters now has the form:
 % 
 \begin{equation}
 \mathcal{N}(\hat{x}_2, \hat{\Sigma}_2) = \mathcal{N}(\hat{x}_1, \hat{\Sigma}_1) \mathcal{N}(x_2^*, \Sigma_2) \quad\quad
 \end{equation}
 % 
-applying the product of Gaussians rule ~\cite{petersen2008matrix}, we obtain:
+applying the product of Gaussians rule ~\cite{petersen2008matrix}:
 % 
 \begin{align}
 \begin{split}
@@ -216,3 +216,4 @@ The optimization shown in Table \ref{tab:iekf-like} represents the entire hand t
 \subsection{Shape prior}
 \label{sec:shapeprior}
 \TODO{Anastasia?}
+\AN{The shape prior should only be used in the first frame, because afterwards it will be incorporated inside of Kalman prior}. \AT{As this is quite advanced, this can be discussed at the very end of the section}
