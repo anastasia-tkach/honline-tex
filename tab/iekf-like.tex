@@ -29,11 +29,12 @@ P(x_n |\hat{x}_{n - 1}) &= \exp \left( \todo{\tfrac{1}{2}} -(x_n - \hat{x}_{n - 
 		\sqrt{\hat{\Sigma}_{n - 1}^{-1}} \\
 	\end{array}
 \right] = 
-\hat{\Sigma}_{n-1}^{-1}  + \Sigma_{n}^{-1}
+\hat{\Sigma}_{n-1}^{-1}  + \todo{\Sigma_{n}}^{-1}
 \end{aligned}
 \end{equation*}
-\caption{\TODO{Objective function of IEKF} \todo{note: I've condensed the evaluation of the derivative at the point: $\tfrac{\partial f(x)}{\partial x|_{x_0}}$ as $\tfrac{\partial f(x_0)}{\partial x}$}}
+\caption{Inter-frame regression formulated as an IEKF.}
 \label{alg:interframeplus}
+\label{alg:iekf-like}
 \label{tab:iekf-like}
 \end{algorithm}
 
