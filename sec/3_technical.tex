@@ -132,29 +132,26 @@ by applying the product of Gaussians rule ~\cite{petersen2008matrix}:
 \end{split}
 \end{align}
 % 
-In \Appendix{kalman}, we shown how \Equation{combining} is equivalent to the Kalman filter update equations in \Algorithm{interframe}, with measurement $x_n^*$, and measurement noise covariance \todo{$\Sigma_n$}. This observation is fundamental as, under the same assumptions made in \Appendix{kalman}, \cite{maybeck1979stochastic} noted how a Kalman filter is provably \emph{optimal} for the problem at hand.
+In \Appendix{kalman}, we shown how \Equation{combining} is equivalent to the Kalman filter update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance \todo{$\Sigma_n$}. This observation is fundamental as, under the same assumptions made in \Appendix{kalman}, \cite{maybeck1979stochastic} noted how a Kalman filter is provably \emph{optimal} for the problem at hand.
 % ``the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it.''}
 This optimization will be used as a \emph{baseline}, as it is arguably the simplest way of achieving an online parameter regression by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF.
 
 \input{tab/iekf-like}
 \subsection{Joint inter/intra frame regression}
-The optimization in \Alg{interframe} does not provide any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve described in \Section{independent}. This could be problematic, as in this case \Eq{energies} does not leverage any temporal information, and relies on a sufficiently good initialization to compute $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.
-
+% Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space.
+The optimization in \Tab{interframe} does not provide any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve described in \Section{independent}. This could be problematic, as in this case \Eq{energies} does not leverage any temporal information, and relies on a sufficiently good initialization to compute $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. One potential way to increase the robustness of the algorithm would be to include this information in \Eq{independent}:
+% 
+\begin{align}
+x^* &= \argmin_{x} \log  P(d|x) P(x_n |\hat{x}_{n - 1}) 
+\label{eq:independenttemp}
+\end{align}
+% 
+However, rather than following this path (\TODO{need a better argument... quantitative comparison?}), we coalesce the inter and intra frame optimization, and propose a \emph{joint} intra/inter online regression scheme in \Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levemberg-Marquardt optimization is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update... what?}.
+Notice how this optimization, representing our online tracking\&modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 \newpage
 
-Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space. 
-
-One way to remedy this is include the term $P(x_n |\hat{x}_{n - 1})$ directly in the independent solve.
-
-
-
-In Appendix \ref{app:ieif-lm} we demonstrate that optimizing the objective function presented in Table \ref{tab:iekf-like} using Levenberg-Marquardt algorithm is equivalent to measurement update of Iterated Extended Kalman Filter.
-
 \input{fig/merging/item}
-
-The optimization shown in \Alg{iekf-like} represents the entire hand tracking system as an Iterated Extended Kalman Filter. Given the next measurement $d_n$, the estimated value of the parameters $\hat{x}_n$,  is directly output by the hand tracking system.
-
-\subsection{Shape prior}
+\subsection{Shape prior (TODO)}
 \label{sec:shapeprior}
 \TODO{Anastasia?}
 \AN{The shape prior should only be used in the first frame, because afterwards it will be incorporated inside of Kalman prior}. \AT{As this is quite advanced, this can be discussed at the very end of the section}
