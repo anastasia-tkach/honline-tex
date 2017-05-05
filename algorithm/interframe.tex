@@ -1,0 +1,43 @@
+\begin{algorithm}
+\begin{equation*}
+\begin{aligned}
+x_n^* &= \argmax_{x_n} \: \log P(d_n|x_n) 
+\\
+\hat{x}_n &= \argmax_{x_n} \: \underbrace{\log \left( P(x_n|x_n^*) \: P(x_n |\hat{x}_{n - 1}) \right)}_{L(x_n)}    
+\\
+\end{aligned}
+\end{equation*}
+
+\begin{equation*}
+\begin{aligned}
+P(x_n |x_n^*) &= \exp \left( - (x_n - x_n^* )^T \todo{\Sigma}_n^{-1}(x_n - x_n^* )\right)
+% \mathcal{N}(x_n^*,\todo{\Sigma_n})
+\\
+P(x_n |\hat{x}_{n - 1}) &= 
+% \mathcal{N}(\hat{x}_{n - 1}, \hat{\Sigma}_{n-1})
+\exp \left( - (x_n - \hat{x}_{n - 1} )^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1} )\right)
+\\
+\hat{\Sigma}_n^{-1} = 
+\left.\tfrac{\partial^2 L}{\partial x_n^2}\right|_{\hat{x}_n} &\approx 
+\todo{
+\left[
+    \begin{array}{cc}
+        \sqrt{\Sigma_n^{-1}} \\
+        \sqrt{\hat{\Sigma}_{n - 1}^{-1}} \\
+    \end{array}
+\right]^T
+\left[
+    \begin{array}{c}
+        \sqrt{\Sigma_n^{-1}} \\
+        \sqrt{\hat{\Sigma}_{n - 1}^{-1}} \\
+    \end{array}
+\right]
+} %< accent
+=
+\hat{\Sigma}_{n-1}^{-1}  + \todo{\Sigma_{n}}^{-1}
+\end{aligned}
+\end{equation*}
+\caption{Inter-frame Kalman regression \AT{what's the point of the big arrays? They tell me nothing as a reader?} \AT{Apply change into ${\Sigma} \Rightarrow \star{\Sigma}$ if approved}}
+\label{alg:interframe}
+\label{tab:kf-like} %< old label
+\end{algorithm}

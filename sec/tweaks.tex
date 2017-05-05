@@ -3,6 +3,7 @@
 \usepackage{graphicx}
 \usepackage{mathrsfs}
 \usepackage{xcolor}
+\usepackage{float} %< to define algorithms
 
 %%
 %% general comments
@@ -86,3 +87,12 @@
 %% figure labels
 %%
 \newcommand{\myfigurename}{\put(-3,0){\vertical{\todo{\currfiledir}}}}
+
+%%
+%% algorithm float (instead of table)
+%%
+\floatstyle{boxed}
+\newfloat{algorithm}{t}{alg}
+\floatname{algorithm}{Algorithm}
+\newcommand{\Alg}[1]{Alg.~\ref{alg:#1}}
+\newcommand{\Algorithm}[1]{Algorithm~\ref{alg:#1}}
