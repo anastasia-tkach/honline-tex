@@ -1,8 +1,6 @@
 \begin{algorithm}
 \begin{equation*}
 \begin{aligned}
-{\color{white} x_n^*} &{\color{white}=\argmax_{x_n} \: \log P(d_n|x_n)}
-\\
 \hat{x}_n &= \argmax_{x_n} \:
 \underbrace{\log \left( P(d_n|x_n) \: P(x_n |\hat{x}_{n - 1}) \right)}_{L(x_n)}   
 \\
@@ -11,9 +9,9 @@
 
 \begin{equation*}
 \begin{aligned}
-P(d_n|x_n) &= \exp \left( \todo{\tfrac{1}{2}} - (d_n - F(x_n))^T (d_n - F(x_n)) \right)
+P(d_n|x_n) &= \exp \left( -\tfrac{1}{2} (d_n - F(x_n))^T (d_n - F(x_n)) \right)
 \\
-P(x_n |\hat{x}_{n - 1}) &= \exp \left( \todo{\tfrac{1}{2}} -(x_n - \hat{x}_{n - 1})^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1})\right)
+P(x_n |\hat{x}_{n - 1}) &= \exp \left( -\tfrac{1}{2}(x_n - \hat{x}_{n - 1})^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1})\right)
 \\
 \hat{\Sigma}_n^{-1} = 
 \left.\tfrac{\partial^2 L}{\partial x_n^2}\right|_{\hat{x}_n} &\approx 
@@ -28,8 +26,8 @@ P(x_n |\hat{x}_{n - 1}) &= \exp \left( \todo{\tfrac{1}{2}} -(x_n - \hat{x}_{n - 
 		\tfrac{\partial F(\hat{x}_n)} {\partial x_n} \\
 		\sqrt{\hat{\Sigma}_{n - 1}^{-1}} \\
 	\end{array}
-\right] = 
-\hat{\Sigma}_{n-1}^{-1}  + \todo{\Sigma_{n}}^{-1}
+\right] 
+= \Sigma_{n}^{-1} + \hat{\Sigma}_{n-1}^{-1}  
 \end{aligned}
 \end{equation*}
 \caption{Inter-frame regression formulated as a probabilistic IEKF.}

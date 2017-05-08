@@ -1,8 +1,6 @@
 \begin{algorithm}
 \begin{equation*}
 \begin{aligned}
-x_n^* &= \argmax_{x_n} \: \log P(d_n|x_n)  \quad \text{\TODO{remove?}}
-\\
 \hat{x}_n &= \argmax_{x_n} \: \underbrace{\log \left( P(x_n|x_n^*) \: P(x_n |\hat{x}_{n - 1}) \right)}_{L(x_n)}    
 \\
 \end{aligned}
@@ -10,38 +8,34 @@ x_n^* &= \argmax_{x_n} \: \log P(d_n|x_n)  \quad \text{\TODO{remove?}}
 
 \begin{equation*}
 \begin{aligned}
-P(x_n |x_n^*) &= \exp \left( - (x_n - x_n^* )^T \todo{\Sigma}_n^{-1}(x_n - x_n^* )\right)
+P(x_n |x_n^*) &= \exp \left( -\tfrac{1}{2}(x_n - x_n^* )^T {\star{\Sigma}_n}^{-1}(x_n - x_n^* )\right)
 % \mathcal{N}(x_n^*,\todo{\Sigma_n})
 \\
 P(x_n |\hat{x}_{n - 1}) &= 
 % \mathcal{N}(\hat{x}_{n - 1}, \hat{\Sigma}_{n-1})
-\exp \left( - (x_n - \hat{x}_{n - 1} )^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1} )\right)
+\exp \left( -\tfrac{1}{2} (x_n - \hat{x}_{n - 1} )^T \hat{\Sigma}_{n - 1}^{-1} (x_n - \hat{x}_{n - 1} )\right)
 \\
 \hat{\Sigma}_n^{-1} = 
 \left.\tfrac{\partial^2 L}{\partial x_n^2}\right|_{\hat{x}_n} &\approx 
-\todo{
 \left[
     \begin{array}{cc}
-        \sqrt{\Sigma_n^{-1}} \\
+        \sqrt{{\star{\Sigma}_n}^{-1}} \\
         \sqrt{\hat{\Sigma}_{n - 1}^{-1}} \\
     \end{array}
 \right]^T
 \left[
     \begin{array}{c}
-        \sqrt{\Sigma_n^{-1}} \\
+        \sqrt{{\star{\Sigma}_n}^{-1}} \\
         \sqrt{\hat{\Sigma}_{n - 1}^{-1}} \\
     \end{array}
 \right]
-} %< accent
-=
-\hat{\Sigma}_{n-1}^{-1}  + \todo{\Sigma_{n}}^{-1}
+= {\star{\Sigma}_n}^{-1} + \hat{\Sigma}_{n-1}^{-1}
 \end{aligned}
 \end{equation*}
 \caption{
 % 
 % 
-Inter-frame regression formulated as a probabilistic KF. 
-\AT{what's the point of the big arrays? They tell me nothing as a reader?} 
+Inter-frame regression formulated as a probabilistic KF.
 % 
 % 
 }

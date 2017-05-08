@@ -5,12 +5,12 @@ To achieve online \emph{joint} calibration and tracking, our algorithm presents 
 
 \input{fig/intra/item}
 \paragraph{Intra-frame regression}
-Given a proper initialization $x_n^0$ and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, as well as estimates the \emph{uncertainty} in the given solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. Estimating uncertainty in the solution is essential for shape estimation. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
+Given a proper initialization $x_n^0$ and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, as well as estimates the \emph{certainty/uncertainty} in the given solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. Estimating uncertainty in the solution is essential for template personalization. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
 Rather than deriving this relationship from data, we follow the ideas in ~\todo{\cite{?}} and derive how this distribution can be approximated by a gaussian $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. A fundamental observation is that the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking energies.
 
 \input{fig/inter/item}
 \paragraph{Inter-frame regression}
-Differently from pose parameters shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. Moreover, in certain frames sufficient information to estimate certain shape parameters is simply not available. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx, therefore knowledge must be gathered from a \emph{collection} of frames. Rather than collecting a persistent model from a set of pre-recorded calibration data as in~\cite{taylor_sig16}, we approach the problem from a online-modeling point of view. In what follows, we detail a principled method to \emph{temporally integrate} parameter estimates in a way that also accounts for their confidence.
+Unlike pose parameters, shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. Further, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx, therefore knowledge must be gathered from a \emph{collection} of frames capturing the user in different poses. Rather than collecting a persistent model from a set of pre-recorded calibration data as in~\cite{taylor_sig16}, we approach the problem from an \emph{online-modeling} point of view. In what follows, we detail a principled method to temporally integrate parameter estimates in a way that also accounts for their confidence.
 
 \subsection{Intra-frame regression -- $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$}
 \label{sec:independent}
@@ -33,9 +33,9 @@ Where the terms $\mathcal{T}$ ensure that:
 \text{\textbf{m2d}} & \quad \text{the model lies in the sensor visual-hull} \\
 \text{\textbf{shape-prior}} & \quad \text{the model shape should be plausible} \\
 \text{\textbf{pose-prior}} & \quad \text{the model pose should be plausible} \\
+\text{\textbf{smooth}} & \quad \text{the recorded sequence is smooth} \\
 \text{\textbf{collision}} & \quad \text{fingers do not interpenetrate} \\
-\text{\textbf{limits}} & \quad \text{joint limits are satisfied} \\
-\text{\textbf{smooth}} & \quad \text{\todo{ought to include -> avoid jitter}}
+\text{\textbf{limits}} & \quad \text{joint limits are satisfied} 
 \end{aligned}
 \end{equation*}
 The energy terms in the objective function are detailed in~\cite{tkach2016sphere} and~\cite{htrack}, with the exception of \emph{shape-prior} that is discussed in \Section{shapeprior}.
@@ -44,18 +44,19 @@ The energy terms in the objective function are detailed in~\cite{tkach2016sphere
 \paragraph{Laplace approximation}
 % \subsection{Posterior distribution of parameters after taking a measurement into account}
 \label{sec:posterior}
-While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To retrieve this information, we first convert the \Equation{energies} in a probabilistic format, and from this formulation we then derive our uncertainties. Towards this goal, we first rewrite the energy terms in \Eq{energies} as:
+While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To retrieve this information, we first convert the \Equation{energies} in a probabilistic format, and from this formulation we then derive our uncertainties. 
+% 
+Towards this goal, we rewrite the \emph{d2m} and \emph{m2d} terms in \Eq{energies} as:
 % 
 \begin{align}
 E_{\tau}(d_n, x_n) = \|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2,
 \end{align} 
-where $I_{d2m}$ and $I_{m2d}$ are identity matrices, and $I_{m2d}(i,i)=0$ if the rasterized 2D template pixel $\mathbf{p}_i$ lies within the sensor silhouette image \AT{correct?} (see \cite{htrack}), and the remaining $I_{\tau}$ are zero matrices.
-% energy terms  can be rewritten in a form $$ with ,  a permutation(/reduction?) matrix that removes from $d_n$ the \todo{entries that are not the closest for any model point} \AT{meaning?},
-For brevity of notation, we also denote:
+where $I_\tau$ are identity matrices, and $I_{m2d}(i,i)=0$ if the rasterized 2D template pixel $\mathbf{p}_i$ lies within the sensor silhouette image; see \cite{htrack}. We also concatenate the two terms in pair of column vectors:
 % 
 \begin{align*}
-F(x_n) &= \left[F_{d2m}^T(x_n), \quad ..., \quad F_{pose}^T(x_n)\right]^T \\
-d_n &= \left[(I_{d2m} d_n)^T, \quad ..., \quad (I_{pose} d_n)^T\right]^T
+F(x_n) = \left[F_{d2m}(x_n); F_{m2d}(x_n)\right] 
+\:\:\text{and}\:\: 
+d_n = \left[(I_{d2m} d_n); (I_{m2d} d_n) \right],
 \end{align*}
 % 
 leading to a compact posterior distribution representation:
@@ -74,83 +75,77 @@ x^* &= \argmin_{x} \underbrace{\log  P(d|x)}_{L(x)}
 %
 We now perform a second-order Taylor expansion of the log-likelihood of the data $L(x)$ around the \emph{optimal} solution $x^*$:
 %
-\begin{align*}
+\begin{align}
 L(x) \approx \tilde{L}(x) = L(x^*)   
 + \tfrac{\partial L(x^*) }{\partial x}  \Delta x 
 + \tfrac{1}{2} \Delta x^T\tfrac{\partial^2 L(x^*)}{{\partial x}^2} \Delta x + \text{h.o.t.}
-\end{align*}
+\label{eq:taylor}
+\end{align}
 %
-where $\Delta x=x - x^*$, and with an abuse of notation, as $\partial f(x_0)/\partial x$ we indicate the partial derivative of $f(x)$ evaluated at the point $x_0$. Note how the Jacobian and the Hessian are respectively zero and positive definite at our critical point $x^*$:
+where $\Delta x=x - x^*$, and with an abuse of notation, as $\partial f(\star{x})/\partial x$ we indicate the partial derivative of $f(x)$ evaluated at $\star{x}$. Note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$:
 %
 \begin{align}
 \tfrac{\partial L(x^*)}{\partial x} &= - 2 F(x^*)^T 
 \tfrac{\partial F(x^*)}{\partial x} = 0 
 \label{eq:taylor-jacobian}
 \\
-\todo{\Sigma} = \tfrac{\partial^2 L(x^*)}{\partial x^2} 
+\tfrac{\partial^2 L(x^*)}{\partial x^2} 
 % = 2 \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*}^T \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} + \\ 2 F(x^*)^T  \left. \tfrac{\partial \partial F (x^*) }{\partial \partial x} \right|_{x^*}
-& \approx 2
-\tfrac{\partial F(x^*)}{\partial x}^T  
-\tfrac{\partial F(x^*)}{\partial x}
-\succ 0
+& \approx 2 \tfrac{\partial F(x^*)}{\partial x}^T \tfrac{\partial F(x^*)}{\partial x}
+= {\star{\Sigma}}^{-1} \succ 0
 \label{eq:taylor-hessian}
 \end{align}
 % 
-Remembering that $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then derive the \emph{approximated} posterior distribution:
+From \Equation{taylor}, remembering that $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then derive the \emph{approximated} posterior distribution:
 %
 \begin{align}
-\tilde{P}(d|x) = \exp\left(- \tfrac{1}{2}(x - x^*)^T \todo{\Sigma}^{-1}  (x - x^*) \right) = \mathcal{N}\left(\star{x}, \todo{\Sigma} \right)
+\tilde{P}(d|x) = \exp\left(- \tfrac{1}{2}(x - x^*)^T {\star{\Sigma}}^{-1}  (x - x^*) \right) = \mathcal{N}\left(\star{x}, \star{\Sigma} \right)
 \end{align}
 %
-\AT{can we rename $\Sigma$ into $\star{\Sigma}$ for clarity of notation?}
-That is, after processing the information in a frame $d_n$, the desired quadratic approximation of posterior distribution of model parameters is a \emph{normal} distribution $\mathcal{N}\left(x_n^*, \Sigma_n \right)$.
-Its mean is the (final) solution of the (iterative) optimization problem in \Equation{energies}; its variance is computed according to \Equation{taylor-jacobian}, that is, from the Jacobian computed in the last iteration of~\Equation{energies}. 
-% 
-\AT{ITERATIVE?}
-% \AT{we might have to also write the iterative version of \Equation{energies}; it sounds a bit... hand-wavy, ahahehehjaja}.
+That is, after processing the information in a frame $d_n$, the sought-after quadratic approximation of posterior distribution of model parameters is a \emph{normal} distribution $\mathcal{N}\left(x_n^*, \star\Sigma_n \right)$.
+Its mean is the solution of the (iterative) optimization problem in \Equation{energies}; its covariance is computed according to \Equation{taylor-hessian}, that is, from the Jacobians of the energy terms $\{E_{\text{d2m}}, E_{\text{m2d}}\}$ at the optimal solution.
 
 \subsection{Inter-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) | \mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ } 
 % \subsection{Merging independent measurements}
 \label{sec:combining}
 \label{sec:inter}
-Given the probabilistic interpretation in \Section{independent}, a \emph{joint} optimization over parameters can be obtained by cumulating the posterior distributions over the set of previous frames. This leads to the to the following pair of inductive update equations:
+Given the probabilistic interpretation in \Section{independent}, a temporal regression over parameters can be obtained by cumulating the posterior distributions over the set of previous frames. This leads to the to the following pair of inductive update equations:
 % 
 \begin{align}
 \mathcal{N}(\hat{x}_1, \hat{\Sigma}_1) &= \mathcal{N}(\star{x}_1, \star{\Sigma}_1) \\
 \mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) &= \mathcal{N}(\hat{x}_{n-1}, \hat{\Sigma}_{n-1}) \mathcal{N}(\star{x}_n, \star{\Sigma}_n)
 \end{align}
 % 
-by applying the product of Gaussians rule ~\cite{petersen2008matrix}:
+By applying the product of Gaussians rule ~\cite{petersen2008matrix}:
 % 
 \begin{align}
 \begin{split}
-\hat{x}_{n} &= \todo{\Sigma_{n}} (\hat{\Sigma}_{n-1} + \Sigma_{n})^{-1} \hat{x}_{n-1} + 
-\hat{\Sigma}_{n-1} (\hat{\Sigma}_{n-1} + \Sigma_n)^{-1} x_n^*
+\hat{x}_{n} &= \star\Sigma_{n} (\hat{\Sigma}_{n-1} + \star\Sigma_{n})^{-1} \hat{x}_{n-1} + 
+\hat{\Sigma}_{n-1} (\hat{\Sigma}_{n-1} + \star\Sigma_n)^{-1} x_n^*
 \\
-\hat{\Sigma}_n &= \hat{\Sigma}_{n-1} (\hat{\Sigma}_{n-1} + \todo{\Sigma_n})^{-1} \todo{\Sigma_n}
+\hat{\Sigma}_n &= \hat{\Sigma}_{n-1} (\hat{\Sigma}_{n-1} + {\star\Sigma_n})^{-1} \star\Sigma_n
 \label{eq:combining}
 \end{split}
 \end{align}
 % 
-In \Appendix{kalman}, we shown how \Equation{combining} is equivalent to the Kalman filter update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance \todo{$\Sigma_n$}. This observation is fundamental as, under the same assumptions made in \Appendix{kalman}, \cite{maybeck1979stochastic} noted how a Kalman filter is provably \emph{optimal} for the problem at hand.
-% ``the Kalman filter can be shown to be the best filter of any conceivable form. It incorporates all information that can be provided to it.''}
-This optimization will be used as a \emph{baseline}, as it is arguably the simplest way of achieving an online parameter regression by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF.
+In \Appendix{kalman}, we shown how \Equation{combining} is equivalent to the Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. This observation is fundamental as, under the same assumptions we made in \Appendix{kalman}, \cite[\todo{Pg.?}]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
+This optimization will be used as a \emph{baseline}, as it is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF.
 
 \input{tab/iekf-like}
 \subsection{Joint inter/intra frame regression}
 % Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space.
-The optimization in \Tab{interframe} does not provide any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve described in \Section{independent}. This could be problematic, as in this case \Eq{energies} does not leverage any temporal information, and relies on a sufficiently good initialization to compute $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. One potential way to increase the robustness of the algorithm would be to include this information in \Eq{independent}:
+The optimization in \Tab{interframe} does not provide any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve described in \Section{independent}. This could be problematic, as in this case \Eq{energies} does not leverage any temporal information aside from initialization, while relying on a sufficiently good initialization to compute $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. One potential way to increase the robustness of the algorithm would be to include this information in \Eq{independent}:
 % 
 \begin{align}
-x^* &= \argmin_{x} \log  P(d|x) P(x_n |\hat{x}_{n - 1}) 
+x_n^* &= \argmin_{x_n} \log  P(d_n|x_n) P(x_n |\hat{x}_{n - 1}) 
 \label{eq:independenttemp}
 \end{align}
 % 
-However, rather than following this path (\TODO{need a better argument... quantitative comparison?}), we coalesce the inter and intra frame optimization, and propose a \emph{joint} intra/inter online regression scheme in \Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levemberg-Marquardt optimization is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update... what?}.
-Notice how this optimization, representing our online tracking\&modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
+Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} intra/inter online regression scheme in \Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levemberg-Marquardt optimization is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update... what?}.
+% 
+Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 \newpage
 
-\input{fig/merging/item}
 \subsection{Shape prior (TODO)}
 \label{sec:shapeprior}
 \TODO{Anastasia?}

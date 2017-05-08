@@ -9,8 +9,7 @@ z_n &= J x_n + v_n
 \end{align}
 % 
 where $w_n$ is a normally distributed process noise $p(w) \sim \mathcal{N}(0, Q)$, and $v_n$ is a normally distributed measurement noise $p(v) \sim \mathcal{N}(0, R)$. The matrix $A$ provides a linear estimate for state updates, while $J$ maps the state $x_n$ to the measurement $z_n$.
-We assume that while  there is no new measurements, an estimate of the current hand parameters are the previous known parameters up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$. We also assume for now that depth sensor noise is normally distributed, which actually is not the case. Thus, the states of our system can be approximated as following:
-\AT{not sure.. wouldn't sensor noise be accounted in \emph{measurement} noise?}:
+We assume that while  there is no new measurements, an estimate of the current hand parameters are the previous known parameters up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$. We also assume for now that depth sensor noise is normally distributed \AT{not sure.. wouldn't sensor noise be accounted for in \emph{measurement} noise?}, which actually is not the case. Thus, the states of our system can be approximated as following:
 % 
 \begin{align}
 x_n &= x_{n - 1} + w_{n - 1} \\
