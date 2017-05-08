@@ -128,7 +128,7 @@ By applying the product of Gaussians rule ~\cite{petersen2008matrix}:
 \end{split}
 \end{align}
 % 
-In \Appendix{kalman}, we shown how \Equation{combining} is equivalent to the Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. This observation is fundamental as, under the same assumptions we made in \Appendix{kalman}, \cite[\todo{Pg.?}]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
+In \Appendix{proof-kalman}, we shown how \Equation{combining} is equivalent to the Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. This observation is fundamental as, under the same assumptions we made in \Appendix{kalman}, \cite[\todo{Pg.?}]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
 This optimization will be used as a \emph{baseline}, as it is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF.
 
 \input{tab/iekf-like}

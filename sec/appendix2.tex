@@ -1,55 +1,29 @@
 \clearpage
-\section{Iterated Extended Kalman Filter (IEKF)}
-\label{app:iekf}
-As the measurement function $F(\cdot)$ is nonlinear, the following LM optimization takes several iterations to converge: 
-\begin{equation}
-\hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)   
-\end{equation}
-To address this problem, we can perform measurement updates in several steps. In each step, we linearize the measurement function $F$ around the updated value $\hat{x}_n^i$, leading to the Iterated Extended Kalman Filter (IEKF) formulation~\cite{havlik2015performance}. The time update equations for EKF and IEKF are analogous to the ones in \Equation{extended}, while the measurement update equations are respectively:
-\begin{table}[!h] 
-\centering
-\resizebox{0.48\textwidth}{!}{
-\begin{tabular}{|l|l|}
-\hline
-Extended Kalman Filter & Iterated Extended Kalman Filter \\
-\hline
-&
-for $i = 1...$ \\
-  
-$F_n = F(\hat{x}_n^0)$ &
-$\:\:\: F_n^\textit{\color{accent}$i$} = F( \hat{x}_n^\textit{\color{accent}$i$})$ \\
-
-${J_n}_{[u, v]} = \frac{ \partial F_{[u]}}{ \partial x_{[v]}}(\hat{x}_n^0)$ & 
-$\:\:\: {J_n}_{[u, v]}^\textit{\color{accent}$i$} = \frac{ \partial F_{[u]}^\textit{\color{accent}$i$}}{ \partial x_{[v]}}(\hat{x}_n^\textit{\color{accent}$i$})$\\
-
-$K_n = P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}$ &
-$\:\:\: K_n^\textit{\color{accent}$i$} = P_n^0 {J^\textit{\color{accent}$i$}_n}^T(J_n^\textit{\color{accent}$i$} P_n^0 {J^\textit{\color{accent}$i$}_n}^T + R)^{-1}$ \\
-
-$\hat{x}_n = \hat{x}_n^0 + K_n(z_n - F_n)$ &
-$\:\:\: \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - $\\
-
- &$\:\:\:\:\:\:\:\:\:\:\:\: - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$})$ \\
-
- &
-end \\
- 
- & $\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}$ \\
- 
-$P_n = (I - K_n J_n)P_n^0$ &
-$P_n = (I - K_n^\textit{\color{accent}$i$} J_n^\textit{\color{accent}$i$})P_n^0$ \\
-
-\hline
-\end{tabular}
-}
-\caption{EKF vs. IEKF measurement update equations \label{tab:ekf-iekf}}
-\end{table}
-
-
 \input{fig/merging/item}
 
-\section{Equivalence of IEIF and \Table{iekf-like}}
-\label{app:ieif-lm}
+\section{Derivations}
 
+\subsection{Derivation \#1}
+\label{app:proof-kalman}
+Link to \Section{inter}. Let us consider the special case when the measurement $z_n = x_n^*$ is in the same space at the estimated state $\hat{x}_n$, thus when $J$ is the identity matrix.
+% 
+\begin{align*}
+\hat{x}_n 
+&= \hat{x}_n^0 + P_n^0  (P_n^0 + R)^{-1}(z_n - \hat{x}_n^0) \\
+&= (P_n^0 + R)(P_n^0 + R)^{-1}\hat{x}_n^0 + P_n^0  (P_n^0 + R)^{-1}(z_n - \hat{x}_n^0) \\
+&= R(P_n^0 + R)^{-1}\hat{x}_n^0 + P_n^0  (P_n^0 + R)^{-1}z_n \\
+% 
+% 
+P_n &= ((P_n^0 + R) (P_n^0 + R)^{-1} - P_n^0  (P_n^0 + R)^{-1}) P_n^0\\
+&= R (P_n^0 + R)^{-1} P_n^0
+\end{align*}
+% 
+Note how these two coincide with \Equation{combining} for product of two Gaussians  with $z_n = x_n^*$, $P_n^0 = \hat{\Sigma}_{n - 1}$ and $R = \Sigma_{n}$.
+
+\subsection{Derivation \#2}
+\label{app:ieif-lm}
+\TODO{Equivalence of IEIF and \Table{iekf-like}}
+% 
 To show that the optimizing the objective in \Table{iekf-like} with LM is equivalent to the IEKF, we first rewrite our EKF measurement updates in the completely equivalent \emph{Extended Information Filter}~\cite{anderson1979optimal} form:
 % 
 \begin{gather*}
