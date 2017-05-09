@@ -1,9 +1,10 @@
 \begin{abstract}
-\todo{The abstract is to be in fully-justified italicized text, at the top
-of the left-hand column, below the author and affiliation
-information. Use the word Abstract as the title, in 12-point
-Times, boldface type, centered relative to the column, initially
-capitalized. The abstract is to be in 10-point, single-spaced type.
-Leave two blank lines after the Abstract, then begin the main text.
-Look at previous CVPR abstracts to get a feel for style and length.}
+% 
+We present a new algorithm for real-time hand tracking on commodity depth-sensing devices. Our method does not require a user-specific calibration session, but rather learns the geometry as the user performs live in front of the camera, thus enabling seamless virtual interaction at the consumer level.
+% tech description
+The key novelty in our approach is an online optimization algorithm that jointly estimates pose/shape in each frame as well as determines the uncertainty in such estimate. This knowledge allows the algorithm to integrate these per-frame estimates over time, and build a personalized geometric model of the captured user.
+% kalman -> optimality
+Our approach integrates in continous generative motion tracking software, and, under certain assumptions, can be considered optimal, as we derive its relationship to the theory of probabilistic Kalman filters.
+% evaluation + simplify workflow 
+We provide a detailed evaluation that shows how our approach achieves accurate motion tracking for real-time applications, while significantly simplifying the workflow of accurate hand performance capture.
 \end{abstract}

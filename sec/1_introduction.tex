@@ -1,2 +1,25 @@
 \section{Introduction}
+% AR/VR
+In our everyday life, we interact with the surrounding environment using our hands. A main focus of recent research has been to bring such interaction form to virtual objects, such as the one projected in virtual reality devices (Oculus Rift, HTC Vive), or super-imposed as a hologram in AR/MR headsets (Microsoft Hololens, MagicLeap, Intel Alloy). 
+% pre-viz 
+Performance capture is also essential in film and game production for pre-visualization, where motion can be transferred in real-time to a virtual avatar. This allows directors to plan shots more effectively, reduce turn-around times and hence costs.
+% requirement: seamless integration
+For these applications, it is desirable for the tracking technology to be robust, accurate, and have an \emph{as seamless as possible} deployment, since performance capture can happen at an animator's desk, on a movie set, or even \emph{in-the-wild} where the user might not be aware of its operative requirements (e.g. advertisement or security).
+
+% typical structure of tracking pipeline
+\paragraph{Hand tracking from monocular depth}
+Recent developments in hand motion capture technology have brought us a step closer in achieving effective tracking, where hardware solutions such as data-gloves, reflective markers and multi-camera setups have been shelved due to their invasiveness, as well as the cumbersomeness of their setup. 
+% color vs. depth
+Hence, a single camera has become the standard acquisition device, where depth cameras (e.g. Intel RealSense SR300) have taken a solid lead over color imagery to overcome the challenges of hand-tracking~\cite{supancic2015depth}. 
+% discriminative + generative
+Modern techniques (e.g. \cite{taylor2016joint}) often rely on \emph{discriminative} techniques (e.g. \cite{valentin2016learning}) to identify a coarse pose, followed by a \emph{generative} stage (e.g. \cite{hmodel}) to refine the solution and thus obtain a precise pose estimate. 
+% template + personalization
+As depth data provides a 3D ... \AT{WORK IN PROGRESS}
+
+
+
+
+
+
+\paragraph{Contributions}
 \todo{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.}
