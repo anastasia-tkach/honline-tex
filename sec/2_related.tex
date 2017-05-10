@@ -1,4 +1,19 @@
 \section{Related Works}
-\todo{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.}
+Driven by recent advances in the development of VR/AR technologies, motion capture has lately focused more and more on body, face and hand tracking. 
+Due to the vast amount of work in the area we refer the reader to recent works by \cite{bogo2015detailed}, \cite{cao2016real} and \cite{taylor2016joint}, \cite{tkach2016sphere} for a more complete overview on respectively full-body, face and hand tracking.
+As model personalization is a core ingredient in generative motion tracking \cite{pons2011model}, in this section we will focus on hand model calibration, keeping in mind that due to the large number of hand self occlusions and the amount of signal-to-noise ratio in nowadays depth sensors the personalization of hand model is a significantly different (and harder) problem than face or body model calibration. \ER{Any reference in mind saying why is hand calibration different and harder than face/body one?} 
+
+\textbf{Off-line model calibration.}
+\cite{albrecht2003construction} pioneered the construction of realistic (skin, bone and muscles) personalized models proposing a pipeline for the registration of a 3D mesh model to RGB data manually pre-processed by the user. Reducing the amount of manual interaction required from the user, \cite{rhee2006human} showed how skin creases and silhouette images can also be used to guide the registration of a model to color imagery. More closely related to ours is the work by \cite{tan2016fits}, demonstrating how to robustly personalize a hand model to an individual use from a set of depth measurements using trained shape basis such the one proposed by \cite{taylor2014user}. The calibration pipeline, although robust and efficient, is not fully automated as the user needs to specify the set of frames over which the calibration optimization is performed. None of the above methods is suitable or easily adaptable to the kind of consumer-level applications that we target, being the absence of complex manual calibration or extensive pre-processing mandatory requirements for our framework.
+
+\textbf{On-line model calibration.}
+\cite{makris2015model} proposed a first model based approach to jointly solve the pose tracking and shape estimation in an online framework, solving for the cylindrical geometry of a hand through render-and-compare evaluations optimized by particle swarm optimization. The pipeline they developed runs in real-time (30fps), but lacks the degree of robustness and accuracy desirable for consumer level applications.
+\ER {Should we discuss \cite{delagorce2011model}? They do calibrate on-line (1st frame), however their pipeline does not run in real time }
+
+
+
+
+
+
 
 \AT{face tracking: in hand tracking there are a set of \emph{default} poses that can be picked}
