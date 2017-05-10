@@ -143,7 +143,7 @@ x_n^* &= \argmin_{x_n} \log  P(d_n|x_n) P(x_n |\hat{x}_{n - 1})
 \label{eq:independenttemp}
 \end{align}
 % 
-Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} intra/inter online regression scheme in \Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levemberg-Marquardt optimization is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update... what?}.
+Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} intra/inter online regression scheme in \Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update... what?}.
 % 
 Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 \newpage
