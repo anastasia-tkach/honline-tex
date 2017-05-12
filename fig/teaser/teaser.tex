@@ -1,13 +1,18 @@
 \begin{teaserfigure}
-\includegraphics[width=\linewidth]{fig/teaser/item.pdf}
+\begin{overpic} 
+[width=\linewidth]
+% [width=\linewidth,grid,tics=10]
+{fig/teaser/item.png}
+\myfigurename{}
+\end{overpic}
 \centering
-% \vspace{-.5in}
+\vspace{-.2in}
 \caption{
 % 
 % 
 % 
-Our adaptive tracking algorithm optimizes for a tracking model on-the-fly, leading to automatic improvements in  tracking accuracy over time. We color-code the surface to visualize the spatially-varying confidence of the estimated geometry. The histograms visualize the uncertainty of each degree of freedom, that is the diagonal entries of the Hessian $\hessian$ estimated from data in the current frame $\isolated\hessian$, or by accumulating the information through time $\accumulated\hessian$.
-% 
+Our adaptive tracking algorithm optimizes for a tracking model on-the-fly, leading to automatic improvements in  tracking accuracy over time. We color-code the surface to visualize the spatially-varying confidence of the estimated geometry. The histograms visualize the uncertainty of each degree of freedom, that is the diagonal entries of the Hessian estimated from data in the current frame $\star\hessian$, or by accumulating the information through time $\hat\hessian$.
+%
 %
 % 
 }
