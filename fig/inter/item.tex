@@ -5,19 +5,29 @@
 % [width=\linewidth,grid,tics=10]
 {\currfiledir/item.pdf}
 \myfigurename{}
-\put(13,39){\scriptsize $\beta_2$}
-\put(13,34){\scriptsize $\beta_1$}
-\put(.5,37){\scriptsize \vertical{$d_n$}}
-\put(.5,17){\scriptsize \vertical{$\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$}}
-\put(.5,1){\scriptsize \vertical{$\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$}}
-\put(14,-3){\small $n=1$}
-\put(35,-3){\small $n=2$}
-\put(58,-3){\small $n=3$}
-\put(83,-3){\small $n=4$}
+% 
+\put(11,47){\scriptsize $\beta_2$}
+\put(11,41){\scriptsize $\beta_1$}
+% 
+\put(3.5,40){\scriptsize \vertical{input data}}
+\put(0,43){\scriptsize \vertical{$d_n$}}
+% 
+\put(3.5,4){\scriptsize \vertical{intra-frame}}
+\put(0,3){\scriptsize \vertical{$\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$}}
+% 
+\put(3.5,23){\scriptsize \vertical{inter-frame}}
+\put(0,22){\scriptsize \vertical{$\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$}}
+% 
+\put(11,-2){\small $n=1$}
+\put(30,-2){\small $n=2$}
+\put(49,-2){\small $n=3$}
+\put(68,-2){\small $n=4$}
+\put(86.5,-2){\small $n=5$}
+% 
 \end{overpic}
 \caption{
 % 
-\textbf{(Inter-frame regression)} We visualize several temporally sorted frames of input data $d_n$, the uncertainty ellipsoid $\star{\Sigma}_n$ (centered in the origin) estimated by intra-frame regression, and the information flow to update the \emph{online} uncertainty estimate $\hat{\Sigma}_n$. For illustration purposes, we only display the 2-dimensional ellipsoids representing the covariance of $\beta_1$ and $\beta_2$. Although $\star{\Sigma}_1=\star{\Sigma}_4$, observe how $\hat{\Sigma}_1 \succ \hat{\Sigma}_4$, that is in the last frame we have a confident guess as the information from frames 2 and 3 has been embedded in our online model; see also \Figure{merging}.
+\textbf{(Inter-frame regression)} We visualize several temporally sorted frames of input data $d_n$, the uncertainty ellipsoid $\star{\Sigma}_n$ (centered in the origin) estimated by intra-frame regression, and the information flow to update the \emph{online} uncertainty estimate $\hat{\Sigma}_n$. For illustration purposes, we only display the 2-dimensional ellipsoids representing the covariance of $\beta_1$ and $\beta_2$. Although $\star{\Sigma}_1=\star{\Sigma}_5$, observe how $\hat{\Sigma}_1 \succ \hat{\Sigma}_5$, that is in the last frame we have a confident guess as the information from frames $2\dots4$ has been embedded in our online model; see also \Figure{merging}.
 %  
 }
 \label{fig:inter}
