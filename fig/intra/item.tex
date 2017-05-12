@@ -3,16 +3,27 @@
 \begin{overpic} 
 [width=\linewidth]
 % [width=\linewidth,grid,tics=10]
-{\currfiledir/item.png}
+{\currfiledir item.pdf}
 \myfigurename{}
-\put(15,-3){straight finger}
-\put(65,-3){bent finger}
+\put(15,40.5){straight finger}
+\put(65,40.5){bent finger}
+% 
+\put(23,-3){$x_s^*$}
+\put(40,-3){$x_s^+$}
+\put(7.5,-3){$x_s^-$}
+% 
+\put(57,-3){$x_b^-$}
+\put(74,-3){$x_b^*$}
+\put(90,-3){$x_b^+$}
 \end{overpic}
 \caption{
+% 
+% 
 \textbf{(Intra-frame regression)} We abstract the hand shape/pose estimation problem from a single frame into the one of a simpler 2D stick-figure.  When the finger is straight (left), it is difficult to estimate finger length as the optimization problem is ill-posed, while with a bent finger (right) the problem is better conditioned.
 % 
-We analyze the energy landscape of the registration problem $E(\shape_1)$, and observe how estimation uncertainty relates to the width of the local minima valley. This certainty can be estimated through a quadratic approximation to $E(\shape_1)$, derived from the Jacobians of the registration energies.
-%  
+We analyze the landscape of the registration energies {\color{anagreen}$E(\shape_1)$}, and observe how estimation uncertainty relates to the width of the local minima valley. This certainty can be estimated through a quadratic approximation {\color{anasalmon}$\tilde{E}(\shape_1)$}, derived from the Jacobians of the registration energies.
+% 
+%
 }
 \label{fig:intra}
 \end{figure}
