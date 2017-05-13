@@ -1,17 +1,19 @@
+\input{fig/intra/item}
 \section{Technical}
 Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ we represent vector of coalesced pose and shape parameters at frame $n$. \TODO{Here describe the hand model, or perhaps that can be done in the intro?}
 
 To achieve online \emph{joint} calibration and tracking, our algorithm presents two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (see \Section{independent}), while the latter integrates this knowlege across frames (see \Section{combining}). We first demonstrate how inter-frame regression can be interpreted as a Kalman Filter (KF), highlight its shortcomings, and finally propose a joint \emph{inter/intra-frame} regression and interpret it as an Iterative Extended Kalman Filter (IEKF).
 
-\input{fig/intra/item}
+\input{fig/inter/item}
 \paragraph{Intra-frame regression}
 Given a proper initialization $x_n^0$ and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, as well as estimates the \emph{certainty/uncertainty} in the given solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. Estimating uncertainty in the solution is essential for template personalization. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
 Rather than deriving this relationship from data, we follow the ideas in ~\todo{\cite{?}} and derive how this distribution can be approximated by a gaussian $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. A fundamental observation is that the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking energies.
 
-\input{fig/inter/item}
 \paragraph{Inter-frame regression}
 Unlike pose parameters, shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. Further, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx, therefore knowledge must be gathered from a \emph{collection} of frames capturing the user in different poses. Rather than collecting a persistent model from a set of pre-recorded calibration data as in~\cite{taylor2016joint}, we approach the problem from an \emph{online-modeling} point of view. In what follows, we detail a principled method to temporally integrate parameter estimates in a way that also accounts for their confidence.
 
+\input{fig/covariance/item}
+\newpage
 \subsection{Intra-frame regression -- $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$}
 \label{sec:independent}
 \label{sec:intra}
@@ -146,7 +148,6 @@ x_n^* &= \argmin_{x_n} \log  P(d_n|x_n) P(x_n |\hat{x}_{n - 1})
 Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} intra/inter online regression scheme in \Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update... what?}.
 % 
 Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
-\newpage
 
 \subsection{Shape prior (TODO)}
 \label{sec:shapeprior}
