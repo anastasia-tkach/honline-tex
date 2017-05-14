@@ -144,7 +144,7 @@ x_n^* &= \argmin_{x_n} \log  P(d_n|x_n) P(x_n |\hat{x}_{n - 1})
 \label{eq:independenttemp}
 \end{align}
 % 
-Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} intra/inter online regression scheme in \Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update... what?}.
+Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} intra/inter online regression scheme in \Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update...} \TODO{what?}.
 % 
 Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 
@@ -159,7 +159,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 \subsection{Something else?}
 \AT{Leaving some space: i am sure we are forgetting something in technical, like the fact that you don't run honline at each frame because it's too heavy?}
 \begin{DRAFT}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.  
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 \end{DRAFT}
     
 \input{fig/synthetic/item}
