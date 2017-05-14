@@ -20,6 +20,7 @@ P_n &= ((P_n^0 + R) (P_n^0 + R)^{-1} - P_n^0  (P_n^0 + R)^{-1}) P_n^0\\
 % 
 Note how these two coincide with \Equation{combining} for product of two Gaussians  with $z_n = x_n^*$, $P_n^0 = \hat{\Sigma}_{n - 1}$ and $R = \Sigma_{n}$.
 
+
 \subsection{Derivation \#2}
 \label{app:ieif-lm}
 \TODO{Equivalence of IEIF and \Table{iekf-like}}
@@ -49,7 +50,9 @@ We assume that measurement noise is i.i.d. across sensor samples, therefore $R=r
 \end{aligned}
 \end{gather}
 
+\input{fig/handmodel/item}
 The LM update in Optimization from Table \ref{tab:iekf-like} has the following form: 
+% 
 \begin{equation}
     x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
 \end{equation}
