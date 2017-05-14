@@ -1,23 +1,25 @@
-\begin{figure}[b]
+\begin{SCfigure}[][b]
 \centering
 \begin{overpic} 
-[width=\linewidth]
+[width=.5\linewidth]
 % [width=\linewidth,grid,tics=10]
 {\currfiledir/item.pdf}
 \myfigurename{}
-\put(0,8){\scriptsize $\beta_2$}
-\put(0,3){\scriptsize $\beta_1$}
+% \put(0,8){\scriptsize $\beta_2$}
+% \put(0,3){\scriptsize $\beta_1$}
 % 
-\put(95,11){\scriptsize $\theta_1$}
-\put(10,95){\scriptsize $\theta_2$}
+\put(93,8){\scriptsize $\theta_1$}
+\put(7,94){\scriptsize $\theta_2$}
 % 
-\put(89,3){\scriptsize $\theta_1$}
-\put(5,89){\scriptsize $\theta_2$}
+% \put(89,3){\scriptsize $\theta_1$}
+% \put(5,89){\scriptsize $\theta_2$}
 \end{overpic}
-\vspace{-.3in}
+\vspace{-.1in}
 \caption{
+% 
 A visualization of the covariance estimate for phalanx lengths $\{\beta_1, \beta_2\}$ as we vary phalanx bend angles $\{\theta_1,\theta_2\}$. Note in this visualization the covariance ellipsoids have been re-centered. 
-\AT{work in progress..}
+% 
+Note how a confident guess for the $\beta_*$ parameters is only available when $\theta_1$ and $\theta_2$ are simultaneously large, that is, with both phalanxes bent.
 }
 \label{fig:covariance}
-\end{figure}
+\end{SCfigure}
