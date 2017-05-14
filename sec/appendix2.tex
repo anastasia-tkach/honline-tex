@@ -21,10 +21,9 @@ P_n &= ((P_n^0 + R) (P_n^0 + R)^{-1} - P_n^0  (P_n^0 + R)^{-1}) P_n^0\\
 Note how these two coincide with \Equation{combining} for product of two Gaussians  with $z_n = x_n^*$, $P_n^0 = \hat{\Sigma}_{n - 1}$ and $R = \Sigma_{n}$.
 
 
-\subsection{Derivation \#2}
+\subsection{Derivation \#2: IEIF and \Table{iekf-like}}
 \label{app:ieif-lm}
-\TODO{Equivalence of IEIF and \Table{iekf-like}}
-% 
+%
 To show that the optimizing the objective in \Table{iekf-like} with LM is equivalent to the IEKF, we first rewrite our EKF measurement updates in the completely equivalent \emph{Extended Information Filter}~\cite{anderson1979optimal} form:
 % 
 \begin{gather*}
@@ -93,8 +92,7 @@ x_n^{i + 1}= x_n^{i} - \left(
 = \hat{x}_{n - 1} + B  - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1}) + A A^{-1}( x_n^i - \hat{x}_{n - 1}) = \\
 = \hat{x}_{n - 1} + B + A(- r H_{n - 1} + {J_n^i}^T J_n^i + r H_{n - 1})(x_n^i - \hat{x}_{n - 1}) = \\
 = \hat{x}_{n - 1} + B + A {J_n^i}^T J_n^i (x_n^i - \hat{x}_{n - 1}) = \\
-= \hat{x}_{n - 1} + \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1} {J_n^i}^T}_{K_n^i} \times \\
-\times (z_n - F_n^i - J_n^i (\hat{x}_{n - 1} - x_n^i)),
+= \hat{x}_{n - 1} + \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1} {J_n^i}^T}_{K_n^i} \times (z_n - F_n^i - J_n^i (\hat{x}_{n - 1} - x_n^i)),
  \end{align*}
  
  which is equivalent to the measurement update of IEIF from Table \ref{tab:ieif}, with $H_n^0 = H_{n-1}$ and $x_n^0 = \hat{x}_{n - 1}$.

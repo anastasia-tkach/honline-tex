@@ -71,7 +71,7 @@ As the measurement function $F(\cdot)$ from \Appendix{ekf} is nonlinear, the fol
 \hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)   
 \end{equation}
 % 
-To address this problem, we can perform measurement updates in several steps. In each step, we linearize the measurement function $F$ around the updated value $\hat{x}_n^i$, leading to the Iterated Extended Kalman Filter (IEKF) formulation~\cite{havlik2015performance}. The time update equation for IEKF is analogous to the one in \Table{extended}, while the measurement update is in \Table{iekf}. 
+To address this problem, we can perform measurement updates in several steps. In each step, we linearize the measurement function $F$ around the updated value $\hat{x}_n^i$, leading to the Iterated Extended Kalman Filter (IEKF) formulation~\cite{havlik2015performance}. The time update equation for IEKF is analogous to the one in \Table{extended}, while the measurement update is reported in \Table{iekf}. 
 
 
 

@@ -1,0 +1,23 @@
+\begin{figure}[b]
+\centering
+\begin{overpic} 
+[width=\linewidth]
+% [width=\linewidth,grid,tics=10]
+{\currfiledir/item.pdf}
+\myfigurename{}
+\put(0,51){\scriptsize \vertical{$E_\beta$}}
+\put(83,1){\scriptsize $\sigma$}
+\end{overpic}
+\caption{
+% 
+Evaluation on synthetic dataset:
+% 
+(left) random perturbation with standard deviation $\sigma$ vs. ground truth calibration residuals;
+% 
+(right) a few (up-to-scale) exemplars drawn from the $\sigma=0.4$ perturbation.
+% 
+The solid line represent the mean, and the dotted line represents the empirical variance.
+% 
+}
+\label{fig:synthetic}
+\end{figure}
