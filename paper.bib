@@ -26,7 +26,13 @@
 @string{bmvc = {Proc. of British Machine Vision Conference (BMVC)}}
 @string{threedv = {International Conference on 3D Vision (3DV)}}
 
-@article{facs,
+@article{yuan2017bighand,
+    title={BigHand2M Benchmark: Hand Pose Dataset and State of the Art Analysis},
+    author={Yuan, Shanxin and Ye, Qi and Stenger, Bjorn and Jain, Siddhand and Kim, Tae-Kyun},
+    journal={arXiv preprint arXiv:1704.02612},
+    year={2017}}
+
+@book{facs,
   title={{Facial Action Coding System}},
   author={Ekman, Paul and Friesen, Wallace V},
   year={1977},
@@ -45,17 +51,17 @@
 	Title = {Realtime Facial Animation with On-the-fly Correctives},
 	Year = {2013}}
 
-@inproceedings{weise2011realtime,
+@article{weise2011realtime,
     title={Realtime performance-based facial animation},
     author={Weise, Thibaut and Bouaziz, Sofien and Li, Hao and Pauly, Mark},
-    booktitle={ACM Transactions on Graphics (TOG)},
+    journal=sig,
     volume={30},
     number={4},
     pages={77},
     year={2011},
     organization={ACM}}
 
-@inproceedings{valentin2016learning,
+@conference{valentin2016learning,
     title={Learning to navigate the energy landscape},
     author={Valentin, Julien and Dai, Angela and Nie{\ss}ner, Matthias and Kohli, Pushmeet and Torr, Philip and Izadi, Shahram and Keskin, Cem},
     booktitle=threedv,
@@ -64,36 +70,33 @@
     organization={IEEE}}
 
 @article{htrack,
-author = {Andrea Tagliasacchi   and   Matthias Schr{\"o}der   and   Anastasia Tkach and 
-          Sofien Bouaziz        and   Mario Botsch            and   Mark Pauly},
-title = {Robust Articulated-ICP for Real-Time Hand Tracking},
-journal = {Symposium on Geometry Processing (Computer Graphics Forum)},
-year = 2015}
+    author = {Andrea Tagliasacchi and Matthias Schr{\"o}der and Anastasia Tkach and Sofien Bouaziz and Mario Botsch and Mark Pauly},
+    title = {Robust Articulated-ICP for Real-Time Hand Tracking},
+    journal = sgp,
+    year = 2015}
 
-@article{welch1995introduction,
+@book{welch1995introduction,
   title={An introduction to the Kalman filter},
-  author={Welch, Greg and Bishop, Gary},
-  year={1995}
-}
+  author={Welch, Greg and Bishop, Gary}, 
+  publisher={Technical report},
+  year={1995}}
 
-@inproceedings{havlik2015performance,
-  title={Performance evaluation of iterated extended Kalman filter with variable step-length},
-  author={Havl{\'\i}k, Jind{\v{r}}ich and Straka, Ond{\v{r}}ej},
-  booktitle={Journal of Physics: Conference Series},
-  volume={659},
-  number={1},
-  pages={012022},
-  year={2015},
-  organization={IOP Publishing}
-}
-
-@article{anderson1979optimal,
+@article{optimal,
   title={Optimal filtering},
   author={Brian Anderson and John Moore},
   journal={Englewood Cliffs},
   volume={21},
   pages={22--95},
   year={1979}}
+
+
+@article{havlik2015performance,
+    title={Performance evaluation of iterated extended Kalman filter with variable step-length},
+    author={Havl{\'\i}k, Jind{\v{r}}ich and Straka, Ond{\v{r}}ej},
+    booktitle={Journal of Physics: Conference Series},
+    year={2015},
+    organization={IOP Publishing}}
+
 
 @article{petersen2008matrix,
   title={The matrix cookbook},
@@ -118,6 +121,7 @@ year = 2015}
   journal=siga,
   volume={35},
   number={6},
+  pages={222},
   year={2016}}
 
 @inproceedings{joseph2016fits,
@@ -142,12 +146,6 @@ COPY PASTED FROM EDOARDO'S PAPER
   author={Jacobson, Alec and Sorkine, Olga},
   journal=tog,
   year={2011}}
-
-@article{delagorce2011model,
-    title={Model-based {3D} hand pose estimation from monocular video},
-    author={de La Gorce, Martin and Fleet, David J and Paragios, Nikos},
-    journal=pami,
-    year={2011}}
 
 @conference{rhee2006hand,
     title={Human hand modeling from surface anatomy},
@@ -191,7 +189,7 @@ COPY PASTED FROM EDOARDO'S PAPER
     booktitle = eccv,
     year = {1994}}
 
-@inproceedings{supancic2015depth,
+@conference{supancic2015depth,
     title={Depth-based hand pose estimation: data, methods, and challenges},
     author={Supancic, James S and Rogez, Gr{\'e}gory and Yang, Yi and Shotton, Jamie and Ramanan, Deva},
     booktitle=iccv,
@@ -241,8 +239,10 @@ COPY PASTED FROM EDOARDO'S PAPER
     title={Real-time continuous pose recovery of human hands using convolutional networks},
     author={Tompson, Jonathan and Stein, Murphy and Lecun, Yann and Perlin, Ken},
     journal=tog,
-    year={2014}
-}
+    volume={33},
+    number={5},
+    pages={169},
+    year={2014}}
 
 @conference{oberweger2015feedback,
     author = {Markus Oberweger and Paul Wohlhart and Vincent Lepetit},
@@ -290,6 +290,7 @@ COPY PASTED FROM EDOARDO'S PAPER
 	author={Tan, David J. and Cashman, Thomas and Taylor, Jonathan and Fitzgibbon, Andrew and Tarlow, Daniel and Khamis, Sameh and Izadi, Shahram and Shotton, Jamie},
 	booktitle=cvpr,
 	pages={5610--5619},
+    publisher={IEEE},
 	year={2016}}
 
 @article{taylor2016joint,
@@ -480,7 +481,7 @@ COPY PASTED FROM EDOARDO'S PAPER
 	booktitle=chi,
 	pages={3633--3642},
 	year={2015},
-	organization={ACM}
+	publisher={ACM}
 }
 
 @InProceedings{Fleishman_2015,
@@ -554,21 +555,23 @@ COPY PASTED FROM EDOARDO'S PAPER
 	year={2012}
 }
 
-@inproceedings{bogo2015detailed,
+@conference{bogo2015detailed,
 	title={Detailed full-body reconstructions of moving people from monocular RGB-D sequences},
 	author={Bogo, Federica and Black, Michael J and Loper, Matthew and Romero, Javier},
-	booktitle={Proceedings of the IEEE International Conference on Computer Vision},
+	booktitle=iccv,
 	pages={2300--2308},
-	year={2015}
-}
+    publisher={IEEE},
+	year={2015}}
 
 @article{cao2015facial,
     author = {Cao, Chen and Bradley, Derek and Zhou, Kun and Beeler, Thabo},
     title = {Real-time High-fidelity Facial Performance Capture},
     year = {2015},
-    journal = sig,
-    articleno = {46}} 
-
+    volume={34},
+    number={4},
+    pages={46},
+    journal = sig} 
+    
 @article{cao2016real,
 	title={Real-time facial animation with image-based dynamic avatars},
 	author={Cao, Chen and Wu, Hongzhi and Weng, Yanlin and Shao, Tianjia and Zhou, Kun},
@@ -580,14 +583,13 @@ COPY PASTED FROM EDOARDO'S PAPER
 	publisher={ACM}
 }
 
-@inproceedings{albrecht2003construction,
+@conference{albrecht2003construction,
 	title={Construction and animation of anatomically based human hand models},
 	author={Albrecht, Irene and Haber, J{\"o}rg and Seidel, Hans-Peter},
 	booktitle={Proceedings of the 2003 ACM SIGGRAPH/Eurographics symposium on Computer animation},
 	pages={98--109},
 	year={2003},
-	organization={Eurographics Association}
-}
+	publisher={Eurographics Association}}
 
 @inproceedings{rhee2006human,
 	title={Human hand modeling from surface anatomy},
@@ -607,14 +609,6 @@ COPY PASTED FROM EDOARDO'S PAPER
 	publisher={Springer}
 }
 
-@article{makris2015model,
-	title={Model-based 3D hand tracking with on-line hand shape adaptation},
-	author={Makris, Alexandros and Argyros, A},
-	journal={Proc. BMVC, pages},
-	pages={77--1},
-	year={2015}
-}
-
 @article{delagorce2011model,
 	title={Model-based {3D} hand pose estimation from monocular video},
 	author={de La Gorce, Martin and Fleet, David J and Paragios, Nikos},
@@ -624,7 +618,7 @@ COPY PASTED FROM EDOARDO'S PAPER
 @article{zou2013coslam,
 	title={Coslam: Collaborative visual slam in dynamic environments},
 	author={Zou, Danping and Tan, Ping},
-	journal={IEEE transactions on pattern analysis and machine intelligence},
+	journal=pami,
 	volume={35},
 	number={2},
 	pages={354--366},
@@ -632,10 +626,3 @@ COPY PASTED FROM EDOARDO'S PAPER
 	publisher={IEEE}
 }
 
-@inproceedings{khamis2015learning,
-	title={Learning an efficient model of hand shape variation from depth images},
-	author={Khamis, Sameh and Taylor, Jonathan and Shotton, Jamie and Keskin, Cem and Izadi, Shahram and Fitzgibbon, Andrew},
-	booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
-	pages={2540--2548},
-	year={2015}
-}

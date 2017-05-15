@@ -1,4 +1,3 @@
-\input{fig/interreal/item}
 \section{Evaluation}
 To evaluate the technical validity of our approach we:
 (\Sec{evalsynth}) analyze its robustness through randomly perturbing the algorithm initialization; 
@@ -6,19 +5,18 @@ To evaluate the technical validity of our approach we:
 (\Sec{evaldataset}) verify its effectiveness on by applying our algorithm to a new calibration dataset acquired through a commodity depth camera; 
 (\Sec{evalstar}) attest how our method achieves state-of-the-art performance on publicly available datasets.
 
-\newpage
 \subsection{Synthetic dataset: robustness -- \Fig{synthetic}}
 \label{sec:evalsynth}
 We empirically evaluate the \emph{robustness} of the algorithm by analyzing its convergence properties. 
 For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{M}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy/Teaser} dataset~\cite{tkach2016sphere}.
 We employ two metrics, one measuring average ground truth residuals, the other measuring the average length of data-to-model ICP correspondences (i.e. part of the tracking energy):
 % 
-\begin{equation*}
-E_{\beta} = \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_m - \bar\beta_m \right|, 
-\:
-E_\text{d2m}^n = \tfrac{1}{|d_n|} \sum_{\mathbf{p}_j \in d_n} \| \mathbf{p}_j - \Pi_{\mathcal{M}(\theta,\beta)}(\mathbf{p}_j) \|_2
+\begin{align}
+E_{\beta} = \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_{[m]} - \bar\beta_{[m]} \right|, 
+\\
+E_\text{d2m}^n = \tfrac{1}{|d_n|} \sum_{\mathbf{p}_j \in d_n} \left| \mathbf{p}_j - \Pi_{\mathcal{M}}(\mathbf{p}_j) \right|_2
 \label{eq:metrics}
-\end{equation*}
+\end{align}
 % 
 Note how we selected only a subset \todo{$M=\{1,2,3,4\}$} of shape parameters; see \Figure{handmodel}. This is necessary as sphere-centres on the palm can move without affecting the tracking energy -- a null-space of our optimization.
 % 
@@ -35,20 +33,21 @@ As expected, the phalanx length can be estimated only in those frames where the 
 %
 Notice how the intra-frame estimate {\small $\star\beta_n$} can oscillate away from the ground truth, and such incorrect estimates should be considered. To achieve this, our algorithm estimates the solution uncertainty {\small $\Sigma^*_n$}, and accordingly updates the online cumulative estimates {\small $\hat\beta_n$} and {\small $\hat\Sigma_n$}.
 
-\input{fig/evalhandy/item}
+\input{fig/evalnyu/item}
 \subsection{Calibration dataset: \texttt{GuessWho?} -- \Fig{realtrack}}
 \label{sec:evaldataset}
-We stress-tested our system by qualitative evaluating our calibration technique with data acquired from twelve different users performing in front of an Intel RealSense SR300 camera (time-of-flight depth RGBD sensor). 
+We stress-tested our system by qualitative evaluating our calibration technique with data acquired from twelve different users performing in front of an Intel RealSense SR300 camera (time-of-flight depth sensor). 
 Snapshot of the twelve calibration sequences are reported in \Figure{realtrack}, but the calibration procedure can be better appreciated by watching our \VideoQualitative{}.
-While ground truth information is not available, these datasets can be evaluated through the use of empirical metrics; e.g. $E_\text{d2m}$ and $E_\text{m2d}$ from \cite{tkach2016sphere}, or the golden-energy from~\cite{taylor2016joint}. Hence, to foster research in this domain, we release these calibration sequences to the community as the ``\texttt{GuessWho?}'' dataset. \AT{get the pun? :P}
- 
-\input{fig/evalnyu/item}
+While ground truth information is not available, these datasets can be evaluated through the use of empirical metrics; e.g. $E_\text{d2m}$ and $E_\text{m2d}$ from \cite{tkach2016sphere}, or the golden-energy from~\cite{taylor2016joint}.
+Hence, to foster research in this domain, we release these calibration sequences to the community as the ``\texttt{GuessWho?}'' dataset -- future works will be able to generate identical synthetic clones of human hands (metrics $\approx 0$), and thus enable biometric authentication applications.
+
+\input{fig/interreal/item}
+\input{fig/evalhandy/item}
 \subsection{State-of-the-art on $\{$\texttt{Handy, NYU}$\}$ --
 \Fig{evalhandy} and \Fig{evalnyu}}
 \label{sec:evalstar}
-We quantitatively evaluate our algorithm in terms of tracking performance on the NYU~\cite{tompson2014real} and Handy~\cite{tkach2016sphere} datasets. \AT{WORK IN PROGRESS...}
-% 
-\begin{DRAFT}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-\end{DRAFT}
+% We quantitatively evaluate our algorithm in terms of tracking performance on .
+To quantitatively evaluate tracking algorithms, while many \emph{marker-based} datasets are available (e.g. \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}), 
+state-of-the-art \emph{generative} methods have focused on the \texttt{NYU}~\cite{tompson2014real} and \texttt{Handy}~\cite{tkach2016sphere} datasets. These datasets allow us to compare our method and its variants to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the MVS calibration and tracking solution of \cite{tkach2016sphere}, as well as the Gaussian-blob tracker of \cite{sridhar2015fast}, and finally discriminative tracking solutions such as  \cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}. 
+
+
