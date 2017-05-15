@@ -8,23 +8,23 @@
 \put(15,40.5){straight finger}
 \put(65,40.5){bent finger}
 % 
-\put(28.5,9.5){\scriptsize $\beta_1$}
-\put(20,19.5){\scriptsize $\beta_2$}
+\put(28.5,9.5){\scriptsize $\beta_{[1]}$}
+\put(18,19.5){\scriptsize $\beta_{[2]}$}
 % 
-\put(23,-3){\small $\beta_1^*$}
-\put(40,-3){\small $\beta_1^+$}
-\put(7.5,-3){\small $\beta_1^-$}
+\put(23,-3){\small $\beta_{[1]}^*$}
+\put(40,-3){\small $\beta_{[1]}^+$}
+\put(7.5,-3){\small $\beta_{[1]}^-$}
 % 
-\put(57,-3){\small $\beta_1^-$}
-\put(74,-3){\small $\beta_1^*$}
-\put(90,-3){\small $\beta_1^+$}
+\put(57,-3){\small $\beta_{[1]}^-$}
+\put(74,-3){\small $\beta_{[1]}^*$}
+\put(90,-3){\small $\beta_{[1]}^+$}
 \end{overpic}
 \caption{
 % 
 %
 \textbf{(Intra-frame regression)} We abstract the hand shape/pose estimation problem from a single frame into the one of a simpler 2D stick-figure. Note however our illustration are not hand-crafted, but are derived from numerical optimization executed on these simplified datasets. When the finger is straight (left), it is difficult to estimate finger length as the optimization problem is ill-posed, while with a bent finger (right) the problem is better conditioned.
 % 
-We analyze the landscape of the registration energies {\color{anagreen}$E(\shape_1)$}, and observe how estimation uncertainty relates to the width of the local minima valley. This certainty can be estimated through a quadratic approximation {\color{anasalmon}$\tilde{E}(\shape_1)$}, derived from the Jacobians of the registration energies.
+We analyze the landscape of the registration energies {\color{anagreen}$E(\shape_{[1]})$}, and observe how estimation uncertainty relates to the width of the local minima valley. This certainty can be estimated through a quadratic approximation {\color{anasalmon}$\tilde{E}(\shape_{[1]})$}, derived from the Jacobians of the registration energies.
 % 
 %
 }

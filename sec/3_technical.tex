@@ -1,14 +1,14 @@
 \input{fig/intra/item}
 \section{Online model calibration}
 \label{sec:technical}
-Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ we represent vector of coalesced pose and shape parameters at frame $n$. \TODO{Here describe the hand model, or perhaps that can be done in the intro?}
+Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud via a wristband~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ we represent vector of coalesced pose and shape parameters at frame $n$. \TODO{Here describe the hand model, or perhaps that can be done in the intro?}
 
 To achieve online \emph{joint} calibration and tracking, our algorithm presents two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (see \Section{independent}), while the latter integrates this knowlege across frames (see \Section{combining}). We first demonstrate how inter-frame regression can be interpreted as a Kalman Filter (KF), highlight its shortcomings, and finally propose a joint \emph{inter/intra-frame} regression and interpret it as an Iterative Extended Kalman Filter (IEKF).
 
 \input{fig/inter/item}
 \paragraph{Intra-frame regression}
 Given a proper initialization $x_n^0$ and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, as well as estimates the \emph{certainty/uncertainty} in the given solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. Estimating uncertainty in the solution is essential for template personalization. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
-Rather than deriving this relationship from experimentation, we follow the ideas in ~\todo{\cite{?}} and derive how this distribution can be approximated by a gaussian $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.
+Rather than deriving this relationship via hard-coded rules, we follow the ideas in ~\todo{\cite{?}} and derive how this distribution can be approximated by a gaussian $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.
 A fundamental observation is that the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking energies. We illustrate why a covariance matrix $\star{\Sigma}_n$, as opposed to per-measurement variances, is necessary through the stick-figure example of \Figure{covariance}.
 
 \input{fig/covariance/item}
@@ -95,7 +95,8 @@ where $\Delta x=x - x^*$, and with an abuse of notation, as $\partial f(\star{x}
 \tfrac{\partial^2 L(x^*)}{\partial x^2} 
 % = 2 \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*}^T \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} + \\ 2 F(x^*)^T  \left. \tfrac{\partial \partial F (x^*) }{\partial \partial x} \right|_{x^*}
 & \approx 2 \tfrac{\partial F(x^*)}{\partial x}^T \tfrac{\partial F(x^*)}{\partial x}
-= {\star{\Sigma}}^{-1} \succ 0
+\triangleq %< DEFINED AS
+{\star{\Sigma}}^{-1} \succ 0
 \label{eq:taylor-hessian}
 \end{align}
 % 
@@ -109,7 +110,7 @@ That is, after processing the information in a frame $d_n$, the sought-after qua
 Its mean is the solution of the (iterative) optimization problem in \Equation{energies}; its covariance is computed according to \Equation{taylor-hessian}, that is, from the Jacobians of the energy terms $\{E_{\text{d2m}}, E_{\text{m2d}}\}$ at the optimal solution.
 
 \input{tab/iekf-like}
-\input{fig/interreal/item}
+\input{fig/realtrack/item}
 \subsection{Inter-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) | \mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ } 
 % \subsection{Merging independent measurements}
 \label{sec:combining}
@@ -160,7 +161,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 \subsection{Something else?}
 \AT{Leaving some space: i am sure we are forgetting something in technical, like the fact that you don't run honline at each frame because it's too heavy?}
 \begin{DRAFT}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
 \end{DRAFT}
     
 \input{fig/synthetic/item}

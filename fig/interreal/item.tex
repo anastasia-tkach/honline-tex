@@ -13,25 +13,25 @@
 {\currfiledir/item.pdf}
 \myfigurename{}
 \put(0.5,17){\scriptsize \vertical{$E_\beta$}}
-\put(98.5,17){\scriptsize \vertical{$\Sigma^{-1}$}}
-\put(6,-1.5){\small thumb middle length -- \todo{$\beta_?$}}
-\put(31,-1.5){\small ring attachment y -- \todo{$\beta_?$}}
-\put(54,-1.5){\small middle middle length -- \todo{$\beta_?$}}
-\put(80,-1.5){\small middle attachment z -- \todo{$\beta_?$}}
+\put(98,17){\scriptsize \vertical{$\Sigma^{-1}$}}
+\put(6,-1.5){\small thumb middle length -- \todo{$\beta_{[?]}$}}
+\put(31,-1.5){\small ring attachment y -- \todo{$\beta_{[?]}$}}
+\put(54,-1.5){\small middle middle length -- \todo{$\beta_{[?]}$}}
+\put(80,-1.5){\small middle attachment z -- \todo{$\beta_{[?]}$}}
 \end{overpic}
 \caption{
 % 
 We illustrate the formulation in \Section{technical} on the calibration of four different degrees-of-freedom on the \texttt{Handy/Teaser} dataset. 
 (top)
-Frames are indexed by $n$ and we display: 
-{\color{truth}ground-truth value $\bar{\beta}$},
-{\color{intra} intra-frame estimate $\star{\beta}_n$} and 
-{\color{inter} inter-frame estimate $\hat{\beta}_n$}, 
-diagonal entry of the covariance matrices for 
-{\color{varintra} intra-frame $\star\Sigma_n$} and 
-{\color{varinter} inter-frame $\hat\Sigma_n$} estimates.
 % 
-(bottom) We also display the pose corresponding to a selection of frames in the sequence~(small grey arrows).
+Frames are indexed by $n$ and we display: 
+{\color{truth} ground-truth value $\bar{\beta}$},
+{\color{intra} intra-frame estimate $\star{\beta}_n$} and 
+{\color{inter} inter-frame estimate $\hat{\beta}_n$}; the scale for these quantities is relative to $\bar{\beta}$, and shown on left-hand side of each axis.
+% 
+In the same plot, we also visualize the \emph{inverse} of the diagonal entry of the covariance matrices (i.e. certainty) for {\color{varintra} intra-frame $\star\Sigma_n$} and {\color{varinter} inter-frame $\hat\Sigma_n$} estimates; the scale for these quantities is on the right-hand side of each plot.
+% 
+(bottom) We also display the pose corresponding to a selection of frames in the sequence~(small grey arrows); please note the correlation between pose and estimate uncertainty.
 % 
 }
 \label{fig:interreal}
