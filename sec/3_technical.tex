@@ -1,5 +1,6 @@
 \input{fig/intra/item}
-\section{Technical}
+\section{Online model calibration}
+\label{sec:technical}
 Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ we represent vector of coalesced pose and shape parameters at frame $n$. \TODO{Here describe the hand model, or perhaps that can be done in the intro?}
 
 To achieve online \emph{joint} calibration and tracking, our algorithm presents two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (see \Section{independent}), while the latter integrates this knowlege across frames (see \Section{combining}). We first demonstrate how inter-frame regression can be interpreted as a Kalman Filter (KF), highlight its shortcomings, and finally propose a joint \emph{inter/intra-frame} regression and interpret it as an Iterative Extended Kalman Filter (IEKF).
@@ -133,9 +134,9 @@ By applying the product of Gaussians rule ~\cite{petersen2008matrix}:
 \end{align}
 % 
 In \Appendix{proof-kalman}, we shown how \Equation{combining} is equivalent to the Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. This observation is fundamental as, under the same assumptions we made in \Appendix{kalman}, \cite[\todo{Pg.?}]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
-This optimization will be used as a \emph{baseline}, as it is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF.
+This optimization will be used as a \emph{baseline}, as it is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a Kalman filter.
 
-\subsection{Joint inter/intra frame regression}
+\subsection{Online inter-frame regression}
 % Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space.
 The optimization in \Tab{interframe} does not provide any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve described in \Section{independent}. This could be problematic, as in this case \Eq{energies} does not leverage any temporal information aside from initialization, while relying on a sufficiently good initialization to compute $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. One potential way to increase the robustness of the algorithm would be to include this information in \Eq{independent}:
 % 
@@ -144,7 +145,7 @@ x_n^* &= \argmin_{x_n} \log  P(d_n|x_n) P(x_n |\hat{x}_{n - 1})
 \label{eq:independenttemp}
 \end{align}
 % 
-Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} intra/inter online regression scheme in \Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update...} \TODO{what?}.
+Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{online} inter-frame regression scheme in~\Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update...} \AT{what? need more info?}.
 % 
 Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 

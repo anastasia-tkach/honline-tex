@@ -1,27 +1,42 @@
 \input{fig/realtrack/item}
 \section{Evaluation}
-To evaluate the technical validity of our approach, we (\Sec{evalsynth}) analyze the robustness of our method on synthetically generated data, (\Sec{evaldataset}) verify its effectiveness on acquired 3D data by applying our algorithm to a new calibration dataset, and (3) attest how our method achieves state-of-the-art performance on public datasets.
+To evaluate the technical validity of our approach we:
+(\Sec{evalsynth}) analyze its robustness through randomly perturbing the algorithm initialization; 
+(\Sec{analysis}) corroborate the formulation of our optimization on a synthetic 3D dataset;
+(\Sec{evaldataset}) verify its effectiveness on by applying our algorithm to a new calibration dataset acquired through a commodity depth camera; 
+(\Sec{evalstar}) attest how our method achieves state-of-the-art performance on publicly available datasets.
 
-\subsection{Synthetic: quantitative and qualitative}
+\newpage
+\subsection{Synthetic dataset: robustness}
 \label{sec:evalsynth}
 We empirically evaluate the \emph{robustness} of the algorithm by analyzing its convergence properties. 
-For synthetic data the ground truth shape parameters $\beta^*$ are readily available, and the model is animated in time with the $\theta^*_n$ parameters corresponding to the complex motions from the \texttt{Handy/Teaser} of~\cite{tkach2016sphere}. 
-We employ two different metrics, one measuring average ground truth residuals, the other measuring the average length of data-to-model ICP correspondences:
+For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{M}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy/Teaser} dataset~\cite{tkach2016sphere}.
+We employ two metrics, one measuring average ground truth residuals, the other measuring the average length of data-to-model ICP correspondences (i.e. part of the tracking energy):
 % 
 \begin{equation*}
-E_{\beta} = \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_m - \beta_m^* \right| 
-\quad \quad
-E_\text{d2m}^n = \sum_j \| \todo{\dots}  \|_2
+E_{\beta} = \tfrac{1}{|M|} \Sigma_{m \in M} \left| \beta_m - \bar\beta_m \right|, 
+\quad
+E_\text{d2m}^n = \sum_j \| \mathbf{p}_j - \Pi_{\mathcal{M}(\theta,\beta)}(\mathbf{p}_j) \|_2
 \label{eq:metrics}
 \end{equation*}
+% 
+Note how we selected only a subset \todo{$M=\{1,2,3,4\}$} of shape parameters; see \Figure{handmodel}. This is strictly necessary, as sphere-centres on the palm can vary significantly without affecting the tracking energy, thus representing a null-space of our problem.
+% 
+The tracking algorithm is initialized in the first frame by $\bar\theta_0$, while initializations for the user-personalized models are drawn from the uniform distribution {\small $\mathcal{U}(\bar\beta, \sigma)$}.
+We limit ourselves to ten samples per value of $\sigma$, as each sample requires the re-execution of our algorithm on an entire sequence. Nonetheless, we empirically noticed that increasing the number of samples did not alter our observations.
+% \AT{I still REALLY don't like this... It is not statistically significant. We'd run at least 50-100 samples...}
+In \Figure{synthetic}, we visualize our two metrics as we vary the intensity of the perturbation. For a random selection of samples (as our synthetic evaluation is performed on \todo{2h30s} of synthetic footage), the sequences can be observed in our \VideoSynth{}.
+%
+ 
 
+\subsection{Synthetic dataset: formulation analysis}
+\label{sec:analysis}
+\TODO{Describe \Figure{interreal}}
+\todo{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.}
 
-\begin{DRAFT}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-\end{DRAFT}
 
 \input{fig/evalhandy/item}
-\subsection{Calibration dataset -- ``GuessMyHand''}
+\subsection{Calibration dataset -- \texttt{GuessMyHand}}
 \label{sec:evaldataset}
 \begin{DRAFT}
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -29,13 +44,9 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 \end{DRAFT}
 
 \input{fig/evalnyu/item}
-\subsection{State-of-the-art comparisons}
+\subsection{State-of-the-art comparisons -- $\{$\texttt{Handy, NYU}$\}$}
+\label{sec:evalstar}
 \begin{DRAFT}
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-\end{DRAFT}
-
-\paragraph{Something}
-\begin{DRAFT}
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 \end{DRAFT}
