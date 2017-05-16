@@ -1,15 +1,35 @@
+\providecommand{\off}{6}
 \begin{figure}[t]
 \centering
 \begin{overpic} 
 [width=\linewidth,height=3in]
-% [width=\linewidth,grid,tics=10]
+% [width=\linewidth,height=3in,grid,tics=10]
 {\currfiledir/item.pdf}
 \myfigurename{}
+\put(96,0){\small $\varepsilon$}
+\put(96,45){\small $\varepsilon$}
+\put(1,41){\small $\%$}
+\put(1,86){\small $\%$}
+% ALGORITHMS LEGEND
+\put(\off,41){\scriptsize \color[RGB]{217,144,143}      Kalman Standard -- \Table{kf-like}???}
+\put(\off,38){\scriptsize \color[RGB]{178,68,117}       Kalman Extended -- \Table{iekf-like}???}
+\put(\off,35){\scriptsize \color[RGB]{179,179,179}      Batch-Offline -- \todo{????}}
+\put(\off,32){\scriptsize \color[RGB]{160,215,190}      Batch-Online -- \todo{????}}
+\put(\off,29){\scriptsize \color[RGB]{61,131,119}       Online --  \todo{????}}
+\put(\off,26){\scriptsize \color[RGB]{77,77,77}         \cite{tkach2016sphere}}
+\put(\off,23){\scriptsize \color[RGB]{150,29,29}        \cite{taylor2016joint}}
+\put(\off,20){\scriptsize \color[RGB]{30,150,30}        \cite{tompson2014real}}
+\put(\off,17){\scriptsize \color[RGB]{150,149,30}       \cite{htrack}}
+\put(\off,14){\scriptsize \color[RGB]{29,30,150}        \cite{sridhar2015fast}}
+\put(\off,11){\scriptsize \color[RGB]{150,30,150}       \cite{oberweger2015hands}}
+\put(\off,8){\scriptsize \color[RGB]{29,150,150}       \cite{tang2015opening}}
+\put(\off,5){\scriptsize \color[RGB]{150,150,150}      \cite{tan2016fits}}
 \end{overpic}
 % \vspace{-.3in}
 \caption{
 % 
-Evaluation on the NYU dataset from \protect\cite{tompson2014real}.
+Evaluation on the NYU dataset from \protect\cite{tompson2014real} reporting the percentage of frames with average (top) and max (bottom) ground-truth marker-error  less than $\varepsilon$.
+\TODO{focus (top) between [0,15]?}
 % 
 }
 \label{fig:evalnyu}

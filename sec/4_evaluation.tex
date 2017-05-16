@@ -9,16 +9,16 @@ To evaluate the technical validity of our approach we:
 \label{sec:evalsynth}
 We empirically evaluate the \emph{robustness} of the algorithm by analyzing its convergence properties. 
 For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{M}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy/Teaser} dataset~\cite{tkach2016sphere}.
-We employ two metrics, one measuring average ground truth residuals, the other measuring the average length of data-to-model ICP correspondences (i.e. part of the tracking energy):
+The model $\mathcal{M}(\theta,\beta)$ is rendered with the camera intrinsics producing a depth map $\mathcal{D}(\theta,\beta)$. We employ two metrics, one measuring average ground-truth residuals, the other measuring the average length of data-to-model ICP correspondences (i.e. part of the tracking energy)=:
 % 
 \begin{align}
-E_{\beta} = \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_{[m]} - \bar\beta_{[m]} \right|, 
+E_{\beta} &= \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_{[m]} - \bar\beta_{[m]} \right|
 \\
-E_\text{d2m}^n = \tfrac{1}{|d_n|} \sum_{\mathbf{p}_j \in d_n} \left| \mathbf{p}_j - \Pi_{\mathcal{M}}(\mathbf{p}_j) \right|_2
+E_\text{d2m}^n &= \tfrac{1}{|d_n|} \sum_{\mathbf{p}_j \in d_n} \left| \mathbf{p}_j - \Pi_{\mathcal{D}(\theta,\beta)}(\mathbf{p}_j) \right|_2
 \label{eq:metrics}
 \end{align}
 % 
-Note how we selected only a subset \todo{$M=\{1,2,3,4\}$} of shape parameters; see \Figure{handmodel}. This is necessary as sphere-centres on the palm can move without affecting the tracking energy -- a null-space of our optimization.
+Where $\Pi$ is an operator computing the closest-point projection of point in the sensor's point cloud, onto the point-cloud associated with the synthetic depth-map $\mathcal{D}(\theta,\beta)$; see~\cite{tkach2016sphere}. For ground-truth comparisons, note how we selected only a subset \todo{$M=\{1,2,3,4\}$} of shape parameters; see \Figure{handmodel}. This is necessary as sphere-centres on the palm can move without affecting the tracking energy -- a null-space of our optimization.
 % 
 The tracking algorithm is initialized in the first frame by $\bar\theta_0$, while initializations for the user-personalized models are drawn from the uniform distribution {\small $\mathcal{U}(\bar\beta, \sigma)$}.
 We limit ourselves to ten samples per value of $\sigma$, as each sample requires the re-execution of our algorithm on an entire sequence. Nonetheless, we empirically noticed that increasing the number of samples did not alter our observations.
@@ -36,18 +36,19 @@ Notice how the intra-frame estimate {\small $\star\beta_n$} can oscillate away f
 \input{fig/evalnyu/item}
 \subsection{Calibration dataset: \texttt{GuessWho?} -- \Fig{realtrack}}
 \label{sec:evaldataset}
-We stress-tested our system by qualitative evaluating our calibration technique with data acquired from twelve different users performing in front of an Intel RealSense SR300 camera (time-of-flight depth sensor). 
+We stress-tested our system by qualitative evaluating our calibration technique with data acquired from \emph{twelve} different users performing in front of an Intel RealSense SR300 camera (time-of-flight depth sensor). 
 Snapshot of the twelve calibration sequences are reported in \Figure{realtrack}, but the calibration procedure can be better appreciated by watching our \VideoQualitative{}.
 While ground truth information is not available, these datasets can be evaluated through the use of empirical metrics; e.g. $E_\text{d2m}$ and $E_\text{m2d}$ from \cite{tkach2016sphere}, or the golden-energy from~\cite{taylor2016joint}.
-Hence, to foster research in this domain, we release these calibration sequences to the community as the ``\texttt{GuessWho?}'' dataset -- future works will be able to generate identical synthetic clones of human hands (metrics $\approx 0$), and thus enable biometric authentication applications.
+Hence, to foster research in this domain, we release these calibration sequences to the community as the ``\texttt{GuessWho?}'' dataset -- future works will be able to generate identical synthetic clones of human hands (metrics~$\approx 0$), and thus enable biometric authentication applications.
 
 \input{fig/interreal/item}
 \input{fig/evalhandy/item}
-\subsection{State-of-the-art on $\{$\texttt{Handy, NYU}$\}$ --
-\Fig{evalhandy} and \Fig{evalnyu}}
+\subsection{State-of-the-art on $\{$\texttt{NYU, Handy}$\}$ --
+\Fig{evalnyu} and \Fig{evalhandy}}
 \label{sec:evalstar}
 % We quantitatively evaluate our algorithm in terms of tracking performance on .
-To quantitatively evaluate real-time tracking algorithms, while many \emph{marker-based} datasets are available (e.g. \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}), 
-state-of-the-art \emph{generative} methods have focused on the \texttt{NYU}~\cite{tompson2014real} and \texttt{Handy}~\cite{tkach2016sphere} datasets. These datasets allow us to compare our method and its variants to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the MVS calibration and real-time solution of \cite{tkach2016sphere}, as well as the Gaussian tracker of \cite{sridhar2015fast}, and finally discriminative tracking solutions such as  \cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}.
-
-
+To quantitatively evaluate real-time tracking algorithms, while many \emph{marker-based} datasets are available (e.g. \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}), state-of-the-art \emph{generative} methods have focused on the \texttt{NYU} \cite{tompson2014real} and \texttt{Handy} \cite{tkach2016sphere} datasets. 
+These datasets allow us to compare our method and its variants to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the cylindrical tracker in~\cite{htrack}, the sphere-mesh calibration/tracker by~\cite{tkach2016sphere}, as well as the Gaussian tracker in~\cite{sridhar2015fast}, and finally discriminative methods such as~\cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}. 
+% 
+On the \texttt{NYU} dataset, our algorithm achieves state-of-the-art performance, and is the first to be able to calibrate the user-personalized tracking model in real-time. Similarly to \cite{taylor2016joint}, we evaluate the metrics on the first user ($n \in [0, 2440]$), as the second is too far from the camera.
+%
