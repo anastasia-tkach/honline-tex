@@ -14,7 +14,7 @@ The model $\mathcal{M}(\theta,\beta)$ is rendered with the camera intrinsics pro
 \begin{align}
 E_{\beta} &= \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_{[m]} - \bar\beta_{[m]} \right|
 \\
-E_\text{d2m}^n &= \tfrac{1}{|d_n|} \sum_{\mathbf{p}_j \in d_n} \left| \mathbf{p}_j - \Pi_{\mathcal{D}(\theta,\beta)}(\mathbf{p}_j) \right|_2
+E_\text{d2m}^n &= \tfrac{1}{|d_n|} \sum_{\mathbf{p}_j \in d_n} \| \mathbf{p}_j - \Pi_{\mathcal{D}(\theta,\beta)}(\mathbf{p}_j) \|_2
 \label{eq:metrics}
 \end{align}
 % 
