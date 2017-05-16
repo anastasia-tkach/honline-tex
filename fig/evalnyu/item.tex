@@ -8,14 +8,14 @@
 \myfigurename{}
 \put(96,0){\small $\varepsilon$}
 \put(96,45){\small $\varepsilon$}
-\put(1,41){\small $\%$}
-\put(1,86){\small $\%$}
+\put(.5,34){\scriptsize \vertical{$\% (max)$}}
+\put(.5,79){\scriptsize \vertical{$\% (avg)$}}
 % ALGORITHMS LEGEND
-\put(\off,41){\scriptsize \color[RGB]{217,144,143}      Kalman Standard -- \Table{kf-like}???}
-\put(\off,38){\scriptsize \color[RGB]{178,68,117}       Kalman Extended -- \Table{iekf-like}???}
-\put(\off,35){\scriptsize \color[RGB]{179,179,179}      Batch-Offline -- \todo{????}}
-\put(\off,32){\scriptsize \color[RGB]{160,215,190}      Batch-Online -- \todo{????}}
-\put(\off,29){\scriptsize \color[RGB]{61,131,119}       Online --  \todo{????}}
+\put(\off,41){\scriptsize \color[RGB]{217,144,143}      Kalman Standard -- \todo{Inter-frame?} from \Table{kf-like}}
+\put(\off,38){\scriptsize \color[RGB]{178,68,117}       Kalman Extended -- \todo{Online inter-frame?} from \Table{iekf-like}}
+\put(\off,35){\scriptsize \color[RGB]{179,179,179}      Batch-Offline -- \todo{Edoardo?}}
+\put(\off,32){\scriptsize \color[RGB]{160,215,190}      Batch-Online -- \todo{Remove?!}}
+\put(\off,29){\scriptsize \color[RGB]{61,131,119}       Online --  \todo{Intra-frame?}}
 \put(\off,26){\scriptsize \color[RGB]{77,77,77}         \cite{tkach2016sphere}}
 \put(\off,23){\scriptsize \color[RGB]{150,29,29}        \cite{taylor2016joint}}
 \put(\off,20){\scriptsize \color[RGB]{30,150,30}        \cite{tompson2014real}}
@@ -29,7 +29,7 @@
 \caption{
 % 
 Evaluation on the NYU dataset from \protect\cite{tompson2014real} reporting the percentage of frames with average (top) and max (bottom) ground-truth marker-error  less than $\varepsilon$.
-\TODO{focus (top) between [0,15]?}
+\TODO{focus (top) in x-range [0,15]?}
 % 
 }
 \label{fig:evalnyu}
