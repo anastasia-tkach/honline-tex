@@ -13,7 +13,7 @@ z_n &= J x_n + v_n
 \end{align}
 % 
 where $w_n$ is a normally distributed process noise $p(w) \sim \mathcal{N}(0, Q)$, and $v_n$ is a normally distributed measurement noise $p(v) \sim \mathcal{N}(0, R)$. The matrix $A$ provides a linear estimate for state updates, while $J$ maps the state $x_n$ to the measurement $z_n$.
-We assume that while there is no new measurements, an estimate of the current hand parameters is given by the ones as the previous time-step up to Gaussian noise, that is, $x_n = x_{n-1} + w_{n-1}$. We also assume for now that depth sensor noise is normally distributed \AT{wouldn't sensor noise be accounted in \emph{measurement} noise?}, which actually is not the case. Thus, the states of our system can be approximated as following:
+We assume that while there is no new measurements, an estimate of the current hand parameters is given by the ones as the previous time-step up to Gaussian noise, that is, $x_n = x_{n-1} + w_{n-1}$. We also assume for now that depth sensor noise is normally distributed \AT{wouldn't sensor noise be accounted in \emph{measurement} noise?}, which actually is not the case. Thus, the state of our system can be approximated as:
 % 
 \begin{align}
 x_n &= x_{n - 1} + w_{n - 1} \\
@@ -62,7 +62,11 @@ By defining $F_n = F(\hat{x}_n^0)$ and ${J_n}_{[i, j]} = \partial F_{[i]} / \par
 %
 \input{tab/ekalman}
 
-\input{tab/iekf}
+\subsection{Extended Information Filters}
+\label{app:eif}
+The EKF measurement updates can also be rewritten in the equivalent \emph{Extended Information Filter} form~\cite{optimal}; see \Table{eif}. Here, we assume that measurement noise is i.i.d. across sensor samples, therefore $R=rI$ where $r\in \mathbb{R}^+$. 
+\input{tab/eif.tex}
+
 \subsection{Iterated Extended Kalman Filter (IEKF)}
 \label{app:iekf}
 As the measurement function $F(\cdot)$ from \Appendix{ekf} is nonlinear, the following LM optimization takes several iterations to converge: 
@@ -72,10 +76,5 @@ As the measurement function $F(\cdot)$ from \Appendix{ekf} is nonlinear, the fol
 \end{equation}
 % 
 To address this problem, we can perform measurement updates in several steps. In each step, we linearize the measurement function $F$ around the updated value $\hat{x}_n^i$, leading to the Iterated Extended Kalman Filter (IEKF) formulation~\cite{havlik2015performance}. The time update equation for IEKF is analogous to the one in \Table{extended}, while the measurement update is reported in \Table{iekf}. 
+\input{tab/iekf}
 
-
-
-
-
-
- 

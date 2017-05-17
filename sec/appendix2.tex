@@ -1,9 +1,7 @@
-\clearpage
-\input{fig/merging/item}
-
+\newpage
 \section{Derivations}
 
-\subsection{Derivation \#1: Link to \Section{inter}}
+\subsection{Derivation for \Section{split}}
 \label{app:proof-kalman}
 Let us consider the special case when the measurement $z_n = x_n^*$ is in the same space at the estimated state $\hat{x}_n$, thus when $J$ is the identity matrix.
 % 
@@ -20,37 +18,10 @@ P_n &= ((P_n^0 + R) (P_n^0 + R)^{-1} - P_n^0  (P_n^0 + R)^{-1}) P_n^0\\
 % 
 Note how these two coincide with \Equation{combining} for product of two Gaussians  with $z_n = x_n^*$, $P_n^0 = \hat{\Sigma}_{n - 1}$ and $R = \Sigma_{n}$.
 
-
-\subsection{Derivation \#2: IEIF and \Table{iekf-like}}
+\subsection{Derivation for \Section{joint}}
 \label{app:ieif-lm}
 %
-To show that the optimizing the objective in \Table{iekf-like} with LM is equivalent to the IEKF, we first rewrite our EKF measurement updates in the completely equivalent \emph{Extended Information Filter}~\cite{optimal} form:
-% 
-\begin{gather*}
-\begin{aligned}
-&\text{Ex. Kalman Filter}                           &       &\text{Ex. Information Filter} \\
-&                                                   &       H_n &= \left(P_n\right)^{-1} \\
-K_n &= P_n^0 J_n^T(J_n P_n^0 J_n^T + R)^{-1}        &       H_n &= H_n^0 + J_n^T R^{-1} J_n \\
-\hat{x}_n &= \hat{x}_n^0 + K_n(z_n - F_n)           &       K_n &= {H_n}^{-1} J_n^T R^{-1} \\
-P_n &= (I - K_n J_n)P_n^0                           &       \hat{x}_n &= \hat{x}_n^0 + K_n (z_n - F_n)
-\end{aligned}
-\label{tab:ieif}
-\end{gather*}
-%  
-We assume that measurement noise is i.i.d. across sensor samples, therefore $R=rI$ where $r\in \mathbb{R}^+$. Similarly to \Appendix{iekf}, we can now write the IEIF, the iterated version of the EIF \AT{NOTE BROKEN LATEX EQs!!!}:
-\begin{gather}
-\begin{aligned}
-&\text{for } i=1 \dots  \\
-&\quad H_n^\textit{\color{accent}$i$} = \tfrac{1}{r} (r H_n^0 +{J_n^\textit{\color{accent}$i$}}^T J_n^\textit{\color{accent}$i$}) \\
-&\quad K_n^\textit{\color{accent}$i$} =\tfrac{r}{r} {H_n^\textit{\color{accent}$i$}}^{-1} {J_n^\textit{\color{accent}$i$}}^T \\
-&\quad \hat{x}_n^\textit{\color{accent}$i + 1$} = \hat{x}_n^0 + K_n^\textit{\color{accent}$i$}(z_n - F_n^\textit{\color{accent}$i$} - \textit{\color{accent} $J_n^i(\hat{x}_n^0 - \hat{x}_n^i)$}) \\
-&\text{end} \\
-&\hat{x}_n = \hat{x}_n^\textit{\color{accent}$i$}
-\end{aligned}
-\end{gather}
-
-\input{fig/handmodel/item}
-The LM update in Optimization from Table \ref{tab:iekf-like} has the following form: 
+To show that the optimizing the objective in \Table{iekf-like} with Levenberg-Marquardt (LM) is equivalent to an IEKF, we first convert the EKF into an EIF like that of \Appendix{eif}. Then, similarly to \Appendix{iekf}, we can write the iterated version of an EIF, are reported in \Table{ieif}. The LM update in Optimization from Table \ref{tab:iekf-like} has the following form:
 % 
 \begin{equation}
     x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
@@ -93,6 +64,8 @@ x_n^{i + 1}= x_n^{i} - \left(
 = \hat{x}_{n - 1} + B + A(- r H_{n - 1} + {J_n^i}^T J_n^i + r H_{n - 1})(x_n^i - \hat{x}_{n - 1}) = \\
 = \hat{x}_{n - 1} + B + A {J_n^i}^T J_n^i (x_n^i - \hat{x}_{n - 1}) = \\
 = \hat{x}_{n - 1} + \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1} {J_n^i}^T}_{K_n^i} \times (z_n - F_n^i - J_n^i (\hat{x}_{n - 1} - x_n^i)),
- \end{align*}
- 
- which is equivalent to the measurement update of IEIF from Table \ref{tab:ieif}, with $H_n^0 = H_{n-1}$ and $x_n^0 = \hat{x}_{n - 1}$.
+\end{align*}
+% 
+which is equivalent to the measurement update of IEIF from Table \ref{tab:ieif}, with $H_n^0 = H_{n-1}$ and $x_n^0 = \hat{x}_{n - 1}$.
+\input{tab/ieif.tex}
+% \input{fig/merging/item}

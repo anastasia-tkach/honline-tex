@@ -1,11 +1,10 @@
-% 
-\begin{algorithm}[b]
+\begin{algorithm}[t]
 \begin{align*}
 &\text{for} \quad i=1... i_{\text{max}} \\
 & \quad \quad
 \begin{aligned}
-F_n^i &= F(\hat{x}_n^i) \Rightarrow {J_n^i}_{[u, v]} = \tfrac{\partial F^i_{[u]}}{ \partial x_{[v]}}(\hat{x}_n^i) \\
-K_n^i &= P_n^0 {J^i_n}^T(J_n^i P_n^0 {J^i_n}^T + R)^{-1} \\
+F_n^i &= F(\hat{x}_n^i) \Rightarrow {J_n^i}_{[u, v]} = {\partial F^i_{[u]}}(\hat{x}_n^i)/{\partial x_{[v]}} \\
+K_n^i &= P_n^0 {J^{iT}_n}(J_n^i P_n^0 {J^{iT}_n} + R)^{-1} \\
 \hat{x}_n^{i+1} &= \hat{x}_n^0 + K_n^i(z_n - F_n^i -J_n^i(\hat{x}_n^0 - \hat{x}_n^i)) \\
 \end{aligned} 
 \\
@@ -13,7 +12,7 @@ K_n^i &= P_n^0 {J^i_n}^T(J_n^i P_n^0 {J^i_n}^T + R)^{-1} \\
 & \hat{x}_n = \hat{x}_n^i \\   
 & P_n = (I - K_n^\textit{\color{accent}$i$} J_n^i) P_n^0
 \end{align*}
-\caption{Iterated EKF measurement update equations.}
+\caption{Iterated EKF measurement update equations. \AT{check indexes? missing i+1 after end?}}
 \label{tab:iekf}
 \end{algorithm}
 
