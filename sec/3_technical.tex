@@ -9,7 +9,7 @@ To achieve online \emph{joint} calibration and tracking, our algorithm presents 
 \paragraph{Intra-frame regression}
 Given a proper initialization $x_n^0$ and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, as well as estimates the \emph{certainty/uncertainty} in the given solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. Estimating uncertainty in the solution is essential for template personalization. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
 Rather than deriving this relationship via hard-coded rules, we follow the ideas in ~\todo{\cite{?}} and derive how this distribution can be approximated by a gaussian $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.
-A fundamental observation is that the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking energies. We illustrate why a covariance matrix $\star{\Sigma}_n$, as opposed to per-measurement variances, is necessary through the stick-figure example of \Figure{covariance}.
+A fundamental observation is that the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking energies. We illustrate why a covariance matrix $\star{\Sigma}_n$, as opposed to per-measurement variances, is necessary through the stick-figure example of \Figure{covariance}. 
 
 \input{fig/covariance/item}
 \paragraph{Inter-frame regression}
@@ -62,6 +62,7 @@ F(x_n) = \left[F_{d2m}(x_n); F_{m2d}(x_n)\right]
 d_n = \left[(I_{d2m} d_n); (I_{m2d} d_n) \right],
 \end{align*}
 % 
+\AN{As we discussed last time, could you please remove this part with indicator variables since I am not using all energies anyway? It takes time to understand it and it does not add anything for the value of the paper.}
 leading to a compact posterior distribution representation:
 % 
 \begin{align}
@@ -72,7 +73,7 @@ P(d_n|x_n) &= \exp \left( - \tfrac{1}{2}(d_n - F(x_n))^T (d_n - F(x_n)) \right)
 \Equation{energies} is then rewritten in probabilistic form, where we temporarily omit the frame index $n$ for conveniency:
 %
 \begin{align}
-x^* &= \argmin_{x} \underbrace{\log  P(d|x)}_{L(x)}
+>> x^* &= \argmax_{x} \underbrace{\log  P(d|x)}_{L(x)}
 \label{eq:independent}
 \end{align}
 %
@@ -85,18 +86,18 @@ L(x) \approx \tilde{L}(x) = L(x^*)
 \label{eq:taylor}
 \end{align}
 %
-where $\Delta x=x - x^*$, and with an abuse of notation, as $\partial f(\star{x})/\partial x$ we indicate the partial derivative of $f(x)$ evaluated at $\star{x}$. Note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$:
+where $\Delta x=x - x^*$, and with an abuse of notation, as $\partial f(\star{x})/\partial x$ we indicate the partial derivative of $f(x)$ evaluated at $\star{x}$. Note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ with $\bar{F}(x_n) = d_n - F(x_n)$ for brevity of notation:
 %
 \begin{align}
-\tfrac{\partial L(x^*)}{\partial x} &= - 2 F(x^*)^T 
-\tfrac{\partial F(x^*)}{\partial x} = 0 
+>> \tfrac{\partial L(x^*)}{\partial x} &= - 2 \bar{F}(x^*)^T 
+\tfrac{\partial \bar{F}(x^*)}{\partial x} = 0 
 \label{eq:taylor-jacobian}
 \\
-\tfrac{\partial^2 L(x^*)}{\partial x^2} 
+>> \tfrac{\partial^2 L(x^*)}{\partial x^2} 
 % = 2 \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*}^T \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} + \\ 2 F(x^*)^T  \left. \tfrac{\partial \partial F (x^*) }{\partial \partial x} \right|_{x^*}
-& \approx 2 \tfrac{\partial F(x^*)}{\partial x}^T \tfrac{\partial F(x^*)}{\partial x}
+& \approx - 2 \tfrac{\partial \bar{F}(x^*)}{\partial x}^T \tfrac{\partial \bar{F}(x^*)}{\partial x}
 \triangleq %< DEFINED AS
-{\star{\Sigma}}^{-1} \succ 0
+-{\star{\Sigma}}^{-1} \succ 0
 \label{eq:taylor-hessian}
 \end{align}
 % 
@@ -146,7 +147,7 @@ x_n^* &= \argmin_{x_n} \log  P(d_n|x_n) P(x_n |\hat{x}_{n - 1})
 \label{eq:independenttemp}
 \end{align}
 % 
-Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} inter-frame regression scheme in~\Table{iekf-like}. Interestingly, we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with \todo{measurement update...} \AT{what? need more info?}.
+Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} inter-frame regression scheme in~\Table{iekf-like}. In \Appendix{ieif-lm} we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with measurement update $d_n$.
 % 
 Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 
