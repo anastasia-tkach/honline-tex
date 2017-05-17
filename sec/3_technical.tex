@@ -1,9 +1,7 @@
 \input{fig/intra/item}
 \section{Online model calibration}
 \label{sec:technical}
-Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud via a wristband~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ we represent vector of coalesced pose and shape parameters at frame $n$. \TODO{Here describe the hand model, or perhaps that can be done in the intro?}
-
-To achieve online \emph{joint} calibration and tracking, our algorithm presents two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (see \Section{independent}), while the latter integrates this knowlege across frames (see \Section{split}). We first demonstrate how inter-frame regression can be interpreted as a Kalman Filter (KF), highlight its shortcomings, and finally propose a \emph{joint} inter-/intra-frame regression and interpret it as an Iterative Extended Kalman Filter (IEKF) (see \Section{joint}).
+Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud via a wristband~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ denotes the vector of coalesced pose and shape parameters at frame $n$. Our model $\mathcal{M}(\theta_n; \beta)$ is a sphere-mesh tracking model~\cite{tkach2016sphere} where shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \cite{edoardo} in the \textbf{additional material}. To achieve online \emph{joint} calibration and tracking, our algorithm presents two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (see \Section{independent}), while the latter integrates this knowlege across frames (see \Section{split}). We first demonstrate how inter-frame regression can be interpreted as a Kalman Filter (KF), highlight its shortcomings, and finally propose a \emph{joint} inter-/intra-frame regression and interpret it as an Iterative Extended Kalman Filter (IEKF) (see \Section{joint}).
 
 \input{fig/inter/item}
 \paragraph{Intra-frame regression}
@@ -34,46 +32,45 @@ Where the terms $\mathcal{T}$ ensure that:
 \begin{aligned}
 \text{\textbf{d2m}} & \quad \text{data points are explained by the model} \\ 
 \text{\textbf{m2d}} & \quad \text{the model lies in the sensor visual-hull} \\
-\text{\textbf{shape-prior}} & \quad \text{the model shape should be plausible} \\
-\text{\textbf{pose-prior}} & \quad \text{the model pose should be plausible} \\
 \text{\textbf{smooth}} & \quad \text{the recorded sequence is smooth} \\
-\text{\textbf{collision}} & \quad \text{fingers do not interpenetrate} \\
-\text{\textbf{limits}} & \quad \text{joint limits are satisfied} 
+\text{\textbf{pose-prior}} & \quad \text{the hand pose should be likely} \\
+\text{\textbf{pose-valid}} & \quad \text{no inter-penetrations and valid joint limits} \\
+\text{\textbf{shape-prior}} & \quad \text{the hand shape should be likely} \\
+\text{\textbf{shape-valid}} & \quad \text{the hand shape should be plausible}
 \end{aligned}
 \end{equation*}
-The energy terms in the objective function are detailed in~\cite{tkach2016sphere} and~\cite{htrack}, with the exception of \emph{shape-prior} that is discussed in \Section{shapeprior}.
+The energy terms in the objective function are detailed in~\cite{tkach2016sphere} and~\cite{htrack}, with the exception of \emph{shape-prior} and \emph{shape-valid} that are discussed in \Section{shapeprior}.
 
 \input{tab/kf-like}
 \paragraph{Laplace approximation}
 % \subsection{Posterior distribution of parameters after taking a measurement into account}
 \label{sec:posterior}
-While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To retrieve this information, we first convert the \Equation{energies} in a probabilistic format, and from this formulation we then derive our uncertainties. 
+While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To retrieve this information, we first convert the \Equation{energies} in a probabilistic format, and from this formulation we then derive our uncertainties. Our data terms \emph{d2m} and \emph{m2d} can be written as posterior distributions:
 % 
-Towards this goal, we rewrite the \emph{d2m} and \emph{m2d} terms in \Eq{energies} as:
-% 
-\begin{align}
-E_{\tau}(d_n, x_n) = \|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2,
-\end{align} 
-where $I_\tau$ are identity matrices, and $I_{m2d}(i,i)=0$ if the rasterized 2D template pixel $\mathbf{p}_i$ lies within the sensor silhouette image; see \cite{htrack}. We also concatenate the two terms in pair of column vectors:
-% 
-\begin{align*}
-F(x_n) = \left[F_{d2m}(x_n); F_{m2d}(x_n)\right] 
-\:\:\text{and}\:\: 
-d_n = \left[(I_{d2m} d_n); (I_{m2d} d_n) \right],
-\end{align*}
-% 
-\AN{As we discussed last time, could you please remove this part with indicator variables since I am not using all energies anyway? It takes time to understand it and it does not add anything for the value of the paper.}
-leading to a compact posterior distribution representation:
+% \begin{DRAFT}
+% Towards this goal, we rewrite the \emph{d2m} and \emph{m2d} terms in \Eq{energies} as:
+% \begin{align}
+% E_{\tau}(d_n, x_n) = \|I_{\tau} d_n - F_{\tau} (x_n)\|_2^2,
+% \end{align}
+% where $I_\tau$ are identity matrices, and $I_{m2d}(i,i)=0$ if the rasterized 2D template pixel $\mathbf{p}_i$ lies within the sensor silhouette image; see \cite{htrack}. We also concatenate the two terms in pair of column vectors:
+% \begin{align*}
+% F(x_n) = \left[F_{d2m}(x_n); F_{m2d}(x_n)\right]
+% \:\:\text{and}\:\:
+% d_n = \left[(I_{d2m} d_n); (I_{m2d} d_n) \right],
+% \end{align*}
+% \end{DRAFT}
+% leading to a compact posterior distribution representation:
+% \AN{As we discussed last time, could you please remove this part with indicator variables since I am not using all energies anyway? It takes time to understand it and it does not add anything for the value of the paper.}
 % 
 \begin{align}
 P(d_n|x_n) &= \exp \left( - \tfrac{1}{2}(d_n - F(x_n))^T (d_n - F(x_n)) \right)
 \label{eq:posterior}
 \end{align}
 % 
-\Equation{energies} is then rewritten in probabilistic form, where we temporarily omit the frame index $n$ for conveniency:
+The data terms in \Equation{energies} are then rewritten in probabilistic form, where we temporarily omit the frame index $n$ for conveniency:
 %
 \begin{align}
->> x^* &= \argmax_{x} \underbrace{\log  P(d|x)}_{L(x)}
+x^* &= \argmax_{x} \underbrace{\log  P(d|x)}_{L(x)}
 \label{eq:independent}
 \end{align}
 %
@@ -86,14 +83,15 @@ L(x) \approx \tilde{L}(x) = L(x^*)
 \label{eq:taylor}
 \end{align}
 %
-where $\Delta x=x - x^*$, and with an abuse of notation, as $\partial f(\star{x})/\partial x$ we indicate the partial derivative of $f(x)$ evaluated at $\star{x}$. Note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ with $\bar{F}(x_n) = d_n - F(x_n)$ for brevity of notation:
+where $\Delta x=x - x^*$, and with an abuse of notation, as {\small $\partial f(\star{x})/\partial x$} we indicate the partial derivative of $f(x)$ evaluated at $\star{x}$. By rewriting {\small $\bar{F}(x_n) = d_n - F(x_n)$} for brevity of notation, note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ 
+:
 %
 \begin{align}
->> \tfrac{\partial L(x^*)}{\partial x} &= - 2 \bar{F}(x^*)^T 
+\tfrac{\partial L(x^*)}{\partial x} &= - 2 \bar{F}(x^*)^T 
 \tfrac{\partial \bar{F}(x^*)}{\partial x} = 0 
 \label{eq:taylor-jacobian}
 \\
->> \tfrac{\partial^2 L(x^*)}{\partial x^2} 
+\tfrac{\partial^2 L(x^*)}{\partial x^2} 
 % = 2 \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*}^T \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} + \\ 2 F(x^*)^T  \left. \tfrac{\partial \partial F (x^*) }{\partial \partial x} \right|_{x^*}
 & \approx - 2 \tfrac{\partial \bar{F}(x^*)}{\partial x}^T \tfrac{\partial \bar{F}(x^*)}{\partial x}
 \triangleq %< DEFINED AS
@@ -151,44 +149,43 @@ Instead, we propose to coalesce the inter and intra frame optimization resulting
 % 
 Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 
-\subsection{Shape prior}
-\label{sec:shapeprior}
-\begin{DRAFT} 
-\subsubsection{Anisotropic uniform scaling shape prior}
-
-Since a lot of hand shape variance can be explained by uniform scale, width and thickness of the hand (do you maybe know some reference?) we introduce anisotropic uniform scaling shape prior. This prior helps at first several frames if user hand size is different from the template. We add this prior with a small weight, so that it does not prevent from finding the exact parameters of the current user\rq{}s hand. The formulation is as following:
-
-\begin{equation}
-E_{uniform\_shape\_prior} = \|\beta - I\tilde{\beta} \circ \bar{\beta}\|_2^2
-\end{equation}
-
-where $\beta_{N_{\beta} \times 1}$ are the hand shape parameters, 
-$\tilde\beta_{3\times1}$ are latent scale parameters - height, width and thickness, 
-$I_{N_{\beta}\times 3}$ is a matrix that puts $\tilde\beta_i$ in correspondence with the relevant $\beta_j$,
-$\bar{\beta}_{N_{\beta} \times 1}$ are the template hand shape parameters,
-$\circ$ is element-wise product.
-
-\subsubsection{Semantic shape prior}
-Since anisotropic uniform scaling shape prior has a small weigh and thus only suggestive power, we need a prior to encode how a human hand can/cannot look like. For example, the finger base cannot be located in mid-air outside of the palm or the fingers should be in order \{index, middle, ring, pinky\} and not some other permutation of this list.
-Semantic shape prior is a list of constraints each of which has a form of linear combination of $\beta_i$.
-
-\begin{equation}
-E_{semantic\_shape\_prior} = \sum_{c = 1}^{N} \chi_c  {\sum_{i = 1}^{N_{c}} \kappa_{c_i} \beta_{c_i}}
-\end{equation}
-
-with $\chi_c = 1$ when semantic constrain $c$ is violated and $\chi_c = 0$ otherwise.
-
-where $\kappa_{c_i}$ are scalar coefficients.
-\end{DRAFT}
-
-\subsection{Something else?}
-\AT{Leaving some space: i am sure we are forgetting something in technical, like the fact that you don't run honline at each frame because it's too heavy?}
-\begin{DRAFT}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-\end{DRAFT}
-
-\subsection{Batch Offline/Online}
-\label{sec:batch}
-\TODO{ANDREA}
-
 \input{fig/interreal/item}
+
+\subsection{Shape regularizers}
+\label{sec:shapeprior}
+Hand shape variation can be explained in a low dimensional space whose fundamental degrees of freedom include variation like uniform scale, palm width, and finger thickness \cite{khamis15learning}. In our paper we follow the ideas presented in~\cite{edoardo}, and build a latent-space encoding hand shape variability through \emph{anisotropic scaling}. This prior acts as a light and soft regularizer, whose weight is small and does not prevent the algorithm from computing a tight fit to the observed user:
+% 
+\begin{equation}
+E_\text{shape-space} = \|\beta - (\bar{\beta} \circ \mathcal{I}\tilde{\beta}) \|^2
+\label{eq:shapespace}
+\end{equation}
+% 
+where $\tilde\beta \in \mathbb{R}^3$ is a latent vector encoding relative changes in hand \emph{height}, \emph{width} and sphere \emph{thickness} with respect to the default template $\bar\beta$, while $\mathcal{I}$ is a matrix mapping latent DOFs to the corresponding full-dimensional DOFs $\beta_{[i]}$; see \Figure{handmodel}. 
+% 
+While this regularizer effectively sub-spaces our calibration problem, it cannot detect unfeasible shape-space like a finger floating in mid-air, or when the natural order of fingers $\{\text{index},\text{middle},\text{ring},\text{pinky}\}$ has been compromised. We overcome this problem by a set of \emph{linear} constraints that are conditionally enabled in the optimization when unfeasible configurations are detected (encoded via $\chi_c \in \{ 0,1 \}$):
+% 
+\begin{equation}
+% E_\text{shape-valid} = \sum_{c=1}^C \chi_c  {\sum_{i=1}^{N_{c}} \kappa_{c_i} \beta_{c_i}}
+E_\text{shape-valid} = \sum_{c=1}^C \chi_c \left< \beta, \kappa \right>
+\label{eq:valideshape}
+\end{equation}
+% 
+\AT{I have a question here, need examples of $\kappa$, also it'd be nice if we can write this in quadratic form, like the rest, rather than in linear form?}
+
+\subsection{Offline calibration}
+\label{sec:batch}
+While we focus on an online/streaming algorithm, we also describe an offline baseline calibration procedure -- inspired by the work of~\cite{taylor2014user} -- where multiple frames in the input sequence are simultaneously considered. To achieve this, \Equation{energies} is modified to consider $N$ frames, each with its own pose parameters $\theta_n$, but with the same underlying shape $\beta$, resulting in what we refer to as \emph{\OfflineHard{}} calibration:
+% 
+\begin{equation}
+\argmin_{\beta, \{\theta_n\} } \sum_{n=1}^N \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, [\theta_n, \beta]) 
+\label{eq:offlinehard}
+\end{equation}
+% 
+Such optimization is initialized with a single $\beta^0$, and in our experiments, we noticed how this resulted in reduced convergence performance and a propensity for the optimization to get \todo{stuck} in local minimas. We therefore introduce an \emph{\OfflineSoft{}} calibration, where the constraint that a single $\beta$ should be optimized is enforced through a soft penalty constraint:
+% 
+\begin{equation}
+\argmin_{\beta, \{\theta_n\} } \sum_{n=1}^N \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, [\theta_n, \beta_n]) + \omega_{\beta} \sum_{n=1}^N \| \beta_n - \beta \|^2
+\label{eq:offlinesoft}
+\end{equation}
+%
+The initializations $\beta_n^0$ is derived from the intra-frame optimization of \Equation{energies}, while the penalty weight is set to a large value ($\small \omega_{\beta}=10e4$). The advantage of \OfflineSoft{} over \OfflineHard{} can be clearly observed in \Figure{evalnyu}, where the former achieves a performance comparable to the one of the (overfitting) intra-frame optimization. Finally, note that in practice we do not consider every frame as this large problem would not fit into memory, but instead we sub-sample at a $\approx 1/20$ rate, the same subsampling is used for our online solution to avoid a bias in the comparisons.
