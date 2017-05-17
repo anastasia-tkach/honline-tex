@@ -1,15 +1,16 @@
 \section{Evaluation}
 To evaluate the technical validity of our approach we:
-(\Sec{evalsynth}) analyze its robustness through randomly perturbing the algorithm initialization; 
+(\Sec{evaldataset}) verify its effectiveness on by applying it to a new calibration dataset acquired through commodity depth cameras;
 (\Sec{analysis}) corroborate the formulation of our optimization on a synthetic 3D dataset;
-(\Sec{evaldataset}) verify its effectiveness on by applying our algorithm to a new calibration dataset acquired through a commodity depth camera; 
+(\Sec{evalsynth}) analyze its robustness through randomly perturbing the algorithm initialization; 
 (\Sec{evalstar}) attest how our method achieves state-of-the-art performance on publicly available datasets.
+
 
 \subsection{Synthetic dataset: robustness -- \Fig{synthetic}}
 \label{sec:evalsynth}
 We empirically evaluate the \emph{robustness} of the algorithm by analyzing its convergence properties. 
 For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{M}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy/Teaser} dataset~\cite{tkach2016sphere}.
-The model $\mathcal{M}(\theta,\beta)$ is rendered with the camera intrinsics producing a depth map $\mathcal{D}(\theta,\beta)$. We employ two metrics, one measuring average ground-truth residuals, the other measuring the average length of data-to-model ICP correspondences (i.e. part of the tracking energy)=:
+The model $\mathcal{M}(\theta,\beta)$ is rendered with the camera intrinsics producing a depth map $\mathcal{D}(\theta,\beta)$. We employ two metrics, one measuring average ground-truth residuals, the other measuring the average length of data-to-model ICP correspondences (i.e. part of the tracking energy):
 % 
 \begin{align}
 E_{\beta} &= \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_{[m]} - \bar\beta_{[m]} \right|
@@ -28,12 +29,10 @@ In \Figure{synthetic}, we visualize our two metrics as we vary the intensity of 
 
 \subsection{Synthetic dataset: formulation analysis -- \Fig{interreal}}
 \label{sec:analysis}
-In \Figure{interreal}, we report an experiment analogous to that of \Figure{inter} but on a full 3D sequence. For example, consider the {\small \todo{$\beta_{[?]}$}} plot, where we report the runtime estimates for the length of the middle-finger's middle-phalanx (to avoid confusion with frame number $n$, the \todo{$[?]$} subscript is implied).
-As expected, the phalanx length can be estimated only in those frames where the finger is bent, as the callout renderings show.
-%
-Notice how the intra-frame estimate {\small $\star\beta_n$} can oscillate away from the ground truth, and such incorrect estimates should be considered. To achieve this, our algorithm estimates the solution uncertainty {\small $\Sigma^*_n$}, and accordingly updates the online cumulative estimates {\small $\hat\beta_n$} and {\small $\hat\Sigma_n$}.
+In \Figure{interreal}, we report an experiment analogous to that of \Figure{inter} but on a full 3D sequence. For example, consider the {\small \todo{$\beta_{[?]}$}} plot, where we report the runtime estimates for the length of the middle-finger's middle-phalanx (to avoid confusion with frame number $n$, the \todo{{\scriptsize $[?]$}} subscript is implied). Congruously to the discussion in \Section{technical}, the phalanx length can be estimated only in those frames where the finger is bent; see callout renderings.
+Notice how the intra-frame estimate {\small $\star\beta_n$} often oscillates away from the ground truth: 
+such incorrect estimates should be discarded while accumulating information. To achieve this, our algorithm estimates the solution uncertainty {\small $\Sigma^*_n$}, and accordingly updates the online cumulative estimates~{\small $\hat\beta_n$}~and~{\small $\hat\Sigma_n$}.
 
-\input{fig/evalnyu/item}
 \subsection{Calibration dataset: \texttt{GuessWho?} -- \Fig{realtrack}}
 \label{sec:evaldataset}
 We stress-tested our system by qualitative evaluating our calibration technique with data acquired from \emph{twelve} different users performing in front of an Intel RealSense SR300 camera (time-of-flight depth sensor). 
@@ -41,14 +40,17 @@ Snapshot of the twelve calibration sequences are reported in \Figure{realtrack},
 While ground truth information is not available, these datasets can be evaluated through the use of empirical metrics; e.g. $E_\text{d2m}$ and $E_\text{m2d}$ from \cite{tkach2016sphere}, or the golden-energy from~\cite{taylor2016joint}.
 Hence, to foster research in this domain, we release these calibration sequences to the community as the ``\texttt{GuessWho?}'' dataset -- future works will be able to generate identical synthetic clones of human hands (metrics~$\approx 0$), and thus enable biometric authentication applications.
 
-\input{fig/interreal/item}
-\input{fig/evalhandy/item}
+\input{fig/synthetic/item}
 \subsection{State-of-the-art on $\{$\texttt{NYU, Handy}$\}$ --
 \Fig{evalnyu} and \Fig{evalhandy}}
 \label{sec:evalstar}
 % We quantitatively evaluate our algorithm in terms of tracking performance on .
-To quantitatively evaluate real-time tracking algorithms, while many \emph{marker-based} datasets are available (e.g. \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}), state-of-the-art \emph{generative} methods have focused on the \texttt{NYU} \cite{tompson2014real} and \texttt{Handy} \cite{tkach2016sphere} datasets. 
-These datasets allow us to compare our method and its variants to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the cylindrical tracker in~\cite{htrack}, the sphere-mesh calibration/tracker by~\cite{tkach2016sphere}, as well as the Gaussian tracker in~\cite{sridhar2015fast}, and finally discriminative methods such as~\cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}. 
+To quantitatively evaluate real-time tracking algorithms, state-of-the-art \emph{generative} methods have focused on the \texttt{NYU} \cite{tompson2014real} and \texttt{Handy} \cite{tkach2016sphere} datasets; other marker-based \emph{marker-based} datasets are available (e.g. \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}), but unsuitable for the task at hand. These datasets allow us to compare our method and its variants to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the cylindrical tracker in~\cite{htrack}, the sphere-mesh calibration/tracker by~\cite{tkach2016sphere}, as well as the Gaussian tracker in~\cite{sridhar2015fast}, and finally discriminative methods such as~\cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}. 
 % 
-On the \texttt{NYU} dataset, our algorithm achieves state-of-the-art performance, and is the \emph{first} capable to calibrate the user-personalized tracking model online (i.e. in real-time). Similarly to \cite{taylor2016joint}, we evaluate the metrics on the first user ($n \in [0, 2440]$), as the second is too far from the camera.
-%
+On the \texttt{NYU} dataset, our algorithm achieves state-of-the-art performance, and is the \emph{first} capable to calibrate the user-personalized tracking model online (i.e. in real-time). To properly compare to~\cite{taylor2016joint}, we evaluate the metrics only on the first 2440 frames.
+
+
+\input{fig/evalnyu/item}
+\input{fig/evalhandy/item}
+
+
