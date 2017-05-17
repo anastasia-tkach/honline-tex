@@ -151,12 +151,34 @@ Instead, we propose to coalesce the inter and intra frame optimization resulting
 % 
 Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 
-\subsection{Shape prior (TODO)}
+\subsection{Shape prior}
 \label{sec:shapeprior}
-\TODO{Anastasia?}
-\AN{The shape prior should only be used in the first frame, because afterwards it will be incorporated inside of Kalman prior}. \AT{As this is quite advanced, this can be discussed at the very end of the section}
-\begin{DRAFT}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\begin{DRAFT} 
+\subsubsection{Anisotropic uniform scaling shape prior}
+
+Since a lot of hand shape variance can be explained by uniform scale, width and thickness of the hand (do you maybe know some reference?) we introduce anisotropic uniform scaling shape prior. This prior helps at first several frames if user hand size is different from the template. We add this prior with a small weight, so that it does not prevent from finding the exact parameters of the current user\rq{}s hand. The formulation is as following:
+
+\begin{equation}
+E_{uniform\_shape\_prior} = \|\beta - I\tilde{\beta} \circ \bar{\beta}\|_2^2
+\end{equation}
+
+where $\beta_{N_{\beta} \times 1}$ are the hand shape parameters, 
+$\tilde\beta_{3\times1}$ are latent scale parameters - height, width and thickness, 
+$I_{N_{\beta}\times 3}$ is a matrix that puts $\tilde\beta_i$ in correspondence with the relevant $\beta_j$,
+$\bar{\beta}_{N_{\beta} \times 1}$ are the template hand shape parameters,
+$\circ$ is element-wise product.
+
+\subsubsection{Semantic shape prior}
+Since anisotropic uniform scaling shape prior has a small weigh and thus only suggestive power, we need a prior to encode how a human hand can/cannot look like. For example, the finger base cannot be located in mid-air outside of the palm or the fingers should be in order \{index, middle, ring, pinky\} and not some other permutation of this list.
+Semantic shape prior is a list of constraints each of which has a form of linear combination of $\beta_i$.
+
+\begin{equation}
+E_{semantic\_shape\_prior} = \sum_{c = 1}^{N} \chi_c  {\sum_{i = 1}^{N_{c}} \kappa_{c_i} \beta_{c_i}}
+\end{equation}
+
+with $\chi_c = 1$ when semantic constrain $c$ is violated and $\chi_c = 0$ otherwise.
+
+where $\kappa_{c_i}$ are scalar coefficients.
 \end{DRAFT}
 
 \subsection{Something else?}
