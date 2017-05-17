@@ -1,34 +1,34 @@
-\providecommand{\off}{6}
+\providecommand{\off}{5}
 \begin{figure}[t]
 \centering
 \begin{overpic} 
-[width=\linewidth,height=3in]
+[width=\linewidth]
 % [width=\linewidth,height=3in,grid,tics=10]
 {\currfiledir/item.pdf}
 \myfigurename{}
-\put(96,0){\small $\varepsilon$}
-\put(96,45){\small $\varepsilon$}
-\put(.5,34){\scriptsize \vertical{$\% (max)$}}
-\put(.5,79){\scriptsize \vertical{$\% (avg)$}}
+\put(97,1.5){\small $\varepsilon$}
+% \put(96,45){\small $\varepsilon$}
+\put(0,38){\scriptsize \vertical{$\% (max)$}}
+\put(0,83){\scriptsize \vertical{$\% (avg)$}}
 % ALGORITHMS LEGEND
-\put(\off,41){\scriptsize \color[RGB]{217,144,143}      Kalman Standard -- \todo{Inter-frame?} from \Table{kf-like}}
-\put(\off,38){\scriptsize \color[RGB]{178,68,117}       Kalman Extended -- \todo{Online inter-frame?} from \Table{iekf-like}}
-\put(\off,35){\scriptsize \color[RGB]{179,179,179}      Batch-Offline -- \todo{Edoardo?}}
-\put(\off,32){\scriptsize \color[RGB]{160,215,190}      Batch-Online -- \todo{Remove?!}}
-\put(\off,29){\scriptsize \color[RGB]{61,131,119}       Online --  \todo{Intra-frame?}}
-\put(\off,26){\scriptsize \color[RGB]{77,77,77}         \cite{tkach2016sphere}}
-\put(\off,23){\scriptsize \color[RGB]{150,29,29}        \cite{taylor2016joint}}
-\put(\off,20){\scriptsize \color[RGB]{30,150,30}        \cite{tompson2014real}}
-\put(\off,17){\scriptsize \color[RGB]{150,149,30}       \cite{htrack}}
-\put(\off,14){\scriptsize \color[RGB]{29,30,150}        \cite{sridhar2015fast}}
-\put(\off,11){\scriptsize \color[RGB]{150,30,150}       \cite{oberweger2015hands}}
-\put(\off,8){\scriptsize \color[RGB]{29,150,150}       \cite{tang2015opening}}
-\put(\off,5){\scriptsize \color[RGB]{150,150,150}      \cite{tan2016fits}}
+\put(\off,43){\scriptsize \color[RGB]{77,77,77}      Scaled Template (anisotropic)}
+\put(\off,40){\scriptsize \color[RGB]{197,151,53}    Batch-Offline -- \Sec{todo}}
+\put(\off,37){\scriptsize \color[RGB]{160,215,190}   Batch-Online -- \Sec{todo}}
+\put(\off,34){\scriptsize \color[RGB]{61,131,119}    Intra-frame -- \Eq{energies}}
+\put(\off,31){\scriptsize \color[RGB]{217,144,143}   Inter-frame (KF) -- \Tab{kf-like}}
+\put(\off,28){\scriptsize \color[RGB]{178,68,117}    Inter-frame (EKF) -- \Tab{iekf-like}}
+\put(\off,25){\scriptsize \color[RGB]{150,29,29}     \cite{taylor2016joint}}
+\put(\off,22){\scriptsize \color[RGB]{30,150,30}     \cite{tompson2014real}}
+\put(\off,19){\scriptsize \color[RGB]{150,149,30}    \cite{htrack}}
+\put(\off,16){\scriptsize \color[RGB]{29,30,150}     \cite{sridhar2015fast}}
+\put(\off,13){\scriptsize \color[RGB]{150,30,150}    \cite{oberweger2015hands}}
+\put(\off,10){\scriptsize \color[RGB]{29,150,150}     \cite{tang2015opening}}
+\put(\off,7){\scriptsize \color[RGB]{150,150,150}    \cite{tan2016fits}} 
 \end{overpic}
 % \vspace{-.3in}
 \caption{
 % 
-Evaluation on the NYU dataset from \protect\cite{tompson2014real} reporting the percentage of frames with average (top) and max (bottom) ground-truth marker-error  less than $\varepsilon$. \TODO{focus (top) in x-range [0,15]?} \TODO{add missing curves from taylor (need properly scaled image to do this)}
+Evaluation on the NYU dataset from \protect\cite{tompson2014real} reporting the percentage of frames with average (top) and max (bottom) ground-truth marker-error  less than $\varepsilon$.
 % 
 }
 \label{fig:evalnyu}
