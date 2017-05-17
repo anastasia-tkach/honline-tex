@@ -44,11 +44,11 @@ Hence, to foster research in this domain, we release these calibration sequences
 \subsection{State-of-the-art on $\{$\texttt{NYU, Handy}$\}$ --
 \Fig{evalnyu} and \Fig{evalhandy}}
 \label{sec:evalstar}
-% We quantitatively evaluate our algorithm in terms of tracking performance on .
-To quantitatively evaluate real-time tracking algorithms, state-of-the-art \emph{generative} methods have focused on the \texttt{NYU} \cite{tompson2014real} and \texttt{Handy} \cite{tkach2016sphere} datasets; other marker-based \emph{marker-based} datasets are available (e.g. \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}), but unsuitable for the task at hand. These datasets allow us to compare our method and its variants to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the cylindrical tracker in~\cite{htrack}, the sphere-mesh calibration/tracker by~\cite{tkach2016sphere}, as well as the Gaussian tracker in~\cite{sridhar2015fast}, and finally discriminative methods such as~\cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}. 
+Although several marker-based \emph{marker-based} datasets are available (e.g. \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}), state-of-the-art \emph{generative} methods have focused on the \texttt{NYU} \cite{tompson2014real} and \texttt{Handy} \cite{tkach2016sphere} datasets for quantitative evaluation. These datasets allow us to compare our method and its variants to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the cylindrical tracker by~\cite{htrack}, the sphere-mesh tracker by~\cite{tkach2016sphere}, as well as the Gaussian tracker in~\cite{sridhar2015fast}, and finally discriminative methods such as~\cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}. 
 % 
-On the \texttt{NYU} dataset, our algorithm achieves state-of-the-art performance, and is the \emph{first} capable to calibrate the user-personalized tracking model online (i.e. in real-time). To properly compare to~\cite{taylor2016joint}, we evaluate the metrics only on the first 2440 frames.
-
+On the \texttt{NYU} dataset, to properly compare to~\cite{taylor2016joint}, we evaluate the metrics on the first 2440 frames (user \#1). Our algorithm achieves very competitive tracking performance while being the \emph{first} capable to calibrate the user-personalized tracking model \emph{online}, rather than in an offline calibration session like~\cite{taylor2016joint}. 
+% 
+Notice how the best performance is achieved by either (1) the intra-frame optimization, where per-frame \emph{overfitting} takes place, or (2) by offline calibration techniques such as \OfflineSoft{} or \cite{taylor2016joint} that have a clear advantage over streaming algorithms.
 
 \input{fig/evalnyu/item}
 \input{fig/evalhandy/item}
