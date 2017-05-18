@@ -13,9 +13,10 @@ The model $\mathcal{M}(\theta,\beta)$ is rendered with the camera intrinsics pro
 % 
 \begin{align}
 E_{\beta} &= \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_{[m]} - \bar\beta_{[m]} \right|
+\label{eq:metricgt}
 \\
 E_\text{d2m}^n &= \tfrac{1}{|d_n|} \sum_{\mathbf{p}_j \in d_n} \| \mathbf{p}_j - \Pi_{\mathcal{D}(\theta,\beta)}(\mathbf{p}_j) \|_2
-\label{eq:metrics}
+\label{eq:metricd2m}
 \end{align}
 % 
 Where $\Pi$ is an operator computing the closest-point projection of point in the sensor's point cloud, onto the point-cloud associated with the synthetic depth-map $\mathcal{D}(\theta,\beta)$; see~\cite{tkach2016sphere}. For ground-truth comparisons, note how we selected only a subset \todo{$M=\{1,2,3,4\}$} of shape parameters; see \Figure{handmodel}. This is necessary as sphere-centres on the palm can move without affecting the tracking energy -- a null-space of our optimization.
@@ -23,37 +24,38 @@ Where $\Pi$ is an operator computing the closest-point projection of point in th
 The tracking algorithm is initialized in the first frame by $\bar\theta_0$, while initializations for the user-personalized models are drawn from the uniform distribution {\small $\mathcal{U}(\bar\beta, \sigma)$}.
 We limit ourselves to ten samples per value of $\sigma$, as each sample requires the re-execution of our algorithm on an entire sequence. Nonetheless, we empirically noticed that increasing the number of samples did not alter our observations.
 % \AT{I still REALLY don't like this... It is not statistically significant. We'd run at least 50-100 samples...}
-In \Figure{synthetic}, we visualize our two metrics as we vary the intensity of the perturbation. Our perturbation analysis is performed over \todo{2h30s} of synthetic footage, thus in our \VideoSynth{}, we only report a \emph{random selection} of tracked sequences.
+In \Figure{synthetic}, we visualize our two metrics as we vary the intensity of the perturbation. Our perturbation analysis is performed over \todo{2h30s} of synthetic footage, thus in our \VideoSynth{}, we only report a \emph{random selection} of tracked synthetic sequences.
 % 
 
 \subsection{Synthetic dataset: formulation analysis -- \Fig{interreal}}
 \label{sec:analysis}
-In \Figure{interreal}, we report an experiment analogous to that of \Figure{inter} but on a full 3D sequence. For example, consider the {\small \todo{$\beta_{[?]}$}} plot, where we report the runtime estimates for the length of the middle-finger's middle-phalanx (to avoid confusion with frame number $n$, the \todo{{\scriptsize $[?]$}} subscript is implied). Congruously to the discussion in \Section{technical}, the phalanx length can be estimated only in those frames where the finger is bent; see callout renderings.
+In \Figure{interreal}, we report an experiment analogous to that of \Figure{inter} but on a full 3D sequence. For example, consider the {\small \todo{$\beta_{[?]}$}} plot, where we report the runtime estimates for the length of the middle-finger's middle-phalanx (to avoid confusion with frame number $n$, the subscript~\todo{{\small$[?]$}}~is implied). Congruously to the discussion in \Section{technical}, the phalanx length can be estimated only in those frames where the finger is bent; see callout renderings.
 Notice how the intra-frame estimate {\small $\star\beta_n$} often oscillates away from the ground truth: 
 such incorrect estimates should be discarded while accumulating information. To achieve this, our algorithm estimates the solution uncertainty {\small $\Sigma^*_n$}, and accordingly updates the online cumulative estimates~{\small $\hat\beta_n$}~and~{\small $\hat\Sigma_n$}.
 
 \subsection{Calibration dataset: \texttt{GuessWho?} -- \Fig{realtrack}}
 \label{sec:evaldataset}
-We stress-tested our system by qualitative evaluating our calibration technique with data acquired from \emph{twelve} different users performing in front of an Intel RealSense SR300 camera (time-of-flight depth sensor). 
-Snapshot of the twelve calibration sequences are reported in \Figure{realtrack}, but the calibration procedure can be better appreciated by watching our \VideoQualitative{}.
+We stress-tested our system by qualitative evaluating our calibration technique with data acquired from \emph{twelve} different users performing in front of an Intel RealSense SR300 camera (a consumer-level time-of-flight depth sensor). Snapshot of the twelve calibration sequences are reported in \Figure{realtrack}.
+% , but the calibration procedure can be better appreciated by watching our \VideoQualitative{}.
 While ground truth information is not available, these datasets can be evaluated through the use of empirical metrics; e.g. $E_\text{d2m}$ and $E_\text{m2d}$ from \cite{tkach2016sphere}, or the golden-energy from~\cite{taylor2016joint}.
 Hence, to foster research in this domain, we release these calibration sequences to the community as the ``\texttt{GuessWho?}'' dataset -- future works will be able to generate identical synthetic clones of human hands (metrics~$\approx 0$), and thus enable biometric authentication applications.
 
 \input{fig/synthetic/item}
-\subsection{State-of-the-art on $\texttt{NYU}$ dataset --
+\subsection{Marker-based evaluation on $\texttt{NYU}$ dataset --
 \Fig{evalnyu}}
 \label{sec:evalstar}
-Although several marker-based \emph{marker-based} datasets are available, such as \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}, state-of-the-art \emph{generative} methods have focused on the \texttt{NYU} \cite{tompson2014real} and \texttt{Handy} \cite{tkach2016sphere} datasets for quantitative evaluation. These datasets allow us to compare our method and its variants to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the cylindrical tracker by~\cite{htrack}, the sphere-mesh tracker by~\cite{tkach2016sphere}, as well as the Gaussian tracker in~\cite{sridhar2015fast}, and finally discriminative methods such as~\cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}. 
+Although several marker-based \emph{marker-based} datasets are available, such as \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}, state-of-the-art \emph{generative} methods have focused on the \texttt{NYU} \cite{tompson2014real} and \texttt{Handy} \cite{tkach2016sphere} datasets for quantitative evaluation. These datasets allow us to compare our method and its variants to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the cylindroid tracker by~\cite{htrack}, the sphere-mesh tracker by~\cite{tkach2016sphere}, as well as the Gaussian tracker in~\cite{sridhar2015fast}, and finally discriminative methods such as~\cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}. 
 % 
-On the \texttt{NYU} dataset, to properly compare to~\cite{taylor2016joint}, we evaluate the metrics on the first 2440 frames (user \#1). Our algorithm achieves very competitive tracking performance while being the \emph{first} capable to calibrate the user-personalized tracking model \emph{online}, rather than in an offline calibration session like~\cite{taylor2016joint}. 
+On the \texttt{NYU} dataset, to properly compare to~\cite{taylor2016joint}, we evaluate the metrics on the first 2440 frames (user \#1). Our online algorithm achieves very competitive tracking performance while being the \emph{first} capable to calibrate the user-personalized tracking model \emph{online}, rather than in an offline calibration session like~\cite{taylor2016joint}. 
 % 
-Notice how the best performance is achieved by either (1) the intra-frame optimization, where per-frame \emph{overfitting} takes place, or (2) by offline calibration techniques such as \OfflineSoft{} or \cite{taylor2016joint} that have a clear advantage (i.e. infinite memory) over streaming algorithms.
-
-\subsection{State-of-the-art on $\texttt{Handy}$ dataset --
-\Fig{evalhandy}}
-
+Notice how the best performance is achieved by either (1) the intra-frame optimization, where per-frame \emph{overfitting} takes place, or (2) by offline calibration techniques such as \OfflineSoft{} or \cite{taylor2016joint} having a clear advantage (i.e. infinite memory) over streaming algorithms. 
+% 
+\TODO{mention which joints were used? no palm, only fingers, etc...}
+\TODO{mention scaled template?}
 
 \input{fig/evalnyu/item}
 \input{fig/evalhandy/item}
-
-
+\subsection{Dense evaluation on the $\texttt{Handy}$ dataset -- \Fig{evalhandy}}
+Another way to evaluate the quality of tracking/calibration is to compare the depth map $\mathcal{\bar{D}}_n$ (i.e. sensor point cloud) to the rendered depth map $\mathcal{D}(\theta,\beta)$ (i.e. model point cloud). As far as rendered depth-maps for the posed and personalized tracking model are available, the metric in \Equation{metricd2m} can be employed to evaluate \emph{dense}, as opposed to marker-based, tracking/calibration performance comparisons: if $E_\text{d2m}\approx0$ in every frame (up to sensor noise), then the personalized model is a perfect \emph{dynamic} digital replica of the user's hand.
+The \texttt{Handy} dataset from~\cite{tkach2016sphere} enables these type of comparisons and includes rendered depth maps for \cite{htrack}, \cite{sharp2015accurate}, as well as the state-of-the-art method of~\cite{taylor2016joint}. Note how this dataset considers a range of motion substantially more complex than the one in the \texttt{NYU} dataset.
+Like in earlier comparisons, the intra-frame technique performs best as it overfits to the data (i.e. generates a collection of $\beta_n$ instead of a single $\beta$). Our techniques calibrate a model with performance comparable to that of~\cite{tkach2016sphere}, where a high-quality multi-view stereo point cloud with manual annotations was used for calibration. \TODO{what about batch data comparisons?}
