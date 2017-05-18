@@ -1,23 +1,27 @@
 \input{fig/intra/item}
 \section{Online model calibration}
 \label{sec:technical}
-Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud via a wristband~\cite{htrack}, and represent it in vectorized form as $d_n$. With $x_n = [\theta_n; \beta_n]$ denotes the vector of coalesced pose and shape parameters at frame $n$. Our model $\mathcal{M}(\theta_n; \beta)$ is a sphere-mesh tracking model~\cite{tkach2016sphere} where shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \cite{edoardo} in the \textbf{additional material}. To achieve online \emph{joint} calibration and tracking, our algorithm presents two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (see \Section{independent}), while the latter integrates this knowlege across frames (see \Section{split}). We first demonstrate how inter-frame regression can be interpreted as a Kalman Filter (KF), highlight its shortcomings, and finally propose a \emph{joint} inter-/intra-frame regression and interpret it as an Iterative Extended Kalman Filter (IEKF) (see \Section{joint}).
+Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud via a wristband~\cite{htrack}, and represent it in matrix form as $d_n$. Let $x_n = [\theta_n; \beta_n]$ denote the vector of coalesced pose and shape parameters at frame $n$. Our model $\mathcal{M}(\theta_n; \beta)$ is a sphere-mesh tracking model~\cite{tkach2016sphere} where shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \Figure{handmodel} and \cite{edoardo} in our \textbf{additional material}. To achieve online \emph{joint} calibration and tracking, we introduce  two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (see \Section{independent}), while the latter integrates this knowlege across frames. We first demonstrate how inter-frame regression can be interpreted as a Kalman Filter (KF) (see \Section{split}), highlight its shortcomings, and finally propose a \emph{joint} inter-/intra-frame regression. We show how this approach can be interpreted as an Iterative Extended Kalman Filter (IEKF)~(see \Section{joint}).
+\begin{edit}
+In \Section{offline}, we conclude by describing two \emph{offline} calibration procedures that will be used as baselines for comparisons to our online calibration solutions.    
+\end{edit}
 
-\input{fig/inter/item}
 \paragraph{Intra-frame regression}
-Given a proper initialization $x_n^0$ and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, as well as estimates the \emph{certainty/uncertainty} in the given solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. Estimating uncertainty in the solution is essential for template personalization. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
-Rather than deriving this relationship via hard-coded rules, we follow the ideas in ~\todo{\cite{?}} and derive how this distribution can be approximated by a gaussian $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.
+Given an initialization $x_n^0$, obtained from discriminative method or from the solution of the previous time-step, and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, and estimates the \emph{certainty/uncertainty} in the this solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. Estimating uncertainty in the solution is essential for template personalization. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
+Rather than deriving this relationship via hard-coded rules, we follow the ideas in ~\todo{\cite{?}} and derive how this distribution can be approximated by a Gaussian $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.
 A fundamental observation is that the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking energies. We illustrate why a covariance matrix $\star{\Sigma}_n$, as opposed to per-measurement variances, is necessary through the stick-figure example of \Figure{covariance}. 
+\input{fig/inter/item}
+
+\paragraph{Inter-frame regression}
+Unlike pose parameters, shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. However, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx. Therefore, knowledge must be gathered from a \emph{collection} of frames capturing the user in different poses. Rather than collecting a persistent model from a set of pre-recorded calibration data as in~\cite{taylor2016joint}, we approach the problem from an \emph{online-modeling} point of view. In what follows, we detail a principled method to temporally integrate parameter estimates in a way that also accounts for their confidence.
 
 \input{fig/covariance/item}
-\paragraph{Inter-frame regression}
-Unlike pose parameters, shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. Further, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx, therefore knowledge must be gathered from a \emph{collection} of frames capturing the user in different poses. Rather than collecting a persistent model from a set of pre-recorded calibration data as in~\cite{taylor2016joint}, we approach the problem from an \emph{online-modeling} point of view. In what follows, we detail a principled method to temporally integrate parameter estimates in a way that also accounts for their confidence.
 
 \subsection{Intra-frame regression -- $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$}
 \label{sec:independent}
 \label{sec:intra}
 % 
-Given $d_n$ the point cloud at frame $n$, and an initialization of hand pose from the previous frame $x_n^0 = x_{n - 1}^*$ we find an independent estimate of $x_n^*$ by local iterative optimization (a-la Levenberg) of the multi-objective energy function:
+Given the point cloud $d_n$ at frame $n$, and an initialization of the hand pose from the previous frame $x_n^0 = x_{n - 1}^*$ we find an independent estimate of $x_n^*$ by local iterative optimization (a-la Levenberg) of the multi-objective energy function:
 % 
 \begin{equation}
 x_n^* = \argmin_{x_n} \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, x_n) 
@@ -31,12 +35,12 @@ Where the terms $\mathcal{T}$ ensure that:
 \setlength{\jot}{0pt}
 \begin{aligned}
 \text{\textbf{d2m}} & \quad \text{data points are explained by the model} \\ 
-\text{\textbf{m2d}} & \quad \text{the model lies in the sensor visual-hull} \\
-\text{\textbf{smooth}} & \quad \text{the recorded sequence is smooth} \\
-\text{\textbf{pose-prior}} & \quad \text{the hand pose should be likely} \\
-\text{\textbf{pose-valid}} & \quad \text{no inter-penetrations and valid joint limits} \\
-\text{\textbf{shape-prior}} & \quad \text{the hand shape should be likely} \\
-\text{\textbf{shape-valid}} & \quad \text{the hand shape should be plausible}
+\text{\textbf{m2d}} & \quad \text{model lies in the sensor visual-hull} \\
+\text{\textbf{smooth}} & \quad \text{recorded sequence is smooth} \\
+\text{\textbf{pose-prior}} & \quad \text{calibrated hand pose is likely} \\
+\text{\textbf{shape-prior}} & \quad \text{calibrated hand shape is likely} \\
+\text{\textbf{pose-valid}} & \quad \text{semantics: collisions and joint limits} \\
+\text{\textbf{shape-valid}} & \quad \text{semantics: finger order and connectivity}
 \end{aligned}
 \end{equation*}
 The energy terms in the objective function are detailed in~\cite{tkach2016sphere} and~\cite{htrack}, with the exception of \emph{shape-prior} and \emph{shape-valid} that are discussed in \Section{shapeprior}.
@@ -45,7 +49,7 @@ The energy terms in the objective function are detailed in~\cite{tkach2016sphere
 \paragraph{Laplace approximation}
 % \subsection{Posterior distribution of parameters after taking a measurement into account}
 \label{sec:posterior}
-While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To retrieve this information, we first convert the \Equation{energies} in a probabilistic format, and from this formulation we then derive our uncertainties. Our data terms \emph{d2m} and \emph{m2d} can be written as posterior distributions:
+While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To retrieve this information, we convert \Equation{energies} to probabilistic form to derive our uncertainties. The data terms \emph{d2m} and \emph{m2d} can be written as posterior distributions:
 % 
 % \begin{DRAFT}
 % Towards this goal, we rewrite the \emph{d2m} and \emph{m2d} terms in \Eq{energies} as:
@@ -67,7 +71,7 @@ P(d_n|x_n) &= \exp \left( - \tfrac{1}{2}(d_n - F(x_n))^T (d_n - F(x_n)) \right)
 \label{eq:posterior}
 \end{align}
 % 
-The data terms in \Equation{energies} are then rewritten in probabilistic form, where we temporarily omit the frame index $n$ for conveniency:
+By temporarily omitting the frame index $n$ for conveniency, our optimization problem is rewritten in log-likelihood form:
 %
 \begin{align}
 x^* &= \argmax_{x} \underbrace{\log  P(d|x)}_{L(x)}
@@ -83,7 +87,7 @@ L(x) \approx \tilde{L}(x) = L(x^*)
 \label{eq:taylor}
 \end{align}
 %
-where $\Delta x=x - x^*$, and with an abuse of notation, as {\small $\partial f(\star{x})/\partial x$} we indicate the partial derivative of $f(x)$ evaluated at $\star{x}$. By rewriting {\small $\bar{F}(x_n) = d_n - F(x_n)$} for brevity of notation, note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ 
+where $\Delta x=x - x^*$, and let {\small $\partial f(\star{x})/\partial x$} indicate the partial derivative of $f(x)$ evaluated at $\star{x}$  with an abuse of notation. By rewriting {\small $\bar{F}(x_n) = d_n - F(x_n)$} for brevity, note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ 
 :
 %
 \begin{align}
@@ -99,7 +103,7 @@ where $\Delta x=x - x^*$, and with an abuse of notation, as {\small $\partial f(
 \label{eq:taylor-hessian}
 \end{align}
 % 
-From \Equation{taylor}, remembering that $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then derive the \emph{approximated} posterior distribution:
+From \Equation{taylor}, using $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then derive the \emph{approximated} posterior distribution:
 %
 \begin{align}
 \tilde{P}(d|x) = \exp\left(- \tfrac{1}{2}(x - x^*)^T {\star{\Sigma}}^{-1}  (x - x^*) \right) = \mathcal{N}\left(\star{x}, \star{\Sigma} \right)
@@ -110,10 +114,10 @@ Its mean is the solution of the (iterative) optimization problem in \Equation{en
 
 \input{tab/iekf-like}
 \input{fig/realtrack/item}
-\subsection{Inter-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) | \mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ } 
+\subsection{Split inter-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) | \mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ } 
 % \subsection{Merging independent measurements}
 \label{sec:split}
-Given the probabilistic interpretation in \Section{independent}, a temporal regression over parameters can be obtained by cumulating the posterior distributions over the set of previous frames. This leads to the to the following pair of inductive update equations:
+Given the probabilistic interpretation in \Section{independent}, a temporal regression over parameters can be obtained by cumulating the posterior distributions over the set of previous frames. This leads to the following pair of inductive update equations:
 % 
 \begin{align}
 \mathcal{N}(\hat{x}_1, \hat{\Sigma}_1) &= \mathcal{N}(\star{x}_1, \star{\Sigma}_1) \\
@@ -132,10 +136,10 @@ By applying the product of Gaussians rule ~\cite{petersen2008matrix}:
 \end{split}
 \end{align}
 % 
-In \Appendix{proof-kalman}, we shown how \Equation{combining} is equivalent to the Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. This observation is fundamental as, under the same assumptions we made in \Appendix{kalman}, \cite[\todo{Pg.?}]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
-This optimization will be used as a \emph{baseline}, as it is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a Kalman filter.
+In \Appendix{proof-kalman}, we shown how \Equation{combining} is equivalent to the Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. This observation is fundamental as, under the same assumptions we make in \Appendix{kalman}, \cite[\todo{Pg.?}]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
+This optimization, which we refer to as \emph{split inter-frame} is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a Kalman filter.
 
-\subsection{Joint inter-frame regression}
+\subsection{Joint inter-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$}
 \label{sec:joint}
 % Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space.
 The optimization in \Tab{interframe} does not provide any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve described in \Section{independent}. This could be problematic, as in this case \Eq{energies} does not leverage any temporal information aside from initialization, while relying on a sufficiently good initialization to compute $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. One potential way to increase the robustness of the algorithm would be to include this information in \Eq{independent}:

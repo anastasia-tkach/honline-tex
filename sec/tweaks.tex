@@ -27,7 +27,6 @@
 %% general comments
 %% 
 \newcommand{\hidden}[1]{{}} %< discards
-\newcommand{\edit}[1]{\textcolor{dark_green}{#1}}
 \newcommand{\LEGACY}[1]{\textcolor{orange}{[LEGACY] #1}}
 \newcommand{\todo}[1]{{\color{red}#1}}
 \newcommand{\red}[1]{{\color{red}#1}}
@@ -37,6 +36,7 @@
 \newcommand{\revision}[1]{{#1}}
 %\newcommand{\revision}[1]{{\color{red}#1}}
 \newenvironment{DRAFT}{\colorlet{oldcolor}{.} \color{red}}{\color{oldcolor}}
+\newenvironment{edit}{\colorlet{oldcolor}{.} \color{dark_green}}{\color{oldcolor}}
 
 %%
 %% personal comments
