@@ -3,7 +3,7 @@ To evaluate the technical validity of our approach we verify its effectiveness o
 
 \subsection{Synthetic dataset: formulation analysis -- \Fig{interreal}}
 \label{sec:analysis}
-For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{M}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy/Teaser} dataset~\cite{tkach2016sphere}.
+For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{M}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy/Teaser} dataset~\cite{tkach2016sphere} \AN{It is not on Handy/Teaser, that sequence starts from fast motion where sensor data sets destroyed, which is bad for calibration.}.
 The model $\mathcal{M}(\theta,\beta)$ is rendered with the camera intrinsics producing a depth map $\mathcal{D}(\theta,\beta)$. We employ two metrics, one measuring average ground-truth residuals, the other measuring the average length of data-to-model ICP correspondences (i.e. part of the tracking energy):
 % 
 \begin{align}
@@ -18,19 +18,24 @@ Where $\Pi$ is an operator computing the closest-point projection of points in t
 %
 $\quad$
 % 
-In~\Figure{interreal},~we report an experiment analogous to that of \Figure{inter} but on a full 3D sequence. For example, consider the {\small \TODO{$\beta_{[?]}$}} plot, where we report the runtime estimates for the length of the middle-finger's middle-phalanx (to avoid confusion with frame number $n$, the subscript~\TODO{{\small$[?]$}}~is implied). Congruously to the discussion in \Section{technical}, the phalanx length can be estimated only in those frames where the finger is bent; see callout renderings.
+In~\Figure{interreal},~we report an experiment analogous to that of \Figure{inter} but on a full 3D sequence. For example, consider the {\small \TODO{$\beta_{[?]}$}} plot, where we report the runtime estimates for the length of the middle-finger's middle-phalanx (to avoid confusion with frame number $n$, the subscript~\TODO{{\small$[?]$}}~is implied). Congruously to the discussion in \Section{technical}, the phalanx length \AN{estimates from the frames where the finger is bent are given large weight,}
+%can be estimated only in those frames where the finger is bent; \AN{this is not the case}
+see callout renderings.
 Notice how the intra-frame estimate {\small $\star\beta_n$} often oscillates away from the ground truth: 
-such incorrect estimates should be discarded while accumulating information. To achieve this, our algorithm estimates the solution uncertainty {\small $\Sigma^*_n$}, and accordingly updates the online cumulative estimates~{\small $\hat\beta_n$}~and~{\small $\hat\Sigma_n$}.
+such incorrect estimates \AN{have small weight.}
+%should be discarded while accumulating information.%
+ To achieve this, our algorithm estimates the solution uncertainty {\small $\Sigma^*_n$}, and accordingly updates the online cumulative estimates~{\small $\hat\beta_n$}~and~{\small $\hat\Sigma_n$}.
 
 \subsection{Synthetic dataset: robustness -- \Fig{synthetic}}
 \label{sec:evalsynth}
 We evaluate the \emph{robustness} of the algorithm by analyzing its convergence properties. Random initializations for the user-personalized models are drawn from the uniform distribution {\small $\mathcal{U}(\bar\beta, \sigma)$}.
 We limit ourselves to ten samples per value of $\sigma$, as each sample requires the re-execution of our algorithm on an entire sequence. Nonetheless, we noticed that increasing the number of samples did not alter our observations.
 % \AT{I still REALLY don't like this... It is not statistically significant. We'd run at least 50-100 samples...}
-In \Figure{synthetic}, we visualize our two metrics as we vary the intensity of the perturbation. Our perturbation analysis is performed over \TODO{2h30s} of synthetic footage, thus in our \VideoSynth{}, we only report a \emph{random selection} of tracked synthetic sequences.
-% 
+In \Figure{synthetic}, we visualize our two metrics as we vary the intensity of the perturbation.
+ Our perturbation analysis is performed over \TODO{2h30s} of synthetic footage, thus in our \VideoSynth{}, we only report a \emph{random selection} of tracked synthetic sequences.\AN{The video of the synthetic data that you saw if not a random selection of the sequences, it is a single sequence where the model is randomly perturbed every several frames. This is not what happens during evaluation. But the actual evaluation would be boring to watch.}
 
-\subsection{Calibration dataset: \texttt{GuessWho?} -- \Fig{realtrack}}
+
+\subsection{Calibration dataset: \texttt{GuessWho?} -- \Fig{realtrack}} 
 \label{sec:evaldataset}
 We stress-tested our system by qualitatively evaluating our calibration technique with data acquired from \emph{twelve} different users performing in front of an Intel RealSense SR300 camera (a consumer-level time-of-flight depth sensor). Snapshots of the twelve calibration sequences are reported in \Figure{realtrack}.
 % , but the calibration procedure can be better appreciated by watching our \VideoQualitative{}.
@@ -43,7 +48,7 @@ Hence, to foster research in this domain, we release these calibration sequences
 \Fig{evalnyu}}
 \label{sec:evalstar}
 Although several marker-based datasets are available, such as \cite{qian2014realtime}, \cite{sharp2015accurate} and \cite{yuan2017bighand}, state-of-the-art \emph{generative} methods have focused on the \texttt{NYU} \cite{tompson2014real} and \texttt{Handy} \cite{tkach2016sphere} datasets for quantitative evaluation. 
-\TODO{anastasia, I need to know which joints were used? no palm, only fingers, etc...}
+\TODO{anastasia, I need to know which joints were used? no palm, only fingers, etc...} \AN{6x4 markers from each finger and 4 markers from the thumb, palm and wrist were not used}
 On the \texttt{NYU} dataset, to properly compare to~\cite{taylor2016joint}, we evaluate the metrics on the first 2440 frames (user \#1). 
 This dataset allow us to compare our method (and its variants) to a number of other algorithms including: the PSO tracker by~\cite{sharp2015accurate}, the calibration methods by~\cite{khamis2015learning} and \cite{tan2016fits}, the subdivision tracker of~\cite{taylor2016joint}, the cylindroid tracker by~\cite{htrack}, the sphere-mesh tracker by~\cite{tkach2016sphere}, as well as the Gaussian tracker in~\cite{sridhar2015fast}, and finally discriminative methods such as~\cite{tompson2014real}, \cite{tang2015opening} and \cite{oberweger2015hands}. 
 % 
@@ -51,7 +56,7 @@ This dataset allow us to compare our method (and its variants) to a number of ot
 % 
 Our online algorithm achieves very competitive tracking performance while being the \emph{first} capable to calibrate the user-personalized tracking model \emph{online}, rather than in an offline calibration session like~\cite{taylor2016joint}. 
 % 
-Notice how the best performance is achieved by either (1) the intra-frame optimization, where per-frame \emph{overfitting} takes place, or (2) by offline calibration techniques such as \OfflineSoft{} or \cite{taylor2016joint} having a clear advantage (i.e. infinite memory) over streaming algorithms. 
+Notice how the best performance is achieved by either (1) the intra-frame optimization, where per-frame \emph{overfitting} takes place, or (2) by offline calibration techniques such as \OfflineSoft{} or \cite{taylor2016joint} having a clear advantage (i.e. infinite memory) over streaming algorithms.  \AN {I am confused about what are you trying to say with \lq\lq{}infinite memory\rq\rq{}}
 
 \input{fig/evalnyu/item}
 \input{fig/evalhandy/item}

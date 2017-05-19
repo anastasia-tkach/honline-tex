@@ -8,12 +8,15 @@ In \Section{offline}, we conclude by describing two \emph{offline} calibration p
 
 \paragraph{Intra-frame regression}
 Given an initialization $x_n^0$, obtained from discriminative method or from the solution of the previous time-step, and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$, and estimates the \emph{certainty/uncertainty} in the this solution. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. Estimating uncertainty in the solution is essential for template personalization. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
-Rather than deriving this relationship via hard-coded rules, we follow the ideas in ~\todo{\cite{?}} and derive how this distribution can be approximated by a Gaussian $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.
+%
+%Rather than deriving this relationship via hard-coded rules,  we follow the ideas in ~\todo{\cite{?} and derive how this distribution can be approximated by a Gaussian  $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.} %\AN{How can one derive hard-coded rules?}
+\AN{We use Laplace Appriximation to find a Gaussian distribution $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ that best approximates the posterior of the parameters optimized for the current frame  $\mathcal{D}_n$.}
+%
 A fundamental observation is that the parameters of this distribution can be \emph{directly} obtained from the Jacobians of the tracking energies. We illustrate why a covariance matrix $\star{\Sigma}_n$, as opposed to per-measurement variances, is necessary through the stick-figure example of \Figure{covariance}. 
 \input{fig/inter/item}
 
 \paragraph{Inter-frame regression}
-Unlike pose parameters, shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. However, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx. Therefore, knowledge must be gathered from a \emph{collection} of frames capturing the user in different poses. Rather than collecting a persistent model from a set of pre-recorded calibration data as in~\cite{taylor2016joint}, we approach the problem from an \emph{online-modeling} point of view. In what follows, we detail a principled method to temporally integrate parameter estimates in a way that also accounts for their confidence.
+Unlike pose parameters, shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. However, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx. Therefore, knowledge must be gathered from a \emph{collection} of frames capturing the user in different poses. Rather than collecting a persistent model from a set of pre-recorded calibration data \AN{maybe say manually picked poses to make it sound worse, as it actually is} as in~\cite{taylor2016joint}, we approach the problem from an \emph{online-modeling} point of view. In what follows, we detail a principled method to temporally integrate parameter estimates in a way that also accounts for their confidence.
 
 \input{fig/covariance/item}
 
@@ -49,8 +52,13 @@ The energy terms in the objective function are detailed in~\cite{tkach2016sphere
 \paragraph{Laplace approximation}
 % \subsection{Posterior distribution of parameters after taking a measurement into account}
 \label{sec:posterior}
-While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To retrieve this information, we convert \Equation{energies} to probabilistic form to derive our uncertainties. The data terms \emph{d2m} and \emph{m2d} can be written as posterior distributions:
+While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. 
+\AN{To derive our uncertainties, we start with converting the data terms of \Equation{energies} to probabilistic form}.
+%To retrieve this information, we convert \AN{data terms of} \Equation{energies} to probabilistic form to derive our uncertainties. \AN{the sentence already starts with to retrieve this in}
+%
+%The data terms \emph{d2m} and \emph{m2d} can be written as posterior distributions: \AN{this is not a posterior distribution yes, and why distributions in plural?}
 % 
+%
 % \begin{DRAFT}
 % Towards this goal, we rewrite the \emph{d2m} and \emph{m2d} terms in \Eq{energies} as:
 % \begin{align}
@@ -87,19 +95,19 @@ L(x) \approx \tilde{L}(x) = L(x^*)
 \label{eq:taylor}
 \end{align}
 %
-where $\Delta x=x - x^*$, and let {\small $\partial f(\star{x})/\partial x$} indicate the partial derivative of $f(x)$ evaluated at $\star{x}$  with an abuse of notation. By rewriting {\small $\bar{F}(x_n) = d_n - F(x_n)$} for brevity, note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ 
+where $\Delta x=x - x^*$, and let {\small $\partial f(\star{x})/\partial x$} indicate the partial derivative of $f(x)$ evaluated at $\star{x}$  with an abuse of notation. We rewrite {\small $\bar{F}(x_n) = d_n - F(x_n)$} for brevity. Note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ 
 :
 %
 \begin{align}
-\tfrac{\partial L(x^*)}{\partial x} &= - 2 \bar{F}(x^*)^T 
+\tfrac{\partial L(x^*)}{\partial x} &= - \bar{F}(x^*)^T 
 \tfrac{\partial \bar{F}(x^*)}{\partial x} = 0 
 \label{eq:taylor-jacobian}
 \\
 \tfrac{\partial^2 L(x^*)}{\partial x^2} 
 % = 2 \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*}^T \left.\tfrac{\partial F(x)}{\partial x}\right|_{x^*} + \\ 2 F(x^*)^T  \left. \tfrac{\partial \partial F (x^*) }{\partial \partial x} \right|_{x^*}
-& \approx - 2 \tfrac{\partial \bar{F}(x^*)}{\partial x}^T \tfrac{\partial \bar{F}(x^*)}{\partial x}
+& \approx - \tfrac{\partial \bar{F}(x^*)}{\partial x}^T \tfrac{\partial \bar{F}(x^*)}{\partial x}
 \triangleq %< DEFINED AS
--{\star{\Sigma}}^{-1} \succ 0
+-{\star{\Sigma}}^{-1} \prec 0
 \label{eq:taylor-hessian}
 \end{align}
 % 
@@ -110,7 +118,10 @@ From \Equation{taylor}, using $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then
 \end{align}
 %
 That is, after processing the information in a frame $d_n$, the sought-after quadratic approximation of posterior distribution of model parameters is a \emph{normal} distribution $\mathcal{N}\left(x_n^*, \star\Sigma_n \right)$.
-Its mean is the solution of the (iterative) optimization problem in \Equation{energies}; its covariance is computed according to \Equation{taylor-hessian}, that is, from the Jacobians of the energy terms $\{E_{\text{d2m}}, E_{\text{m2d}}\}$ at the optimal solution.
+Its mean $x^*$ is the solution of the (iterative) optimization problem in \Equation{energies}; its covariance  $\star\Sigma_n$ is computed according to \Equation{taylor-hessian}, that is, from the 
+%Jacobians of the energy terms $\{E_{\text{d2m}}, E_{\text{m2d}}\} at the optimal solution.$ \AN{for $E_{\text{d2m}}$ Equation 6 is an approximation of the hessian, not jacobian, since E = F^T * F}
+\AN{Hessian of the objective function evaluated at the optimal solution $x^*$.}
+
 
 \input{tab/iekf-like}
 \input{fig/realtrack/item}
@@ -124,6 +135,7 @@ Given the probabilistic interpretation in \Section{independent}, a temporal regr
 \mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) &= \mathcal{N}(\hat{x}_{n-1}, \hat{\Sigma}_{n-1}) \mathcal{N}(\star{x}_n, \star{\Sigma}_n)
 \end{align}
 % 
+\AN{with $x^*_n$ the \lq\lq{}measurement\rq\rq{} of the parameters at the current frame $n$ and $\hat{x}$ the estimate of the parameters accumulated since the beginning of the sequence till the frame $n$.}
 By applying the product of Gaussians rule ~\cite{petersen2008matrix}:
 % 
 \begin{align}
@@ -136,22 +148,28 @@ By applying the product of Gaussians rule ~\cite{petersen2008matrix}:
 \end{split}
 \end{align}
 % 
-In \Appendix{proof-kalman}, we shown how \Equation{combining} is equivalent to the Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. This observation is fundamental as, under the same assumptions we make in \Appendix{kalman}, \cite[\todo{Pg.?}]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
+In \Appendix{proof-kalman}, we shown how \Equation{combining} is equivalent to the Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. This observation is fundamental as, under the same assumptions we make in \Appendix{kalman}, \cite[Pg. 7]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
 This optimization, which we refer to as \emph{split inter-frame} is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a Kalman filter.
 
 \subsection{Joint inter-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$}
 \label{sec:joint}
 % Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space.
-The optimization in \Tab{interframe} does not provide any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve described in \Section{independent}. This could be problematic, as in this case \Eq{energies} does not leverage any temporal information aside from initialization, while relying on a sufficiently good initialization to compute $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. One potential way to increase the robustness of the algorithm would be to include this information in \Eq{independent}:
+The optimization in \Tab{interframe} does not provide any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve described in \Section{independent}. This could be problematic, as in this case \Eq{energies} does not leverage any temporal information aside from initialization, while relying on a sufficiently good initialization to compute $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. 
+%
+%One potential way to increase the robustness of the algorithm would be to include this information in \Eq{independent}:
 % 
-\begin{align}
-x_n^* &= \argmin_{x_n} \log  P(d_n|x_n) P(x_n |\hat{x}_{n - 1}) 
-\label{eq:independenttemp}
-\end{align}
+%\begin{align}
+%x_n^* &= \argmax_{x_n} \log  P(d_n|x_n) P(x_n |\hat{x}_{n - 1}) 
+%\label{eq:independenttemp}
+%\end{align}
 % 
-Instead, we propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} inter-frame regression scheme in~\Table{iekf-like}. In \Appendix{ieif-lm} we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with measurement update $d_n$.
+%Instead, 
+%\AN{Why do you discuss one potential way that we never use or refer to afterwards?}
+%
+We propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} inter-frame regression scheme in~\Table{iekf-like}. In \Appendix{ieif-lm} we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF), with measurement update $d_n$.
+\AN{Notice that the optimization presented in ~\Table{iekf-like} is equivalent to adding one more energy term $E_\text{iekf} = \| \hat{\Sigma}^{-1/2}_{n - 1}(x_n - \hat{x}_{n - 1})\|_2^2$ to the ~\Equation{energies}. Thus in \Appendix{ieif-lm} we have proven that adding a  $E_\text{iekf}$ to a standard LM sum of energies optimization (that is used in our field all the time) turns the entire system into Iterated Extended Kalman Filter. If you already have an LM system, this can be literally coded in hours at most including debug time :). To our knowledge, this trick was not known/used before. }
 % 
-Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
+%Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as %well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 
 \input{fig/interreal/item}
 
@@ -166,15 +184,18 @@ E_\text{shape-space} = \|\beta - (\bar{\beta} \circ \mathcal{I}\tilde{\beta}) \|
 % 
 where $\tilde\beta \in \mathbb{R}^3$ is a latent vector encoding relative changes in hand \emph{height}, \emph{width} and sphere \emph{thickness} with respect to the default template $\bar\beta$, while $\mathcal{I}$ is a matrix mapping latent DOFs to the corresponding full-dimensional DOFs $\beta_{[i]}$; see \Figure{handmodel}. 
 % 
-While this regularizer effectively sub-spaces our calibration problem, it cannot detect unfeasible shape-space like a finger floating in mid-air, or when the natural order of fingers $\{\text{index},\text{middle},\text{ring},\text{pinky}\}$ has been compromised. We overcome this problem by a set of \emph{linear} constraints that are conditionally enabled in the optimization when unfeasible configurations are detected (encoded via $\chi_c \in \{ 0,1 \}$):
+%While this regularizer effectively sub-spaces our calibration problem, it cannot detect unfeasible shape-space \AN{we are not solving in a subspace and shape prior is totally against the wierd stuff, it just has too small weight to prevent it from happening.}
+\AN{Thanks to our sphere-meshes hand model representation, the shape parameters are already nearly as compact as it gets, thus the last thing we want is to solve our optimization in shape-subspace; hence the small weight on $E_\text{shape-space}$. However, we still need a way to prevent inhumane configurations, }
+like a finger floating in mid-air, or when the natural order of fingers $\{\text{index},\text{middle},\text{ring},\text{pinky}\}$ has been compromised. We overcome this problem by a set of \emph{linear} constraints that are conditionally enabled in the optimization when unfeasible configurations are detected (encoded via $\chi_c \in \{ 0,1 \}$):
 % 
 \begin{equation}
-% E_\text{shape-valid} = \sum_{c=1}^C \chi_c  {\sum_{i=1}^{N_{c}} \kappa_{c_i} \beta_{c_i}}
-E_\text{shape-valid} = \sum_{c=1}^C \chi_c \left< \beta, \kappa \right>
+%E_\text{shape-valid} = \sum_{c=1}^C \chi_c  {\sum_{i=1}^{N_{c}} \kappa_{c_i} \beta_{c_i}}
+E_\text{shape-valid} = \sum_{c=1}^C\| \chi_c \left< \beta, \kappa \right> \|_2^2
 \label{eq:valideshape}
 \end{equation}
 % 
-\AT{I have a question here, need examples of $\kappa$, also it'd be nice if we can write this in quadratic form, like the rest, rather than in linear form?}
+\AT{I have a question here, need examples of $\kappa$, also it'd be nice if we can write this in quadratic form, like the rest, rather than in linear form?} \AN{My mistake, they are already in quadratic form.
+Example $\beta_{\text{index-base-x}} - \beta_{\text{index-base-radius}} - \beta_{\text{middle-base-x}} + \beta_{\text{middle-base-radius} > 0}$ prevents index and middle fingers from switching places}.
 
 \subsection{Offline calibration}
 \label{sec:batch}
@@ -192,4 +213,4 @@ Such optimization is initialized with a single $\beta^0$, and in our experiments
 \label{eq:offlinesoft}
 \end{equation}
 %
-The initializations $\beta_n^0$ is derived from the intra-frame optimization of \Equation{energies}, while the penalty weight is set to a large value ($\small \omega_{\beta}=10e4$). The advantage of \OfflineSoft{} over \OfflineHard{} can be clearly observed in \Figure{evalnyu}, where the former achieves a performance comparable to the one of the (overfitting) intra-frame optimization. Finally, note that in practice we do not consider every frame as this large problem would not fit into memory, but instead we sub-sample at a $\approx 1/20$ rate, the same subsampling is used for our online solution to avoid a bias in the comparisons.
+The initializations $\beta_n^0$ is derived from the intra-frame optimization of \Equation{energies}, while the penalty weight is set to a large value ($\small \omega_{\beta}=10e4$). The advantage of \OfflineSoft{} over \OfflineHard{} can be clearly observed in \Figure{evalnyu}, where the former achieves a performance comparable to the one of the (overfitting) intra-frame optimization. Finally, note that in practice we do not consider every frame as this large problem would not fit into memory, but instead we sub-sample at a $\approx 1/20$ rate, the same subsampling is used for our online solution to avoid a bias in the comparisons. \AN{This sounds like our online algorithm runs only every 20th frame. THIS IS NOT THE CASE. KF and IEKF measurements are taken every 20th frame to satisfy independent measurements assumption of the Kalman filter. The neighboring frames are not independent, they are too similar to each other.}
