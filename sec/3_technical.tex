@@ -20,9 +20,9 @@ A fundamental observation is that the parameters of this distribution can be  ob
 \input{fig/inter/item}
 
 \paragraph{Inter-frame regression}
-Unlike pose parameters, shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. However, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx. Therefore, knowledge must be gathered from a \emph{collection} of frames capturing the user in different poses. Rather than manually picked a few frames in different poses as in~\cite{taylor2016joint}, 
+Unlike pose parameters, shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. However, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx. Therefore, knowledge must be gathered from a \emph{collection} of frames capturing the user in different poses. Rather than manually picking a few frames in different poses as in~\cite{taylor2016joint}, 
 % collecting a persistent model from a set of pre-recorded calibration data \AN{maybe say manually picked poses to make it sound worse, as it actually is} as in~\cite{taylor2016joint},
-we approach the problem from an \emph{online-modeling} point of view. In what follows, we detail a principled method to temporally integrate parameter estimates in a way that also accounts for their confidence.
+we approach the problem from an \emph{online}-modeling viewpoint. In what follows, we detail a principled method to temporally integrate parameter estimates in a way that also accounts for their confidence.
 
 \input{fig/covariance/item}
 
@@ -58,9 +58,7 @@ The energy terms in the objective function are detailed in~\cite{tkach2016sphere
 \paragraph{Laplace approximation}
 % \subsection{Posterior distribution of parameters after taking a measurement into account}
 \label{sec:posterior}
-While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. 
-\AN{To derive our uncertainties, we start with converting the data terms of \Equation{energies} to probabilistic form}.
-%To retrieve this information, we convert \AN{data terms of} \Equation{energies} to probabilistic form to derive our uncertainties. \AN{the sentence already starts with to retrieve this in}
+While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To derive our uncertainties, we start by converting the data terms \emph{d2m} and \emph{m2d} of \Equation{energies} into probabilistic form:
 %
 %The data terms \emph{d2m} and \emph{m2d} can be written as posterior distributions: \AN{this is not a posterior distribution yes, and why distributions in plural?}
 % 
@@ -85,7 +83,7 @@ P(d_n|x_n) &= \exp \left( - \tfrac{1}{2}(d_n - F(x_n))^T (d_n - F(x_n)) \right)
 \label{eq:posterior}
 \end{align}
 % 
-By temporarily omitting the frame index $n$ for conveniency, our optimization problem is rewritten in log-likelihood form:
+By temporarily omitting the frame index $n$ for conveniency, our problem is rewritten as a maximum likelihood optimization:
 %
 \begin{align}
 x^* &= \argmax_{x} \underbrace{\log  P(d|x)}_{L(x)}
@@ -101,8 +99,7 @@ L(x) \approx \tilde{L}(x) = L(x^*)
 \label{eq:taylor}
 \end{align}
 %
-where $\Delta x=x - x^*$, and let {\small $\partial f(\star{x})/\partial x$} indicate the partial derivative of $f(x)$ evaluated at $\star{x}$  with an abuse of notation. We rewrite {\small $\bar{F}(x_n) = d_n - F(x_n)$} for brevity. Note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ 
-:
+where $\Delta x=x - x^*$, and let {\small $\partial f(\star{x})/\partial x$} indicate the partial derivative of $f(x)$ evaluated at $\star{x}$  with an abuse of notation. We rewrite {\small $\bar{F}(x_n) = d_n - F(x_n)$} for brevity. Note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ (see \cite[Sec.~10.2]{nocedal2006numerical}):
 %
 \begin{align}
 \tfrac{\partial L(x^*)}{\partial x} &= - \bar{F}(x^*)^T 
@@ -124,9 +121,8 @@ From \Equation{taylor}, using $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then
 \end{align}
 %
 That is, after processing the information in a frame $d_n$, the sought-after quadratic approximation of posterior distribution of model parameters is a \emph{normal} distribution $\mathcal{N}\left(x_n^*, \star\Sigma_n \right)$.
-Its mean $x^*$ is the solution of the (iterative) optimization problem in \Equation{energies}; its covariance  $\star\Sigma_n$ is computed according to \Equation{taylor-hessian}, that is, from the 
+Its mean $x^*$ is the solution of the (iterative) optimization in \Equation{energies}; its covariance  $\star\Sigma_n$ is computed according to \Equation{taylor-hessian}, that is, from the Hessian of the objective function evaluated at the optimal solution~$x^*$.
 %Jacobians of the energy terms $\{E_{\text{d2m}}, E_{\text{m2d}}\} at the optimal solution.$ \AN{for $E_{\text{d2m}}$ Equation 6 is an approximation of the hessian, not jacobian, since E = F^T * F}
-\AN{Hessian of the objective function evaluated at the optimal solution $x^*$.}
 
 
 \input{tab/iekf-like}
