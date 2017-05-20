@@ -143,7 +143,7 @@ By applying the product of Gaussians rule ~\cite{petersen2008matrix}:
 \hat{x}_{n} &= \star\Sigma_{n} (\hat{\Sigma}_{n-1} + \star\Sigma_{n})^{-1} \hat{x}_{n-1} + 
 \hat{\Sigma}_{n-1} (\hat{\Sigma}_{n-1} + \star\Sigma_n)^{-1} x_n^*
 \\
-\hat{\Sigma}_n &= \hat{\Sigma}_{n-1} (\hat{\Sigma}_{n-1} + {\star\Sigma_n})^{-1} \star\Sigma_n
+\hat{\Sigma}_n &= \hat{\Sigma}_{n-1} (\hat{\Sigma}_{n-1} + {\star\Sigma_n})^{-1} \star\Sigma_n = {\star{\Sigma}_n}^{-1} + \hat{\Sigma}_{n-1}^{-1}
 \label{eq:combining}
 \end{split}
 \end{align}
