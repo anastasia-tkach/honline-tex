@@ -3,8 +3,10 @@ To evaluate the technical validity of our approach we verify its effectiveness o
 
 \subsection{Synthetic dataset: formulation analysis -- \Fig{interreal}}
 \label{sec:analysis}
-For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{M}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy/Teaser} dataset~\cite{tkach2016sphere} \AN{It is not on Handy/Teaser, that sequence starts from fast motion where sensor data sets destroyed, which is bad for calibration.}.
-The model $\mathcal{M}(\theta,\beta)$ is rendered with the camera intrinsics producing a depth map $\mathcal{D}(\theta,\beta)$. We employ two metrics, one measuring average ground-truth residuals, the other measuring the average length of data-to-model ICP correspondences (i.e. part of the tracking energy):
+For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{M}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy} dataset~\cite{tkach2016sphere} 
+% \AN{It is not on Handy/Teaser, that sequence starts from fast motion where sensor data sets destroyed, which is bad for calibration.}.
+% \AT{Just update the page with the new dataset!}
+The model $\mathcal{M}(\theta,\beta)$ is rendered with the camera intrinsics producing a depth map $\mathcal{D}(\theta,\beta)$. We employ two metrics, $E_{\beta}$ measures average ground-truth residuals, while $E_\text{d2m}^n$ measures the average length of data-to-model ICP correspondences; see~\cite{tkach2016sphere}. The latter requires the definition of $\Pi$: an operator computing the closest-point projection of points in the sensor's point cloud, onto the point-cloud associated with the synthetic depth-map~$\mathcal{D}(\theta,\beta)$:
 % 
 \begin{align}
 E_{\beta} &= \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_{[m]} - \bar\beta_{[m]} \right|
@@ -14,7 +16,7 @@ E_\text{d2m}^n &= \tfrac{1}{|d_n|} \sum_{\mathbf{p}_j \in d_n} \| \mathbf{p}_j -
 \label{eq:metricd2m}
 \end{align}
 % 
-Where $\Pi$ is an operator computing the closest-point projection of points in the sensor's point cloud, onto the point-cloud associated with the synthetic depth-map $\mathcal{D}(\theta,\beta)$; see~\cite{tkach2016sphere}. For ground-truth comparisons, we selected only a subset \TODO{$M=\{1,2,3,4\}$} of shape parameters; see \Figure{handmodel}. This is necessary as sphere-centres on the palm can move without affecting the tracking energy -- a null-space of our optimization. The tracking algorithm is initialized in the first frame by $\bar\theta_0$.
+For ground-truth comparisons, we selected only a subset \TODO{$M=\{1,2,3,4\}$} of shape parameters; see \Figure{handmodel}. This is necessary as sphere-centres on the palm can move without affecting the tracking energy -- a null-space of our optimization. The tracking algorithm is initialized in the first frame by $\bar\theta_0$.
 %
 $\quad$
 % 
