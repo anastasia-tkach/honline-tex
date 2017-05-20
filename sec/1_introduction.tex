@@ -34,14 +34,18 @@ Therefore, inspired by recent efforts in facial performance capture that calibra
 The approach we present has been tailored to monocular acquisition, where we tackle the significant technical challenges created by missing data due to self-occlusions.
 
 \paragraph{Contributions}
-Our core contribution is a principled way to integrate per-frame information into an online real-time pose/shape tracking algorithm: one that estimates the hand's \emph{pose}, while simultaneously refining the \emph{shape} of the user being tracked. That is, as more of the user's hand and articulation is observed during tracking, the more the tracking template is progressively adapted to match the performer, which in turns results in more accurate motion tracking. 
-%Due to extensive self-occlusions and the dynamic nature of hand articulation, only a small subset of degrees of freedom can %be inferred from a single isolated frame. \AN{Dynamic nature of hand articulation? This is not a thing.}
-\AN{ Due to ambiguity of is hand shape parameters only a subset of degrees of freedom can be inferred from a single isolated frame. (For example individual phalanges length and finger attachment height are hard to tell when fingers are straight) }.
-Our technique automatically estimates the \emph{confidence} in the per-frame parameter computations, and leverages this information to build a tracking model that selectively \emph{accumulates} confident parameter estimates over time. Assuming a reasonable performance by the user, our system typically constructs a fully calibrated model within 
-\AN{a few seconds, while working as a real-time hand tracking system.}%\TODO{ten seconds}. 
-The validity of our technical solution is corroborated by re-interpreting our algorithm as 
-\AN{a Kalman filter, which finds a provably optimal estimate of the parameters given available online input}
-%an optimal Kalman filter, %\AN{It sounds a bit like optimal is a type of kalman filter.}
+Our core contribution is a principled way to integrate per-frame information into an online real-time pose/shape tracking algorithm: one that estimates the hand's \emph{pose}, while simultaneously refining its \emph{shape}. That is, as more of the user's hand and articulation is observed during tracking, the more the tracking template is progressively adapted to match the performer, which in turns results in more accurate motion tracking. 
+% Due to extensive self-occlusions and the dynamic nature of hand articulation, only a small subset of degrees of freedom can %be inferred from a single isolated frame. \AN{Dynamic nature of hand articulation? This is not a thing.}
+\begin{edit}
+From a single frame only a subset of the shape degrees of freedom can be estimated, for example, it is difficult to estimate the length of a phalanx when observing a straight finger.
+\end{edit}
+% \AN{ Due to ambiguity of is hand shape parameters only a subset of degrees of freedom can be inferred from a single isolated frame. (For example individual phalanges length and finger attachment height are hard to tell when fingers are straight) }.
+% \AT{See integrated comments above}
+Our technique automatically estimates the \emph{confidence} in per-frame parameter computations, and leverages this information to build a tracking model that selectively \emph{accumulates} confident parameter estimates over time. Assuming a reasonable performance by the user, our system typically constructs a fully calibrated model within a few seconds, while simultaneously tracking the user in real-time.
+% \AN{a few seconds, while working as a real-time hand tracking system.}%\TODO{ten seconds}.
+The validity of our technical solution is corroborated by re-interpreting our algorithms as Kalman filters, 
+% \AN{a Kalman filter, which finds a provably optimal estimate of the parameters given available online input}
+% \AT{Mark mentioned to avoid saying it's optimal}
 and its performance evaluated in comparison to state-of-the-art algorithms. Overall, our solution yields a fully automatic, real-time hand tracking system that is well-suited for consumer applications.
 % \MP{We can also mention here how long it usually takes (assuming a reasonable performance by the user) before the calibration is converged.} \AT{Taken care of}
 % \MP{We should probably mention that our system requires a cooperative user, or at least say that (obviously) we can only recover those shape parameters that are sufficiently exposed during tracking. Asking the user to perform a few simple initial poses (not in a precise way) at the beginning in my view is not a significant drawback} \AT{see github issue#9}

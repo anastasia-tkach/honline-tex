@@ -8,14 +8,15 @@ A hand in motion can be described by two types of parameters.
 Given a sequence of depth sensor images $\mathcal{D}_n$, the goal of our system is to get best possible estimate of shape parameters $\hat{\beta}_n$ from the input available so far.
 
 How much information do we need to have a good guess of $\beta$? A trivial lower bound would finding $\beta$ from a single sensor image. This scenario could be conceived for palm shape and fingers thickness, since they are ``visible'' in any hand pose. However, the phalanges length cannot be estimated when the fingers are straight; moreover the locations of finger bases are hidden under the skin and can only be inferred after seeing a range of hand poses. Sensor noise and $2,5 D$ nature of the data further aggravate the problem. 
+
 Previous authors \cite{joseph2016fits} and \cite{tkach2016sphere} suggested to find hand shape from a set of manually picked hand poses. 
 
-\textbf{Advantages of online optimization over batch optimization}
-\begin{itemize}
-\item \textit{user experience:} the user does not have to track with uncalibrated model first, manually pick the poses, wait till batch optimization finishes; also there is an immediate feedback on the result quality, so no need for several ``blind'' trials.
-\vspace{-1em}
-\item \textit{system efficiency:} a system of equations required to solve for batch optimization is   potentially very big, thus online hand tracking algorithm uses less computational resources; potentially it can run on a lighter hardware.
-\item \textit{result quality:} this claim will be /*hopefully*/ proven experimentally. 
+% \textbf{Advantages of online optimization over batch optimization}
+% \begin{itemize}
+% \item \textit{user experience:} the user does not have to track with uncalibrated model first, manually pick the poses, wait till batch optimization finishes; also there is an immediate feedback on the result quality, so no need for several ``blind'' trials.
+% \vspace{-1em}
+% \item \textit{system efficiency:} a system of equations required to solve for batch optimization is   potentially very big, thus online hand tracking algorithm uses less computational resources; potentially it can run on a lighter hardware.
+% \item \textit{result quality:} this claim will be /*hopefully*/ proven experimentally.
 
 \begin{itemize}
 \item By default performance of batch algorithm is an upper bound for online algorithm running on the same data. However, in practice online algorithm can use any amount of data and batch algorithm is limited by the available memory and computational power.

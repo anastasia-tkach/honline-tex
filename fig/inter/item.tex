@@ -33,20 +33,20 @@
 % frame 1
 \put(16,31){\scriptsize \color[RGB]{51,109,98} $\star\beta_1$}
 \put(16,12){\scriptsize \color[RGB]{158,45,92} $\hat\beta_1$}
-\put(19,02){\scriptsize \color[RGB]{220,137,139} $\hat{H}_1$}
-\put(18.5,21){\scriptsize \color[RGB]{155,207,183} $\star{H}_1$}
+\put(19,02){\scriptsize \color[RGB]{220,137,139} $\hat{\Sigma}_1$}
+\put(18.5,21){\scriptsize \color[RGB]{155,207,183} $\star{\Sigma}_1$}
 % frame 5
 \put(90,31){\scriptsize \color[RGB]{51,109,98} $\star\beta_5$}
 \put(88,11){\scriptsize \color[RGB]{158,45,92} $\hat\beta_5$}
-\put(91,07){\scriptsize \color[RGB]{220,137,139} $\hat{H}_5$}
-\put(92,21){\scriptsize \color[RGB]{155,207,183} $\star{H}_5$}
+\put(91,07){\scriptsize \color[RGB]{220,137,139} $\hat{\Sigma}_5$}
+\put(92,21){\scriptsize \color[RGB]{155,207,183} $\star{\Sigma}_5$}
 % 
 \end{overpic}
 \caption{
 % 
 \textbf{(Inter-frame regression)} We visualize several temporally sorted frames of input data $d_n$, the uncertainty ellipsoid $\star{\Sigma}_n$ estimated by intra-frame regression, and the \emph{online} uncertainty estimate $\hat{\Sigma}_n$. For illustration purposes, we only display the two-dimensional ellipsoids representing the covariance of $\beta_{[1]}$ and $\beta_{[2]}$. Although $\star{\Sigma}_1=\star{\Sigma}_5$, observe how $\hat{\Sigma}_1 \succ \hat{\Sigma}_5$: in the last frame we have a confident estimate as the information from frames {\scriptsize $2:4$} has been integrated.
-% 
-Further, notice how, even though the parameter $\beta_{[2]}$ was not observed directly in any of the presented frames, its value was inferred from the measurements \AN{high certainty measurements. It is important to say that they are high certainty}of~$(\beta_{[1]})_{n=2}$~and~$(\beta_{[1]} + \beta_{[2]})_{n=3}$.
+%
+{Further, notice how even though the parameter $\beta_{[2]}$ was not observed directly in any of the presented frames, its value was inferred from the highly-certain measurements~$(\beta_{[1]})_{n=2}$~and~$(\beta_{[1]}+\beta_{[2]})_{n=4}$.} 
 %; see also \Figure{merging}.
 %  
 }
