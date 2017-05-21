@@ -5,13 +5,15 @@ To evaluate the technical validity of our approach we verify its effectiveness o
 \label{sec:evaldataset}
 We stress-tested our system by qualitatively evaluating our calibration technique with data acquired from \emph{twelve} different users performing in front of an Intel RealSense SR300 camera (a consumer-level time-of-flight depth sensor). Snapshots of the twelve calibration sequences are reported in \Figure{realtrack}.
 % , but the calibration procedure can be better appreciated by watching our \VideoQualitative{}.
-While ground truth information is not available, these datasets can be evaluated through the use of empirical metrics; e.g. $E_\text{d2m}$ and $E_\text{m2d}$ from \cite{tkach2016sphere}, or the golden-energy from~\cite{taylor2016joint}.
-Hence, to foster research in this domain, we release these calibration sequences to the community as the ``\texttt{GuessWho?}'' dataset.
-% -- future works will be able to generate identical synthetic clones of human hands (metrics~$\approx 0$), and thus enable biometric authentication applications.
+While ground truth information is not available, these datasets will enable comparisons to our method through the use of empirical metrics; e.g. $E_\text{d2m}$ and $E_\text{m2d}$~\cite{tkach2016sphere}, or the golden-energy~\cite{taylor2016joint}.
+% REMOVED FOR PAGE BREAK
+% Hence, to foster research in this domain, we release these calibration sequences to the community as the ``\texttt{GuessWho?}'' dataset.
+% MARK DOESN'T LIKE THIS
+% future works will be able to generate identical synthetic clones of human hands (metrics~$\approx 0$), and thus enable biometric authentication applications.
 
 \subsection{Synthetic dataset: formulation analysis -- \Fig{interreal}}
 \label{sec:analysis}
-For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{N}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy} dataset~\cite{tkach2016sphere}. The following metric measures average ground-truth residuals (in millimeters):
+For synthetic data the ground truth shape parameters $\bar\beta$ are readily available, and the sphere-mesh model $\mathcal{M}(\theta,\beta)$ is animated in time with the $\bar\theta_n$ parameters of the complex motions in the \texttt{Handy} dataset~\cite{tkach2016sphere}. The following metric measures average ground-truth residuals (in millimeters):
 % 
 \begin{align}
 E_{\beta} &= \tfrac{1}{|M|} \sum_{m \in M} \left| \beta_{[m]} - \bar\beta_{[m]} \right|
@@ -32,22 +34,29 @@ Intra-frame estimates {\small $\star\beta_n$} can often oscillate away from the 
 % 
 Our algorithm estimates these intra-frame uncertainties {\small $\Sigma^*_n$}, and accordingly updates the online cumulative estimates~{\small $\hat\beta_n$}~and~{\small $\hat\Sigma_n$}.
 
+\input{fig/synthetic/item}
 \subsection{Synthetic dataset: robustness -- \Fig{synthetic}}
 \label{sec:evalsynth}
-We evaluate the \emph{robustness} of the algorithm by analyzing its convergence properties. Random initializations for the user-personalized models are drawn from the Gaussian distribution {\small $\mathcal{U}(\bar\beta, \sigma)$}.
-\begin{edit}
-Examples of perturbations for $\sigma=.4$ are visualized in \Figure{synthetic}.
-\end{edit}
-We limit ourselves to ten samples per value of $\sigma$, as each sample requires the re-execution of our algorithm on an entire sequence. Nonetheless, we noticed that increasing the number of samples did not alter our observations.
-% \AT{I still REALLY don't like this... It is not statistically significant. We'd run at least 50-100 samples...}
-In \Figure{synthetic}, we visualize our two metrics as we vary the intensity of the perturbation. Our perturbation analysis is performed over \todo{2h30s} of synthetic footage, thus in our video we only report a \emph{random selection} of tracked synthetic sequences. 
-\TODO{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.}
+%--- Intro
+We evaluate the \emph{robustness} of the algorithm by analyzing its convergence properties as we vary the magnitude of perturbations.
+%--- Datasets
+We provide two experiments: \emph{synthetic} and \emph{sensed}. The sensed dataset consists of depth maps $\{\mathcal{D}_n\}$ measured by an Intel Realsense SR300 sensor, where we track motion with the MVS calibrated model from~\cite{tkach2016sphere} to estimate a sequence of pose parameters $\{ \theta_n \}$; the shape parameters $\bar\beta$ of this user are known with good confidence thanks to the MVS data. In the synthetic dataset, depth images $\{\mathcal{D}_n\}$ are generated by animating the sphere-mesh model $\mathcal{M}(\theta_n, \bar\beta)$ and then rasterizing the model as in \Section{analysis}.
+% --- Perturbations
+To achieve this, Random initializations for the user-personalized models are drawn from the Gaussian distribution {\small $\mathcal{N}(\bar\beta, \sigma)$}. A few examples of such perturbations for $\sigma=.4$ are visualized in \Figure{synthetic}.
+In our experiments, we draw ten random samples per each value of $\sigma$, and compute mean and standard deviation of the measured ground truth residuals $E_\beta$. We observed how increasing the number of samples did not alter our observations. 
+% --- Mention of video
+As each sample requires the re-tracking the entire sequence ($\approx$ 20 seconds) with a new initialization, the two plot in \Figure{synthetic} amounts to roughly four hours of footage. For this reason, in ~\VideoSynth{} we only display a few examples of calibration for \emph{joint inter-frame} and apply a random perturbation every few seconds.
+% --- Why we don't get zero (refers to video)
+Notice that although we still have a non-zero average residual of $\approx 1$mm, the video shows how the model is an excellent fit to the synthetic data.  
+% --- Offline variants
+In both experiments, \OfflineHard{} performs worse than \OfflineSoft{} for the reasons discussed in \Section{offline}. With the large ($\sigma=.4$) perturbations \OfflineSoft{} still had some troubles converging to the correct results, as per-frame pose initializations were too significantly wrong; in this regard, we believe discriminative pose re-initializers such as~\cite{oberweger2015hands} would be helpful for both versions of offline calibration.
+% --- Intra-frame.. SKIP?
+For intra-frame, \todo{..maybe skip? the danger is that by looking at this figure someone might think ``why work so hard -- you could have just gone with intra!''}.
+% independent is model parameters of the independent algorithm at the last frame of the sequence. since betas are initialized from previous frame, independent is getting better and better towards the end of the sequence. On the synthetic data it is doing almost as good as kf and iekf, because you can kind of "see" the parameters from the rendered model, since there is no noise.
+% --- Inter-frame variants
+It is difficult to differentiate the split vs. joint inter-frame variants in the synthetic dataset, as calibration converges very effectively when it can rely on precise measurements. Overall, on the sensed dataset our \emph{joint inter-frame} calibration performs the best.
 
-% ; see \VideoSynth{}.
-% \AN{The video of the synthetic data that you saw if not a random selection of the sequences, it is a single sequence where the model is randomly perturbed every several frames. This is not what happens during evaluation. But the actual evaluation would be boring to watch.}
-% \AT{What I said is in perfect agreement with what you say!! the sequences differ in the way in which they are tracked -- with a differently perturbed template}
-
-\input{fig/synthetic/item}
+\input{fig/evalnyu/item}
 \subsection{Marker-based evaluation on $\texttt{NYU}$ dataset --
 \Fig{evalnyu}}
 \label{sec:evalnyu}
@@ -62,9 +71,6 @@ This dataset allow us to compare our method (and its variants) to a number of ot
 Our online algorithm achieves very competitive tracking performance while being the \emph{first} capable to calibrate the user-personalized tracking model \emph{online}, rather than in an offline calibration session like~\cite{taylor2016joint}. 
 % 
 Notice how the best performance is achieved by either: (1) the intra-frame optimization, where per-frame \emph{overfitting} takes place, or (2) by offline calibration techniques, such as \OfflineSoft{} or \cite{taylor2016joint}. This is expected, as offline algorithms jointly consider all available information, while online/streaming algorithms can only integrate information one frame at a time.
-
-\input{fig/evalnyu/item}
-
 
 \input{fig/evalhandy/item}
 \subsection{Dense evaluation on the $\texttt{Handy}$ dataset -- \Fig{evalhandy}}
