@@ -5,17 +5,20 @@
 % [width=\linewidth,grid,tics=10]
 {\currfiledir/item.pdf}
 \myfigurename{}
-\put(0,83.5){\scriptsize \vertical{$E_\text{d2m}$}}
-\put(0,40){\scriptsize \vertical{$E_\beta$}}
+\put(0,87){\scriptsize \vertical{$E_\beta$}}
+\put(0,41){\scriptsize \vertical{$E_\beta$}}
 \put(83,1){\scriptsize $\sigma$}
 \put(83,45.5){\scriptsize $\sigma$}
 \end{overpic}
 \caption{
 % 
-Evaluation on a synthetic dataset and random perturbation with standard deviation $\sigma$: (top-left) ground-truth calibration residuals and (bottom-left) average tracking energy residuals; (right) a few exemplars drawn from the $\sigma=0.4$ perturbation (up-to-scale).
-The solid line represent the mean, and the dotted line pair represents the empirical variance.
+Ground-truth average calibration residuals and variance on a synthetic dataset with random perturbation: (top) \TODO{real?} and (bottom) \TODO{synthetic?};
+(right) a few exemplars drawn from the $\sigma=0.4$ perturbation.
+\AT{need more information, what's initial? what's real/synth?}
+% The solid line represent the mean, and the dotted line pair represents the empirical variance.
 % 
 }
 \label{fig:synthetic}
 \end{figure}
- 
+% \textbf{batch-online} is not doing better than the others for sigma = 0.4 because it has to work on the frames from the whole sequence and frames from the beginning when independent did not get the good parameters yet degrade performance.
+% independent is model parameters of the independent algorithm at the last frame of the sequence. since betas are initialized from previous frame, independent is getting better and better towards the end of the sequence. On the synthetic data it is doing almost as good as kf and iekf, because you can kind of "see" the parameters from the rendered model, since there is no noise.

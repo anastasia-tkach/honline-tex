@@ -3,13 +3,25 @@
 \begin{overpic} 
 [width=\linewidth]
 % [width=\linewidth,grid,tics=10]
-{\currfiledir/item.png}
+{\currfiledir/item.pdf}
 \myfigurename{}
+\put(18,-3){Pose DOFs $\theta_{[i]}$}
+\put(68,-3){Shape DOFs $\beta_{[i]}$}
 \end{overpic}
 \caption{
 % 
-A posed sphere-mesh tracking template (right), and its corresponding (left) pose $\theta$ and (middle) shape $\beta$ degrees of freedom. 
+The degrees of freedom of our optimization, where use a cartesian right-handed coordinate frame for translational DOFs. 
+For pose parameters, we color code 
+{\color[RGB]{53,120,109} flexion or x-translation}, 
+{\color[RGB]{212,144,133} twist or y-translation}, and {\color[RGB]{172,72,100} abduction or z-translation}. 
+For shape parameters, we color code 
+{\color[RGB]{172,72,100} lengths},
+{\color[RGB]{53,120,109} \{x,y,z\} positions},
+{\color[RGB]{129,190,163} \{x,y\} positions \AT{diff from above?}},
+{\color[RGB]{212,144,133} radii}, and
+{\color[RGB]{120,120,120} depend on other dofs \AT{what?}}.
 % 
+\AT{and by the way, how can there be translations in the pose parameters beside global translation?}
 }
 \label{fig:handmodel}
 \end{figure}
