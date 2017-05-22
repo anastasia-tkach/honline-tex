@@ -3,7 +3,7 @@
 
 \subsection{Derivation for \Section{split}}
 \label{app:proof-kalman}
-Let us consider the special case when the measurement $z_n = x_n^*$ is in the same space at the estimated state $\hat{x}_n$, thus when $J$ is the identity matrix.
+Let us consider the Kalman Filter measurement update equations introduced in Table \Table{ekalman}, recalling to the reader that we are considering the case in which the measurement $z_n = x_n^*$ is in the same space of the estimated state $\hat{x}_n$, thus when $J$ is the identity matrix.
 % 
 \begin{align*}
 \hat{x}_n 
@@ -21,14 +21,13 @@ Note how these two coincide with \Equation{combining} for product of two Gaussia
 \subsection{Derivation for \Section{joint}}
 \label{app:ieif-lm}
 %
-To show that the optimizing the objective in \Table{iekf-like} with Levenberg-Marquardt (LM) is equivalent to an IEKF, we first convert the EKF into an EIF like that of \Appendix{eif}. Then, similarly to \Appendix{iekf}, we can write the iterated version of an EIF, are reported in \Table{ieif}. The LM update in Optimization from Table \ref{tab:iekf-like} has the following form:
+To show that the optimizing the objective in Table \Table{iekf-like} with Levenberg-Marquardt (LM) is equivalent to an IEKF, we first convert the EKF into an EIF like the one of \Appendix{eif}. Then, similarly to \Appendix{iekf}, we can write the iterated version of an EIF, as reported in \Table{ieif}. The LM update in the optimization associated to Table \ref{tab:iekf-like} then can be written as:
 % 
 \begin{equation}
     x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
 \end{equation}
- 
  with $\bar{J}_n$ and $\bar{F}_n$ expanded below, $F_n^i = F(x_n^i)$, 
- $J_n^i = \frac{\partial F}{\partial x_n}(x_n^i)$, the measurement $z_n = d_n$ and $\hat{\Sigma}_n^{-1} = r H_{n - 1}$.
+ $J_n^i = \frac{\partial F}{\partial x_n}(x_n^i)$, the measurement $z_n = d_n$ and $\hat{\Sigma}_n^{-1} = r H_{n - 1}$. 
  
  \begin{align*}
 x_n^{i + 1}= x_n^{i} - \left(
@@ -63,9 +62,10 @@ x_n^{i + 1}= x_n^{i} - \left(
 = \hat{x}_{n - 1} + B  - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1}) + A A^{-1}( x_n^i - \hat{x}_{n - 1}) = \\
 = \hat{x}_{n - 1} + B + A(- r H_{n - 1} + {J_n^i}^T J_n^i + r H_{n - 1})(x_n^i - \hat{x}_{n - 1}) = \\
 = \hat{x}_{n - 1} + B + A {J_n^i}^T J_n^i (x_n^i - \hat{x}_{n - 1}) = \\
-= \hat{x}_{n - 1} + \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1} {J_n^i}^T}_{K_n^i} \times (z_n - F_n^i - J_n^i (\hat{x}_{n - 1} - x_n^i)),
+= \hat{x}_{n - 1} + \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1} {J_n^i}^T}_{K_n^i}  \big(z_n - F_n^i - J_n^i (\hat{x}_{n - 1} - x_n^i)\big),
 \end{align*}
 % 
 which is equivalent to the measurement update of IEIF from Table \ref{tab:ieif}, with $H_n^0 = H_{n-1}$ and $x_n^0 = \hat{x}_{n - 1}$.
 \input{tab/ieif.tex}
+\TODO{ where $\times$ denotes the standard matrix product.}
 % \input{fig/merging/item}
