@@ -183,7 +183,7 @@ E_\text{iekf} = \| \hat{\Sigma}^{-1/2}_{n - 1}(x_n - \hat{x}_{n - 1})\|_2^2
 %
 In \Appendix{ieif-lm} we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF) with measurement update $d_n$. 
 \begin{edit}
-To the best of our knowledge, this simple relationship between LM and IEKF in \Equation{iekflm} was unknown. In a practical setting, this observation creates a very simple way to encode IEKF-like behavior within existing LM optimization codebases.
+To the best of our knowledge, this simple relationship between LM and IEKF in \Equation{iekflm} was unknown. In a practical setting, this observation creates a very simple way to encode IEKF-like behavior within existing LM optimization codebases.  \AF{A bit rich for me to say this, as it's mentioned at in p35 of ``Bundle Adjustment: A modern synthesis'', and I've said it a few times at summer schools etc since http://www.bmva.org/meetings.d/04/17nov/prog.pdf ...}
 \end{edit}
 
 

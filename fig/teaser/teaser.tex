@@ -1,3 +1,4 @@
+%!TEX root = ../../paper.tex
 \begin{teaserfigure}
 \begin{overpic} 
 [width=\linewidth]
@@ -13,8 +14,12 @@
 % 
 % 
 % 
-Our adaptive hand tracking algorithm optimizes for a tracking model on-the-fly, leading to progressive improvements in tracking accuracy over time. In each frame, we color-code the surface to visualize the spatially-varying confidence of the estimated geometry, in the top-right corner we colourize the \emph{cumulative} certainty. Notice how in the last frame all parameters are certain. The histograms also visualize the certainty of each degree of freedom, that is, the diagonal entries of the Hessian estimated from data in the current frame $\star\hessian$, or by accumulating the information through time $\hat\hessian$. These results are best appreciated by watching the supplementary \textbf{video}.
-\AT{replace H with the usual sigma? Or we need to define it somewhere!}
+Our adaptive hand tracking algorithm optimizes for a tracking model on the fly, leading to progressive improvements in tracking accuracy over time.   
+{\bf Above}: Hand surface color-coded to visualize the spatially-varying confidence of the estimated geometry. Insets: color-coded \emph{cumulative} certainty.  Notice how in the last frame all parameters are certain. 
+{\bf Below}: Histograms visualize the certainty of each degree of freedom, that is, the diagonal entries of the inverse of the covariance estimate from:
+(a) data in the current frame $\star\Sigma$, or 
+(b) the accumulated information through time $\hat\Sigma$. 
+% These results are best appreciated by watching the supplementary \textbf{video}.
 %
 %
 % 
