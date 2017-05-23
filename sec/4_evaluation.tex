@@ -55,10 +55,11 @@ In both experiments, \OfflineHard{} performs worse than \OfflineSoft{} for the r
 For intra-frame, \todo{..maybe skip? the danger is that by looking at this figure someone might think ``why work so hard -- you could have just gone with intra!''}.
 \AN{COME ON, ANDREA, WE DISCUSSED THIS SO MANY TIMES AND YOU STILL WHAT TO SKIP INTRA-FRAME}.
 \begin{edit}
-Notice that intra-frame algorithm
+Notice that our intra-frame algorithm has good performance too, it even outperforms Offline-Hard. This is because it was made as robust as possible with Shape Priors. Also, its computational budget is twice higher than for the other algorithms, since it is optimizing both pose and shape parameters. Good performance of intra-frame algorithm is crucial for the success of our inter-frame algorithms. This is because they rely on the assumption that in the corresponding parameters measured accurately when the good pose for them. If independent measurements are wrong, inter-frame algorithms cannot accumulate them into a correct estimate. Having all this said, intra-frame algorithm is undesirable to use for tracking by itself, since it cannot cope with any complications, like bad initialization of $\theta$, too fast motion, ect. Also, intra-frame is running twice slower than the other algorithms, thus the subjects on the video were asked not to move too fast during calibration stage.
 \end{edit}
+
 % --- Inter-frame variants
-It is difficult to differentiate the split vs. joint inter-frame variants in the synthetic dataset, as calibration converges very effectively when it can rely on precise measurements. Overall, on the sensed dataset our \emph{joint inter-frame} calibration performs the best.
+It is difficult to differentiate the split vs. joint inter-frame variants in the synthetic dataset, as calibration converges very effectively when it can rely on precise measurements. Overall, on the sensed dataset our \emph{joint inter-frame} calibration performs the best. \begin{edit} The general observation is that split algorithm is better to use when intra-frame algorithm is doing well by itself and does not need a robustness boost from joint-inter-frame. Since during calibration stage of split-inter-frame the measured value just comes from intra-frame algorithm, the measurement are more independent, while joint-inter-frame algorithm influences the measurement by giving additional information too them $\|\hat{\Sigma}_{n-1}^{-1/2} (x_n - \hat{x}_{n-1})\|_2^2$. Exactly this influence makes joint-inter-frame algorithm more robust and better to use if the subjects are less cooperative (for example, on a dataset that was not created for calibration)\end{edit}.
 
 \input{fig/evalnyu/item}
 \subsection{Marker-based evaluation on $\texttt{NYU}$ dataset --
