@@ -17,16 +17,13 @@ Rather than manually picking a few frames in different poses as in~\cite{taylor2
 The input data are a sequence of depth frames $\mathcal{D}_n$, which are segmented via a wristband~\cite{htrack} to produce a point cloud $d_n \subset \mathbb R^3$.   The pose vector in frame~$n$ is $\theta_n$, and our shape model $\mathcal{M}(\theta; \beta)$ is the sphere mesh of \citeN{tkach2016sphere}.   Shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \Figure{handmodel} and \cite{edoardo}.
 
 \paragraph{Estimation}
-\AN{I replace $x^*$ by $\hat{x}$ everywhere in this paragraph, since later we use $\hat{x}$ to denote an estimate of $x$ from the frames seen so far.}
 Let $x_n = [\theta_n; \beta_n]$ denote the model {\em state}: the vector of coalesced pose and shape parameters at frame $n$.  
-Our goal in tracking is to produce the best estimate \begin{edit}$\hat{x}_n$\end{edit}, at frame~$n$, of the state~$x_n$, given all the data seen previously, $d_1, ..., d_n$.
+Our goal in tracking is to produce the best estimate $\hat{x}_n$, at frame~$n$, of the state~$x_n$, given all the data seen previously, $d_1, ..., d_n$.
 What is more, we want to estimate not just the state, but the parameters of the {\em probability distribution} over the state $p(x_n|d_{1..n})$.  Thus, if we write
-\begin{edit}
 \begin{equation}
 p(x_n|d_{1..n}) \approx \mathcal N(x_n \mid \hat{x}_n, \hat{\Sigma}_n),
 \end{equation}
-\end{edit}
-we are saying that $x_n$ approximately follows a normal distribution with mean ~\begin{edit} $\hat x_n$ \end{edit} and covariance~\begin{edit}$\hat\Sigma_n$ \end{edit}.  When we display a tracked hand to the user, we will most likely just draw the hand with pose and shape parameters~\begin{edit}$\hat x_n$ \end{edit}, which sometimes leads to~\begin{edit}$\hat x_n$ \end{edit} being called ``the estimate of $x_n$'', but it is more correctly ``the estimate of the mean of the distribution $p(x_n)$'', and similarly with~\begin{edit}$\hat\Sigma_n$ \end{edit}.
+we are saying that $x_n$ approximately follows a normal distribution with mean ~$\hat x_n$ and covariance~$\hat\Sigma_n$.  When we display a tracked hand to the user, we will most likely just draw the hand with pose and shape parameters~ $\hat x_n$, which sometimes leads to ~$\hat x_n$ being called ``the estimate of $x_n$'', but it is more correctly ``the estimate of the mean of the distribution $p(x_n)$'', and similarly with $\hat\Sigma_n$.
 
 It is generally computationally intractable to estimate the parameters conditioned on all the previous history~$d_{1..n}$ at every frame (although see~\Section{offline} where compute some related quantities as a baseline), so the estimation is typically expressed in terms of an {\em intra}-frame term $p(x_n|d_n)$, which describes the components due only to information in frame~$d_n$ and {\em inter}-frame term $p(x_n|d_1, ..., d_{n-1})$.  Different approximations for this term leads to different methods, denoted {\em split inter-frame} and {\em joint inter-frame} below.
 
@@ -178,24 +175,10 @@ p(x_n|d_{1..n}) \approx \mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)
 \end{equation}
 Then, given values of the parameters $\hat{x}_{n-1}, \hat{\Sigma}_{n-1}$ at the previous timestep, we must update them to incorporate the new information in frame $n$.   
 %
-
-\AN{It might be the case that I misunderstand this, but we are not using a prior of this form  $\mathcal N(x_n | x_{n-1}, \gamma I)$, it is rather of the form $\mathcal N(x_n | \hat{x}_{n-1}, \hat{\Sigma}_n)$. So, I suggest we replace this paragraph by what I we had before.}
-\begin{DRAFT}
-From above, this information is encoded in the normal distribution $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.
-% 
-In addition, we need the temporal prior $p(x_n|x_{n-1})$.  As we are primarily interested in the shape components of $x$, let us assume a constant-position temporal prior $p(x_n|x_{n-1}) = \mathcal N(x_n | x_{n-1}, \gamma I)$.
-% 
-\AT{link?}
-% 
-The update in {\em split inter-frame} is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF.  
-\end{DRAFT}
-%We write the update as a product
-\begin{edit}
 This leads to the following pair of inductive update equations:
 \begin{align}
 \mathcal{N}(x_n|\hat{x}_1, \hat{\Sigma}_1) &= \mathcal{N}(x_n|\star{x}_1, \star{\Sigma}_1) 
 \end{align}
-\end{edit}
 % 
 \begin{align}
 \mathcal{N}(x_n | \hat{x}_n, \hat{\Sigma}_n) &= \mathcal{N}(x_n | \hat{x}_{n-1}, \hat{\Sigma}_{n-1}) \mathcal{N}(x_n |\star{x}_n, \star{\Sigma}_n)
@@ -215,7 +198,7 @@ By applying the product of Gaussians rule~\cite{petersen2008matrix}, we obtain u
 In \Appendix{proof-kalman}, we shown how \Equation{combining} is equivalent to the~Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. 
 %This observation is fundamental as, under the same assumptions we make in \Appendix{kalman}, \cite[Pg. 7]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
 %
-\begin{edit}This optimization, which we refer to as \emph{split inter-frame} is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF. \end{edit}
+This optimization, which we refer to as \emph{split inter-frame} is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF. 
 
 \subsection{Joint inter-frame estimate -- $p(x_n|d_{1..n})$}
 \label{sec:joint}
