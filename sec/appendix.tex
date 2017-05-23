@@ -83,13 +83,12 @@ The EKF performs well for systems with mildly nonlinear measurement functions, b
 In order to ease the derivations of the upcoming section let us observe that the EKF measurement updates can also be rewritten in the equivalent \emph{Extended Information Filter} form~\cite{optimal}; see \Table{eif}. We introduce this formulation in order to ease the upcoming derivations. Note that in order to do that we need to assume the measurement noise to be independent and identically distributed (i.i.d.) across samples, therefore $R=rI$ where $r\in \mathbb{R}^+$ and $I$ is the identity matrix. Further, similarly to EKF, we can write the iterated version of an EIF, as reported in \Table{ieif}.   
 \input{tab/eif.tex}
 
-\begin{DRAFT}
-As the measurement function $F(\cdot)$ from \Appendix{ekf} is nonlinear, the following LM optimization takes several iterations to converge:
-% %
-\begin{equation}
-\hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)
-\end{equation}    
-\end{DRAFT}
+% \begin{DRAFT}
+% As the measurement function $F(\cdot)$ from \Appendix{ekf} is nonlinear, the following LM optimization takes several iterations to converge:
+% \begin{equation}
+% \hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)
+% \end{equation}
+% \end{DRAFT}
 
 \section{Derivations}
 
@@ -119,26 +118,32 @@ Focusing on the optimization associated to Table \ref{tab:iekf-like}, let us con
 \label{eq:der-ieif-lm}
     x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
 \end{equation}
- observing that $\bar{J}_n = \left[
+observing that
+\begin{equation}
+\bar{J}_n = \left[
  \begin{array}{c}
  	- J_n^i \\
 \hat{\Sigma}_{n-1}^{-1/2} \\
  \end{array}
- \right]  $ and $\bar{F}_n = \left[
+ \right]
+\quad
+\bar{F}_n = \left[
  \begin{array}{c}
  d_n - F_n^i \\
 \hat{\Sigma}_{n-1}^{-1/2} (x_n^i - \hat{x}_{n - 1}) \\
  \end{array}
- \right]$, where  $F_n^i = F(x_n^i)$ and
- $J_n^i = \frac{\partial F}{\partial x_n}(x_n^i)$ it follows that:
+ \right]   
+\end{equation}
+we obtain what follows:
 \begin{align*}
 \bar{J}_n^T \bar{J}_n &= {J_n^i}^T J_n^i +\hat{\Sigma}_{n-1}^{-1} = A^{-1} \\
 \bar{J}_n^T \bar{F}_n  &=  	- {J_n^i}^T(z_n - F_n^i) + \hat{\Sigma}_{n-1}^{-1}(x_n^i - \hat{x}_{n - 1})
  \end{align*}
+where  $F_n^i = F(x_n^i)$ and $J_n^i = \frac{\partial F}{\partial x_n}(x_n^i)$.
 Hence, expanding the matrix products in \eqref{eq:der-ieif-lm}, we can write:
  \begin{align*}
 x_n^{i + 1} 
-= x_n^i +\underbrace{A {J_n^i}^T(d_n - F_n^i)}_B - A \hat{\Sigma}_{n-1}^{-1}(x_n^i - \hat{x}_{n - 1})  = \\
+= x_n^i +\overbrace{A {J_n^i}^T(d_n - F_n^i)}^B - A \hat{\Sigma}_{n-1}^{-1}(x_n^i - \hat{x}_{n - 1})  = \\
 = \hat{x}_{n - 1} + B  - A \hat{\Sigma}_{n-1}^{-1}(x_n^i - \hat{x}_{n - 1}) + A A^{-1}( x_n^i - \hat{x}_{n - 1}) = \\
 = \hat{x}_{n - 1} + B + A(- \hat{\Sigma}_{n-1}^{-1} + {J_n^i}^T J_n^i + \hat{\Sigma}_{n-1}^{-1})(x_n^i - \hat{x}_{n - 1}) = \\
 = \hat{x}_{n - 1} + B + A {J_n^i}^T J_n^i (x_n^i - \hat{x}_{n - 1}) = \\
@@ -147,6 +152,6 @@ x_n^{i + 1}
 % 
 Recalling the definition of the \textit{a priori} estimate $x_n^0 = \hat{x}_{n - 1}$, setting $H_n^0 = H_{n-1}$ and denoting $\hat{\Sigma}_{n-1}^{-1} = r H_{n - 1}$ we can now see that such an iterative update is equivalent to the update of the IEIF from Table \ref{tab:ieif} for measurement $z_n = d_n$. Finally, under  the assumption of the measurement noise to be i.i.d. across samples, we can conclude that the optimization from \ref{tab:ieif} is indeed equivalent to an IEKF.
 \input{tab/ieif.tex}
-\ER{Note that I changed LM to Gauss Newton since in the derivations we are considering the updates without damping $\lambda$!}
+% \ER{Note that I changed LM to Gauss Newton since in the derivations we are considering the updates without damping $\lambda$!}
 
 % \input{fig/merging/item}
