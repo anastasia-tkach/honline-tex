@@ -36,7 +36,8 @@
 \newcommand{\revision}[1]{{#1}}
 %\newcommand{\revision}[1]{{\color{red}#1}}
 \newenvironment{DRAFT}{\colorlet{oldcolor}{.} \color{red}}{\color{oldcolor}}
-\newenvironment{edit}{\colorlet{oldcolor}{.} \color{dark_green}}{\color{oldcolor}}
+% \newenvironment{edit}{\colorlet{oldcolor}{.} \color{dark_green}}{\color{oldcolor}}
+\newenvironment{edit}{\colorlet{oldcolor}{.}}{\color{oldcolor}}
 
 %%
 %% personal comments
@@ -92,7 +93,8 @@
 %%
 %% figure labels
 %%
-\newcommand{\myfigurename}{\put(-4,0){\vertical{\todo{\currfiledir}}}}
+% \newcommand{\myfigurename}{\put(-4,0){\vertical{\todo{\currfiledir}}}}
+\newcommand{\myfigurename}{}
 
 %%
 %% algorithm float (instead of table)
