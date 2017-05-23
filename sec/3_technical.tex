@@ -19,7 +19,7 @@ The input data are a sequence of depth frames $\mathcal{D}_n$, which are segment
 \paragraph{Estimation}
 Let $x_n = [\theta_n; \beta_n]$ denote the model {\em state}: the vector of coalesced pose and shape parameters at frame $n$.  
 Our goal in tracking is to produce the best estimate $\hat{x}_n$, at frame~$n$, of the state~$x_n$, given all the data seen previously, $d_1, ..., d_n$.
-What is more, we want to estimate not just the state, but the parameters of the {\em probability distribution} over the state $p(x_n|d_{1..n})$.  Thus, if we write
+Additionally, we want to estimate not just the state, but the parameters of the {\em probability distribution} over the state $p(x_n|d_{1..n})$.  Thus, if we write
 \begin{equation}
 p(x_n|d_{1..n}) \approx \mathcal N(x_n \mid \hat{x}_n, \hat{\Sigma}_n),
 \end{equation}
@@ -251,7 +251,7 @@ Therefore, we introduce the \emph{\OfflineSoft{}} calibration, where the constra
 \label{eq:offlinesoft}
 \end{equation}
 %
-The initializations $\beta_n^0$ is derived from the per-frame optimization of \Equation{energies}, while the penalty weight is set to a large value ($\small \omega_{\beta}=10e4$). The advantage of \OfflineSoft{} over \OfflineHard{} can be clearly observed in \Figure{evalnyu}, where the former achieves a performance comparable to the one of the (overfitting) per-frame optimization. Finally, note that in practice we do not consider every frame as this large problem would not fit into memory, but instead we sub-sample at a $\approx 1/20$ rate, the same subsampling is used for Kalman \emph{measurement} updates in our online solution to avoid a bias in the comparisons.
+The initializations $\beta_n^0$ are derived from the per-frame optimization of \Equation{energies}, while the penalty weight is set to a large value ($\small \omega_{\beta}=10e4$). The advantage of \OfflineSoft{} over \OfflineHard{} can be clearly observed in \Figure{evalnyu}, where the former achieves a performance comparable to the one of the (overfitting) per-frame optimization. Finally, note that in practice we do not consider every frame as this large problem would not fit into memory, but instead we sub-sample at a $\approx 1/20$ rate, the same subsampling is used for Kalman \emph{measurement} updates in our online solution to avoid a bias in the comparisons.
 % \AN{This sounds like our online algorithm runs only every 20th frame. THIS IS NOT THE CASE. KF and IEKF measurements are taken every 20th frame to satisfy independent measurements assumption of the Kalman filter. The neighboring frames are not independent, they are too similar to each other.}
 % \AT{see github issue }
 

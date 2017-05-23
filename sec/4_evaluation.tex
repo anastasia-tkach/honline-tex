@@ -45,7 +45,7 @@ To achieve this, random initializations for the user-personalized models are dra
 In our experiments, we draw fifteen random samples per each value of $\sigma$, and compute mean and standard deviation of the measured ground truth residuals $E_\beta$. 
 %We observed how increasing the number of samples did not alter our observations. \AN{I did not study this, 15 is already enough, lets just drop this sentence}
 % --- Mention of video
-As each sample requires the re-tracking the entire sequence ($\approx$ 20 seconds) with a new initialization, the two plot in \Figure{synthetic} amounts to roughly four hours of footage. For this reason, in ~\VideoSynth{} we only display a few examples of calibration 
+As each sample requires the re-tracking the entire sequence ($\approx$ 20 seconds) with a new initialization, the two plots in \Figure{synthetic} amount to roughly four hours of footage. For this reason, in ~\VideoSynth{} we only display a few examples of calibration 
 % \AT{it was a typo}
 % for \emph{joint cumulative}\AN{What are you referring to? We do not display any joint cumulative on synthetic data. We display only per-frame. You cannot perturb template for cumulative, since it converges}
 and apply a random perturbation every few seconds.
@@ -60,8 +60,14 @@ were too significantly wrong; in this regard, we believe discriminative pose re-
 % \AN{Why do you want to say this? Our cumulative already solves the problem}.
 % --- Intra-frame.. SKIP?
 % independent is model parameters of the independent algorithm at the last frame of the sequence. since betas are initialized from previous frame, independent is getting better and better towards the end of the sequence. On the synthetic data it is doing almost as good as kf and iekf, because you can kind of "see" the parameters from the rendered model, since there is no noise.
+% \begin{edit}
+% Note how per-frame calibration performs excellently, even outperforming Offline-Hard. This is because,  thanks to our carefully designed shape priors, per-frame calibration is quite robust; see \VideoReal{}. This is essential in cumulative calibration, as information can be effectively integrated only when a precise and confident measurement is available. Compared to per-frame calibration, our cumulative solutions can deal with more difficult sequences, where information with low confidence is simply discarded.
+% \end{edit}
+
 \begin{edit}
-Note how per-frame calibration performs excellently, even outperforming Offline-Hard. This is because,  thanks to our carefully designed shape priors, per-frame calibration is quite robust; see \VideoReal{}. This is essential in cumulative calibration, as information can be effectively integrated only when a precise and confident measurement is available. Compared to per-frame calibration, our cumulative solutions can deal with more difficult sequences, where information with low confidence is simply discarded. 
+Note how technically we could not display the per-frame algorithm performance in \Figure{synthetic}, since it does not provide a single final estimate of shape parameters. To do this, we employ the model parameters it estimated in the last frame of each sequence. In the last frames the error is low, as each frame is initialized with the values from the previous frame; see \VideoReal{}. 
+% Note how per-frame calibration performs excellently, even outperforming Offline-Hard. This is because, thanks to our carefully designed shape priors, per-frame calibration is quite robust; see \VideoReal{}.
+This is essential in cumulative calibration, as the true value of a parameter can be recovered only if accurate measurements are available in at least some poses. The per-frame algorithm should also not be mistaken for tracking algorithm (where shape parameters are fixed) which is if twice more efficient and, in general, much more robust.
 \end{edit}
 
 % \begin{edit}
@@ -75,9 +81,9 @@ Note how per-frame calibration performs excellently, even outperforming Offline-
 
 % --- Inter-frame variants
 It is difficult to differentiate the split vs. joint  cumulative variants in the synthetic dataset, as calibration converges very effectively when it can rely on precise measurements. 
-\begin{edit}
-Overall, on the sensed dataset our \emph{joint cumulative} calibration performs the best. Our split variant performs very well when per-frame consistently provides an accurate solution (e.g. on the synthetic sequences). Nonetheless, we noticed that how with more challenging motions, the joint-cumulative can aid the per-frame solver by providing a temporal regularization. This is highly beneficial when dealing with an uncooperative user, or to perform calibrations in sequences that were not specifically designed to perform this task (e.g. fast motion, long-term occlusions,...)
-\end{edit}
+% \begin{edit}
+Overall, on the sensed dataset our \emph{joint cumulative} calibration performs the best. Our split variant performs very well when per-frame consistently provides an accurate solution (e.g. on the synthetic sequences). Nonetheless, we noticed that how with more challenging motions, the joint-cumulative can aid the per-frame solver by providing a temporal regularization. This is highly beneficial when dealing with an uncooperative user, or to perform calibrations in sequences that were not specifically designed to perform this task (e.g. fast motion, long-term occlusions, etc.)
+% \end{edit}
 
 % \begin{edit}
 % The general observation is that split algorithm is better to use when per-frame algorithm is doing well by itself and does not need a robustness boost from joint-cumulative.
@@ -95,7 +101,7 @@ This dataset allow us to compare our method (and its variants) to a number of ot
 % 
 % \TODO{describe scaled template}
 % 
-Our online algorithm achieves very competitive tracking performance while being the \emph{first} capable to calibrate the user-personalized tracking model \emph{online}, rather than in an offline calibration session like~\citeN{taylor2016joint}. 
+Our online algorithm achieves very competitive tracking performance while being the \emph{first} capable of calibrating the user-personalized tracking model \emph{online}, rather than in an offline calibration session like~\citeN{taylor2016joint}. 
 % 
 Notice how the best performance is achieved by either: (1) the per-frame optimization, where per-frame \emph{overfitting} takes place, or (2) by offline calibration techniques such as \OfflineSoft{} or \cite{taylor2016joint}. This is expected, as offline algorithms jointly consider all available information, while online/streaming algorithms can only integrate information one frame at a time.
 
