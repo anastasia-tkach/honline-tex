@@ -74,27 +74,27 @@ Given $E$ as above, we can write
 p(x_n|d_n) \propto \exp(-E(x_n)), 
 \label{eq:p_from_E}
 \end{equation}
-but to perform propagation, we will need a more compact form, for example a Gaussian approximation.   A natural choice is the Laplace approximation: a Gaussian with its mode \AN{why mode and not mean (they are the same, but I saw normally saw the pair \lq\lq{}mean and covariance\rq\rq{})} at the maximizer of~(\ref{eq:p_from_E}), and covariance chosen to match a second-order expansion of~$E$ about that mode.
-The mode \AN{mean?} computation is the standard energy minimization
+but to perform propagation, we will need a more compact form, for example a Gaussian approximation.   A natural choice is the Laplace approximation: a Gaussian with its mean at the mode of~(\ref{eq:p_from_E}), and covariance chosen to match a second-order expansion of~$E$ about that mode.
+The mode computation is the standard energy minimization
 \begin{equation}
 \star x_n = \argmin_{x_n} E(x_n)
 \label{eq:xmin}
 \end{equation}
 which can be solved by nonlinear optimization given an initialization $x_n^0$ (obtained from a discriminative method or from the solution of the previous time-step), and indeed this is the same minimization performed by current state-of-the-art hand trackers.
-The covariance matrix~$\star\Sigma_n$ of the Laplace approximation is the inverse of the Hessian of~$E$, and as we are using a Gauss-Newton solver, $E(x)$ is of the form $\|d_n - F(x_n)\|^2$, so we may make the G-N approximation of the Hessian in terms of the Jacobian of~
+The covariance matrix~$\star\Sigma_n$ of the Laplace approximation (see \Appendix{laplace-approximation}) is the inverse of the Hessian of~$E$, and as we are using a Gauss-Newton solver, $E(x)$ is of the form $\|d_n - F(x_n)\|^2$, so we may make the G-N approximation of the Hessian in terms of the Jacobian of~
 %$F$
-\begin{edit}$\bar{F}(x_n) = d_n - F(x_n)$\end{edit}, yielding
+$\bar{F}(x_n) = d_n - F(x_n)$, yielding
 \begin{equation}
 {\star{\Sigma}_n} = \left(\tfrac{\partial \bar{F}(x^*)}{\partial x}^\top \tfrac{\partial \bar{F}(x^*)}{\partial x}\right)^{-1}.
 \end{equation}
-\begin{edit}(The step by step derivation of what is described above in words is presented in \Appendix{laplace-approximation}).\end{edit} \AN{I put it in the appendix for now, but we have to at least partially put this back, since Table 1 and Table 2 rely on this derivation and use notation from there. I would prefer to return it altogether, I am not sure that Laplace approximation is a well-known thing in Graphics community, so the readers might not be able to follow the description.}
 Thus, after processing the information in a frame $d_n$, the sought-after quadratic approximation of posterior distribution of model parameters is 
 %a \emph{normal} distribution $\mathcal{N}\left(x_n^*, \star\Sigma_n \right)$.
 %Its mean $x^*$ is the solution of the (iterative) optimization in \Equation{energies}; its covariance  $\star\Sigma_n$ is computed according to \Equation{taylor-hessian}, that is, from the Hessian of the objective function evaluated at the optimal solution~$x^*$.
 %Jacobians of the energy terms $\{E_{\text{d2m}}, E_{\text{m2d}}\} at the optimal solution.$ \AN{for $E_{\text{d2m}}$ Equation 6 is an approximation of the hessian, not jacobian, since E = F^T * F}
 \begin{align}
-\tilde{p}(x_n|d_n) \approx \mathcal{N}\left(\star{x}_n, \star{\Sigma}_n \right)
+\tilde{p}(x_n|d_n) \approx \mathcal{N}\left(\star{x}_n, \star{\Sigma}_n \right),
 \end{align}
+so that for ``intra'', the posterior parameters are $\hat x_n = \star x_n, \hat\Sigma_n = \star\Sigma_n$.
 
 
 %
