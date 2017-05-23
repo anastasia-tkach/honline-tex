@@ -5,7 +5,7 @@ From an application point of view, our approach significantly improves on the us
 \paragraph{Limitations and future works}
 Currently, our optimization relies on heavy parallelization and high-end GPU hardware -- we use a 4GHz i7 equipped with an NVIDIA GTX 1080Ti. In future work we want to reduce computational overhead to facilitate deployment on mobile devices. Our current hand shape prior relies on low-level geometric properties captured in anisotropic scaling penalties.
 %--- priors
-More sophisticated priors could be derived from a data base of hand models, in analogy to the morphable face models used successfully in face calibration.
+More sophisticated priors could be derived from a database of hand models, in analogy to the morphable face models commonly used in face calibration.
 %--- feedback
 To obtain a complete personalized tracking model, the user needs to perform a suitable series of hand poses. As discussed above, if a finger is never bent, the estimate of phalanx lengths will be unreliable. Currently, the system provides limited visual feedback to the user to guide the calibration. In the future, we aim to design a feedback system that provides visual indication of the most informative hand poses given the current model estimate.
 %--- generalization
