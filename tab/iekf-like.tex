@@ -23,7 +23,7 @@ P(x_n |\hat{x}_{n - 1}) &= \exp \left( -\tfrac{1}{2}(x_n - \hat{x}_{n - 1})^T \h
 \right]^T 
 \left[
 	\begin{array}{c}
-		\tfrac{\partial F(\hat{x}_n)} {\partial x_n} \\
+		-\tfrac{\partial F(\hat{x}_n)} {\partial x_n} \\
 		\sqrt{\hat{\Sigma}_{n - 1}^{-1}} \\
 	\end{array}
 \right] 

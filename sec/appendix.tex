@@ -1,8 +1,54 @@
 \appendix
+%
+\section{Laplace Approximation}
+\label{app:laplace-approximation}
+
+While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To derive our uncertainties, we start by converting the data terms \emph{d2m} and \emph{m2d} of \Equation{energies} into probabilistic form:
+\begin{align}
+p(d_n|x_n) &= \exp \left( - \tfrac{1}{2}(d_n - F(x_n))^T (d_n - F(x_n)) \right)
+\label{eq:posterior}
+\end{align}
+% 
+By temporarily omitting the frame index $n$ for conveniency, our problem is rewritten as a maximum likelihood optimization:
+%
+\begin{align}
+x^* &= \argmax_{x} \underbrace{\log  p(d|x)}_{L(x)}
+\label{eq:independent}
+\end{align}
+%
+We now perform a second-order Taylor expansion of the log-likelihood of the data $L(x)$ around the \emph{optimal} solution $x^*$:
+%
+\begin{align}
+L(x) \approx \tilde{L}(x) = L(x^*)   
++ \tfrac{\partial L(x^*) }{\partial x}  \Delta x 
++ \tfrac{1}{2} \Delta x^T\tfrac{\partial^2 L(x^*)}{{\partial x}^2} \Delta x + \text{h.o.t.}
+\label{eq:taylor}
+\end{align}
+%
+where $\Delta x=x - x^*$, and let {\small $\partial f(\star{x})/\partial x$} indicate the partial derivative of $f(x)$ evaluated at $\star{x}$  with an abuse of notation. We rewrite {\small $\bar{F}(x_n) = d_n - F(x_n)$} for brevity. Note how the Jacobian and the Hessian are respectively zero and positive definite at our optimal point $x^*$ (see \cite[Sec.~10.2]{nocedal2006numerical}):
+%
+\begin{align}
+\tfrac{\partial L(x^*)}{\partial x} &= - \bar{F}(x^*)^T 
+\tfrac{\partial \bar{F}(x^*)}{\partial x} = 0 
+\label{eq:taylor-jacobian}
+\\
+\tfrac{\partial^2 L(x^*)}{\partial x^2} 
+& \approx - \tfrac{\partial \bar{F}(x^*)}{\partial x}^T \tfrac{\partial \bar{F}(x^*)}{\partial x}
+\triangleq %< DEFINED AS
+-{\star{\Sigma}}^{-1} \prec 0
+\label{eq:taylor-hessian}
+\end{align}
+% 
+From \Equation{taylor}, using $\tilde p(d|x) = \exp (\tilde{L}(x))$, we can then derive the \emph{approximated} posterior distribution:
+%
+\begin{align}
+\tilde{p}(d|x) = \exp\left(- \tfrac{1}{2}(x - x^*)^T {\star{\Sigma}}^{-1}  (x - x^*) \right) = \mathcal{N}\left(\star{x}, \star{\Sigma} \right)
+\end{align}
+%
 \input{tab/kalman}
 \section{Overview on Kalman Filters}
 % In this section we will briefly introduce Kalman Filters focusing on how to apply them to our online shape calibration framework, and preparing the reader to the upcoming section in which we will re-interpret the algorithms introduced in \Section{technical} as Kalman Filters.
-
+%
 \paragraph{Kalman Filter (KF)} 
 % \label{app:kalman}
 Following the notation in~\cite{welch1995introduction}, let us denote the latent state of a discrete-time controlled process as $x_n \in \mathbb{R}^N$, a generic measurement as $z_n \in \mathbb{R}^M$ and let us consider the following linear stochastic difference equations
