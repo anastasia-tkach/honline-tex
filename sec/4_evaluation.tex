@@ -65,9 +65,7 @@ were too significantly wrong; in this regard, we believe discriminative pose re-
 % \end{edit}
 
 \begin{edit}
-Note how technically we could not display the per-frame algorithm performance in \Figure{synthetic}, since it does not provide a single final estimate of shape parameters. To do this, we employ the model parameters it estimated in the last frame of each sequence. In the last frames the error is low, as each frame is initialized with the values from the previous frame; see \VideoReal{}. 
-% Note how per-frame calibration performs excellently, even outperforming Offline-Hard. This is because, thanks to our carefully designed shape priors, per-frame calibration is quite robust; see \VideoReal{}.
-This is essential in cumulative calibration, as the true value of a parameter can be recovered only if accurate measurements are available in at least some poses. The per-frame algorithm should also not be mistaken for tracking algorithm (where shape parameters are fixed) which is if twice more efficient and, in general, much more robust.
+Technically we could not display the per-frame algorithm performance in \Figure{synthetic}, since it does not provide a single final estimate of shape parameters. To do this, we employ the model parameters it estimated in the last frame of each sequence. In the last frame the error is low, as each frame is initialized with the values from the previous frame; see \VideoReal{}. Note how per-frame calibration performs excellently, even outperforming Offline-Hard. This is because, thanks to our carefully designed shape priors, per-frame calibration is quite robust; see \VideoReal{}. This is essential in cumulative calibration, as the true value of a parameter can be recovered only if accurate measurements are available in at least some poses. The per-frame algorithm should also not be mistaken for tracking algorithm (where shape parameters are fixed) which is twice more efficient and, in general, much more robust.
 \end{edit}
 
 % \begin{edit}
