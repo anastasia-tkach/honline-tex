@@ -1,10 +1,10 @@
 \appendix
 \input{tab/kalman}
 \section{Overview on Kalman Filters}
-\TODO{ In this section we will briefly introduce Kalman Filters from a high-level point of view, focusing on how to apply them to our online shape calibration framework and preparing the reader to the upcoming section in which we will re-interpret the algorithms introduced in section \ref{sec:technical} as optimal Kalman Filters.}
+% In this section we will briefly introduce Kalman Filters focusing on how to apply them to our online shape calibration framework, and preparing the reader to the upcoming section in which we will re-interpret the algorithms introduced in \Section{technical} as Kalman Filters.
 
-\subsection{Kalman Filter (KF)} 
-\label{app:kalman}
+\paragraph{Kalman Filter (KF)} 
+% \label{app:kalman}
 Following the notation in~\cite{welch1995introduction}, let us denote the latent state of a discrete-time controlled process as $x_n \in \mathbb{R}^N$, a generic measurement as $z_n \in \mathbb{R}^M$ and let us consider the following linear stochastic difference equations
 % 
 \begin{align}
@@ -22,19 +22,20 @@ We can then define \textit{a priori} and \textit{a posteriori} estimate error co
 \end{align}
 %
 The Kalman Filter (KF) estimates the latent state $x_n$ of a discrete control linear process by minimizing the \textit{a posteriori} error covariance. In particular it estimates the process through a \textit{predictor-corrector} approach: given a generic time $n$ the filter first estimates the process state (\textbf{time update equation}) and then obtains feedback in the form of noisy measurements (\textbf{measurement update equation}).
-Let us now particularize the system above to our framework, where the latent state of our system corresponds to hand parameters and the measurement corresponds to the solution of problem \eqref{eq:energies}.
-An estimate of the current hand parameters is therefore given by the one of the previous time-step up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$, while the noisy measurement corresponds to the state itself, meaning that $J = I$ (note that in order to highlight the similarities to other Kalman filter formulations we will maintain the notation J). Our discrete-time process can simply be written as
+Let us now particularize the system above to our framework, where the latent state of our system corresponds to hand parameters and the measurement corresponds to the solution of \Equation{energies}.
+% 
+An estimate of the current hand parameters is given by the one of the previous time-step up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$, while the noisy measurement corresponds to the state itself, meaning that $J = I$ (note that in order to highlight the similarities to other Kalman filter formulations we will maintain the notation J). Our discrete-time process can simply be written as
 % 
 \begin{align}
 x_n &= x_{n - 1} + w_{n - 1} \\
 z_n &= J x_n + v_n
 \end{align}
 % 
-resulting (\cite{welch1995introduction}) in the time/measurement updates in \Table{kalman}.
+resulting in the time/measurement updates in \Table{kalman}; see \cite{welch1995introduction}.
 
-\subsection{Extended Kalman Filter (EKF)}
-\label{app:ekf}
-The Extended Kalman Filter (EKF) extends the KF to the case in which the process to be estimated and (or) the measurement relationship to the process are not linear:
+\paragraph{Extended Kalman Filter (EKF)}
+% \label{app:ekf}
+The Extended Kalman Filter (EKF) extends the KF to the case in which the process to be estimated and/or the measurement relationship to the process are not linear:
 % 
 \begin{align}
 x_n &= \tilde{F}(x_{n - 1},  w_{n - 1}) \\
@@ -42,8 +43,8 @@ z_n &= F(x_n, v_n)
 \end{align}
 % 
 where $\tilde{F}$ relates the current latent state $ x _n$ to the previous time step one $ x _{n-1}$ and $F$ relates the current latent state $ x _n$ to measurement $ z _n$.
-The EKF simply estimates the latent state of such system by means of linearization of process and measurement equations around the current estimate (see \cite{welch1995introduction} for a detailed overview).
-We can apply this framework to ours and, differently from the linear case, consider now the input depth map $d_n$ as system measurement. The function $F(\cdot)$ therefore maps state $x_n$ to measurement $z_n$ by 'applying' shape and pose parameters to the template hand model and computing the closest model points to sensor data points, while as discussed in the previous section $\tilde{F}(\cdot)$ is a simple identity mapping.
+The EKF simply estimates the latent state of such system by means of linearization of process and measurement equations around the current estimate; see \cite{welch1995introduction} for a detailed overview.
+We can apply this framework to ours and, differently from the linear case, consider now the input depth map $d_n$ as system measurement. The function $F(\cdot)$ therefore maps state $x_n$ to measurement $z_n$ by \emph{applying} shape and pose parameters to the template hand model and computing the closest model points to sensor data points, while as discussed in the previous section $\tilde{F}(\cdot)$ is a simple identity mapping.
 We can write the non-linear process and measurement equations associated to our framework as:
 % 
 \begin{align}
@@ -51,42 +52,116 @@ We can write the non-linear process and measurement equations associated to our 
 	z_n &= F(x_n) + v_n 
 \end{align}
 %
-By defining $F_n = F(\hat{x}_n^0)$ and ${J_n}_{[i, j]} = \partial F_{[i]} / \partial x_{[j]}(\hat{x}_n^0)$, the EKF update equations can be written (\cite{welch1995introduction}) as reported in \Table{ekalman}.
+By defining $F_n = F(\hat{x}_n^0)$ and ${J_n}_{[i, j]} = \partial F_{[i]} / \partial x_{[j]}(\hat{x}_n^0)$, the EKF update equations can be written as reported in \Table{ekalman}; see \cite{welch1995introduction}.
 %
 \input{tab/ekalman}
 
-\ER{ I would go for a high level approach here and omit these derivations, otherwise we should go much deeper with them and write derivations also for the precedent section. Let me know what do you think about it!
-\begin{equation*}
-\tfrac{ \partial \tilde{F}_{[i]}}{ \partial x_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I
-\quad
-\tfrac{ \partial \tilde{F}_{[i]}}{ \partial w_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I
-\quad
-\tfrac{ \partial F_{[i]}}{ \partial v_{[j]}}(\hat{x}_n^0, 0) \equiv I
-\end{equation*}
-% 
-where $I$ is an identity matrix of the corresponding size.}
-% 
-\AT{where is this chunk needed for? }
-\AN{If these experssions are plugged in in the general IEFK equations, we get the below time and measurement update}
-
-\subsection{Iterated Extended Kalman Filter (IEKF)}
-\label{app:iekf}
-The EKF performs well for systems with mildly nonlinear measurement functions, but if the measurement equation is strongly nonlinear the performance of the filter deteriorates (\cite{havlik2015performance}).
-To address this problem, we can perform measurement updates in several steps, where in each one we linearize the measurement function $F$ around the updated value iteration $\hat{x}_n^i$, leading to the Iterated Extended Kalman Filter (IEKF) formulation~\cite{havlik2015performance}. The time update equation for IEKF is analogous to the one in \Table{extended}, while the measurement update is reported in \Table{iekf}.
-
-\ER{Don't know how to make this flow with the rest...working on it! \\
-	As the measurement function $F(\cdot)$ from \Appendix{ekf} is nonlinear, the following LM optimization takes several iterations to converge: 
-	% 
-	\begin{equation}
-	\hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)   
-	\end{equation}
-	% 
-}
+% \ER{I would go for a high level approach here and omit these derivations, otherwise we should go much deeper with them and write derivations also for the precedent section. Let me know what do you think about it!}
+% \AT{concur}
+% \begin{equation*}
+% \tfrac{ \partial \tilde{F}_{[i]}}{ \partial x_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I
+% \quad
+% \tfrac{ \partial \tilde{F}_{[i]}}{ \partial w_{[j]}}(\hat{x}_{n - 1}, 0) \equiv I
+% \quad
+% \tfrac{ \partial F_{[i]}}{ \partial v_{[j]}}(\hat{x}_n^0, 0) \equiv I
+% \end{equation*}
+% %
+% where $I$ is an identity matrix of the corresponding size.
+% \AT{where is this chunk needed for? }
+% \AN{If these experssions are plugged in in the general IEFK equations, we get the below time and measurement update}
 
 \input{tab/iekf}
+\paragraph{Iterated Extended Kalman Filter (IEKF)}
+% \label{app:iekf}
+The EKF performs well for systems with mildly nonlinear measurement functions, but if the measurement equation is strongly nonlinear the performance of the filter deteriorates; see \cite{havlik2015performance}. To address this problem, we can perform measurement updates in several steps, where in each one we linearize the measurement function $F$ around the updated value iteration $\hat{x}_n^i$, leading to the Iterated Extended Kalman Filter (IEKF) formulation~\cite{havlik2015performance}. The time update equation for IEKF is analogous to the one in \Table{extended}, while the measurement update is reported in \Table{iekf}.
 
-\subsection{Extended Information Filters (EIF)}
+\newpage
+
+
+\paragraph{Extended Information Filters (EIF)}
 \label{app:eif}
-In order to ease the derivations of the upcoming section let us observe that the EKF measurement updates can also be rewritten in the equivalent \emph{Extended Information Filter} form~\cite{optimal}; see \Table{eif}. Note that in order to do that we need to assume the measurement noise to be independent and identically distributed across samples, therefore $R=rI$ where $r\in \mathbb{R}^+$ and $I$ is the identity matrix. We introduce this formulation in order to ease the upcoming derivations. 
+In order to ease the derivations of the upcoming section let us observe that the EKF measurement updates can also be rewritten in the equivalent \emph{Extended Information Filter} form~\cite{optimal}; see \Table{eif}. We introduce this formulation in order to ease the upcoming derivations. Note that in order to do that we need to assume the measurement noise to be independent and identically distributed across samples, therefore $R=rI$ where $r\in \mathbb{R}^+$ and $I$ is the identity matrix. Further, similarly to EKF, we can write the iterated version of an EIF, as reported in \Table{ieif}.   
 \input{tab/eif.tex}
 
+\begin{DRAFT}
+As the measurement function $F(\cdot)$ from \Appendix{ekf} is nonlinear, the following LM optimization takes several iterations to converge:
+% %
+\begin{equation}
+\hat{x}_n^{i + 1} = (J(\hat{x}_n^i) ^T J(\hat{x}_n^i) + \lambda I)^{-1} J(\hat{x}_n^i)^T F(\hat{x}_n^i)
+\end{equation}    
+\end{DRAFT}
+
+\section{Derivations}
+
+\subsection{Derivation for \Section{split}}
+\label{app:proof-kalman}
+Let us consider the Kalman Filter measurement update equations introduced in Table \Table{ekalman}, recalling to the reader that we are considering the case in which the measurement $z_n = x_n^*$ is in the same space of the estimated state $\hat{x}_n$, thus when $J$ is the identity matrix.
+% 
+\begin{align*}
+\hat{x}_n 
+&= \hat{x}_n^0 + P_n^0  (P_n^0 + R)^{-1}(z_n - \hat{x}_n^0) \\
+&= (P_n^0 + R)(P_n^0 + R)^{-1}\hat{x}_n^0 + P_n^0  (P_n^0 + R)^{-1}(z_n - \hat{x}_n^0) \\
+&= R(P_n^0 + R)^{-1}\hat{x}_n^0 + P_n^0  (P_n^0 + R)^{-1}z_n \\
+% 
+% 
+P_n &= ((P_n^0 + R) (P_n^0 + R)^{-1} - P_n^0  (P_n^0 + R)^{-1}) P_n^0\\
+&= R (P_n^0 + R)^{-1} P_n^0
+\end{align*}
+% 
+Note how these two coincide with \Equation{combining} for product of two Gaussians  with $z_n = x_n^*$, $P_n^0 = \hat{\Sigma}_{n - 1}$ and $R = \star\Sigma_{n}$.
+
+\subsection{Derivation for \Section{joint}}
+\label{app:ieif-lm}
+%
+To show that the optimizing the objective in \Table{iekf-like} with Levenberg-Marquardt (LM) is equivalent to an IEKF. We first convert the IEKF into the corresponding IEIF form.
+
+
+
+The LM update in the optimization associated to Table \ref{tab:iekf-like} then can be written as:
+% 
+\begin{equation}
+    x_n^{i + 1}= x_n^{i} - (\bar{J}_n^T \bar{J}_n)^{-1} \bar{J}_n^T \bar{F}_n 
+\end{equation}
+ with $\bar{J}_n$ and $\bar{F}_n$ expanded below, $F_n^i = F(x_n^i)$, 
+ $J_n^i = \frac{\partial F}{\partial x_n}(x_n^i)$, the measurement $z_n = d_n$ and $\hat{\Sigma}_n^{-1} = r H_{n - 1}$. 
+ 
+ \begin{align*}
+x_n^{i + 1}= x_n^{i} - \left(
+\left[
+	\begin{array}{cc}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]
+\right)^{-1} \times\\
+\times \left[
+	\begin{array}{cc}
+		- J_n^i \\
+		\left(r H_{n - 1}\right)^{1/2} \\
+	\end{array}
+\right]^T 
+\left[
+	\begin{array}{c}
+		z_n - F_n^i \\
+		\left(r H_{n - 1}\right)^{1/2}(x_n^i - \hat{x}_{n - 1}) \\
+	\end{array}
+\right] = \\
+= x_n^{i} - \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1}}_{A} \times \\
+\times \left( - {J_n^i}^T(z_n - F_n^i) + r H_{n - 1}(x_n^i - \hat{x}_{n - 1})\right)  = \\
+= x_n^i +\underbrace{A {J_n^i}^T(z_n - F_n^i)}_B - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1})  = \\
+= \hat{x}_{n - 1} + B  - A r H_{n - 1}(x_n^i - \hat{x}_{n - 1}) + A A^{-1}( x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + B + A(- r H_{n - 1} + {J_n^i}^T J_n^i + r H_{n - 1})(x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + B + A {J_n^i}^T J_n^i (x_n^i - \hat{x}_{n - 1}) = \\
+= \hat{x}_{n - 1} + \underbrace{\left({J_n^i}^T J_n^i + r H_{n - 1}\right)^{-1} {J_n^i}^T}_{K_n^i}  \big(z_n - F_n^i - J_n^i (\hat{x}_{n - 1} - x_n^i)\big),
+\end{align*}
+% 
+which is equivalent to the measurement update of IEIF from Table \ref{tab:ieif}, with $H_n^0 = H_{n-1}$ and $x_n^0 = \hat{x}_{n - 1}$.
+\input{tab/ieif.tex}
+\TODO{ where $\times$ denotes the standard matrix product.}
+% \input{fig/merging/item}
