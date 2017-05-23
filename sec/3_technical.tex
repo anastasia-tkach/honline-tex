@@ -1,7 +1,5 @@
 %!TEX root = ../paper.tex
 \input{fig/intra/item}
-\input{fig/inter/item}
-\input{fig/covariance/item}
 
 \section{Online model calibration}
 \label{sec:technical}
@@ -10,7 +8,10 @@ We now describe our combined calibration and tracking algorithm, which combines 
 gathered from a \emph{collection} of frames capturing the user in different poses. 
 
 As we illustrate in \Figure{intra} and \Figure{covariance}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
-Rather than manually picking a few frames in different poses as in~\cite{taylor2016joint}, we show how propagation of not just the shape estimate, but also its uncertainty alllows reliable calibration even if the initial poses fail entirely to constrain some shape dimensions.  Additionally, the temporal priors of previous work are easily incorporated in the LMKF formulation.
+Rather than manually picking a few frames in different poses as in~\cite{taylor2016joint}, we show how propagation of not just the shape estimate, but also its uncertainty allows reliable calibration even if the initial poses fail entirely to constrain some shape dimensions.  Additionally, the temporal priors of previous work are easily incorporated in the LMKF formulation.
+
+\input{fig/inter/item}
+\input{fig/covariance/item}
 
 \paragraph{Input data and shape model}
 The input data are a sequence of depth frames $\mathcal{D}_n$, which are segmented via a wristband~\cite{htrack} to produce a point cloud $d_n \subset \mathbb R^3$.   The pose vector in frame~$n$ is $\theta_n$, and our shape model $\mathcal{M}(\theta; \beta)$ is the sphere mesh of \citeN{tkach2016sphere}.   Shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \Figure{handmodel} and \cite{edoardo}.
@@ -34,7 +35,7 @@ It is generally computationally intractable to estimate the parameters condition
 
 
 
-\subsection{Intra-frame estimate $p(x_n|d_n)$}
+\subsection{Intra-frame estimate -- $p(x_n|d_n)$}
 \label{sec:independent}
 \label{sec:intra}
 The distribution $p(x_n|d_n)$ is, by Bayes' rule, proportional to the product of a data term and a prior $p(d_n|x_n)p(x_n)$, which is naturally related to the traditional energy formulations by identifying the negative log likelihood with the energy.  Consider the energy function
@@ -162,16 +163,19 @@ From \Equation{taylor}, using $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then
 
 \input{tab/iekf-like}
 \input{fig/realtrack/item}
-\subsection{Split inter-frame estimate}% -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) | \mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ } 
+\subsection{Split inter-frame estimate -- $p(x_n|d_{1..n})$}
+% -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) | \mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ } 
 \label{sec:split}
 The intra-frame distribution in \Section{independent} encodes the uncertainty in pose and shape solely due to the data in frame~$n$.  To aggregate information from previous frames, we would like a simple form of the distribution $p(x_n|d_{1..n}) $, for example a Gaussian:
 \begin{equation}
 p(x_n|d_{1..n}) \approx \mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)
 \end{equation}
-Then, given values of the parameters $\hat{x}_{n-1}, \hat{\Sigma}_{n-1}$ at the previous timestep, we must update them to incorporate the new information in frame $n$.   From above, this information is encoded in the normal distribution $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.  
-
+Then, given values of the parameters $\hat{x}_{n-1}, \hat{\Sigma}_{n-1}$ at the previous timestep, we must update them to incorporate the new information in frame $n$.   From above, this information is encoded in the normal distribution $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.
+% 
 In addition, we need the temporal prior $p(x_n|x_{n-1})$.  As we are primarily interested in the shape components of $x$, let us assume a constant-position temporal prior $p(x_n|x_{n-1}) = \mathcal N(x_n | x_{n-1}, \gamma I)$.
-
+% 
+\AT{link?}
+% 
 The update in {\em split inter-frame} is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF.  We write the update as a product
 % 
 \begin{align}
