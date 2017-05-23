@@ -1,39 +1,46 @@
+%!TEX root = ../paper.tex
 \input{fig/intra/item}
+\input{fig/inter/item}
+\input{fig/covariance/item}
 
 \section{Online model calibration}
 \label{sec:technical}
-Given the $n$-th input depth frame $\mathcal{D}_n$ we first segment the hand point cloud via a wristband~\cite{htrack}, and represent it in matrix form as $d_n$. Let $x_n = [\theta_n; \beta_n]$ denote the vector of coalesced pose and shape parameters at frame $n$. Our model $\mathcal{M}(\theta_n; \beta)$ is a sphere-mesh tracking model~\cite{tkach2016sphere} where shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \Figure{handmodel} and \cite{edoardo} in our \textbf{additional material}. To achieve online \emph{joint} calibration and tracking, we introduce  two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (see \Section{independent}), while the latter integrates this knowlege across frames. We first demonstrate how inter-frame regression can be interpreted as a Kalman Filter (KF) (see \Section{split}), highlight its shortcomings, and finally propose a \emph{joint} inter-/intra-frame regression. We show how this approach can be interpreted as an Iterative Extended Kalman Filter (IEKF)~(see \Section{joint}).
-\begin{edit}
-In \Section{offline}, we conclude by describing two \emph{offline} calibration procedures that will be used as baselines for comparisons to our online calibration solutions.    
-\end{edit}
 
-\paragraph{Intra-frame regression}
-Given an initialization $x_n^0$ (obtained from discriminative method or from the solution of the previous time-step) and the input data $d_n$, intra-frame regression solves for a locally optimal $x_n^*$ and estimates its  \emph{uncertainty}. That is, this scheme provides a distribution for $x_n$ that is solely based on the knowledge in the depth frame $\mathcal{D}_n$. Estimating uncertainty in the solution is essential for template personalization. As we illustrate in \Figure{intra}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
-%
-%Rather than deriving this relationship via hard-coded rules,  we follow the ideas in ~\todo{\cite{?} and derive how this distribution can be approximated by a Gaussian  $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.} %\AN{How can one derive hard-coded rules?}
-% \AN{We use Laplace Appriximation to find a Gaussian distribution $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ that best approximates the posterior of the parameters optimized for the current frame  $\mathcal{D}_n$.}
-\begin{edit}
-A fundamental observation is that the parameters of this distribution can be  obtained from a Laplace approximation of the posterior for $\mathcal{D}_n$, and this allows us to \emph{easily} derive uncertainty: as a function of the the Jacobians of the tracking energies. As illustrated in \Figure{covariance}, these certainties are optimally expressed as covariance matrices~$\star{\Sigma}_n$.
-\end{edit}
-% We also discuss why a covariance matrix $\star{\Sigma}_n$, as opposed to per-measurement variances, is necessary
-% Through the example in , it is possible to notice the fundamental role of , as opposed to
-\input{fig/inter/item}
+We now describe our combined calibration and tracking algorithm, which combines the Levenberg-style optimization of previous hand trackers with the uncertainty maintenance framework of Kalman filtering.   Previous hand tracking work has made use of temporal smoothing priors to propagate {\em pose} information from previous frames, without the use of filtering.  However this approach cannot be used for {\em shape} because it is so weakly constrained in any given frame, and because its temporal prior is so strong, as shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera for thousands of frames. However, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx. Therefore, knowledge must be 
+gathered from a \emph{collection} of frames capturing the user in different poses. 
 
-\paragraph{Inter-frame regression}
-Unlike pose parameters, shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera. However, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}, it is difficult to estimate the length of a phalanx. Therefore, knowledge must be gathered from a \emph{collection} of frames capturing the user in different poses. Rather than manually picking a few frames in different poses as in~\cite{taylor2016joint}, 
-% collecting a persistent model from a set of pre-recorded calibration data \AN{maybe say manually picked poses to make it sound worse, as it actually is} as in~\cite{taylor2016joint},
-we approach the problem from an \emph{online}-modeling viewpoint. In what follows, we detail a principled method to temporally integrate parameter estimates in a way that also accounts for their confidence.
+As we illustrate in \Figure{intra} and \Figure{covariance}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
+Rather than manually picking a few frames in different poses as in~\cite{taylor2016joint}, we show how propagation of not just the shape estimate, but also its uncertainty alllows reliable calibration even if the initial poses fail entirely to constrain some shape dimensions.  Additionally, the temporal priors of previous work are easily incorporated in the LMKF formulation.
 
-\input{fig/covariance/item}
+\paragraph{Input data and shape model}
+The input data are a sequence of depth frames $\mathcal{D}_n$, which are segmented via a wristband~\cite{htrack} to produce a point cloud $d_n \subset \mathbb R^3$.   The pose vector in frame~$n$ is $\theta_n$, and our shape model $\mathcal{M}(\theta; \beta)$ is the sphere mesh of \citeN{tkach2016sphere}.   Shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \Figure{handmodel} and \cite{edoardo} in our additional material.
 
-\subsection{Intra-frame regression -- $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$}
+\paragraph{Estimation}
+Let $x_n = [\theta_n; \beta_n]$ denote the model {\em state}: the vector of coalesced pose and shape parameters at frame $n$.  
+Our goal in tracking is to produce the best estimate, at frame~$n$, of the state~$x_n$, given all the data seen previously, $d_1, ..., d_n$.
+What is more, we want to estimate not just the state, but the parameters of the {\em probability distribution} over the state $p(x_n|d_{1..n})$.  Thus, if we write
+\begin{equation}
+p(x_n|d_{1..n}) \approx \mathcal N(x_n \mid \star x_n, \star\Sigma_n),
+\end{equation}
+we are saying that $x_n$ approximately follows a normal distribution with mean~$\star x_n$ and covariance~$\star\Sigma_n$.  When we display a tracked hand to the user, we will most likely just draw the hand with pose and shape parameters~$\star x_n$, which sometimes leads to~$\star x_n$ being called ``the estimate of $x_n$'', but it is more correctly ``the estimate of the mean of the distribution $p(x_n)$'', and similarly with~$\star\Sigma_n$.
+
+It is generally computationally intractable to estimate the parameters conditioned on all the previous history~$d_{1..n}$ at every frame (although see~\Section{offline} where compute some related quantities as a baseline), so the estimation is typically expressed in terms of an {\em intra}-frame term $p(x_n|d_n)$, which describes the components due only to information in frame~$d_n$ and {\em inter}-frame term $p(x_n|d_1, ..., d_{n-1})$.  Different approximations for this term leads to different methods, denoted {\em split inter-frame} and {\em joint inter-frame} below.
+
+% AF: These points are now above..
+% To achieve online \emph{joint} calibration and tracking, we introduce  two fundamental components which we refer to as \emph{intra-} and \emph{inter-frame} regression. The former gathers estimates from a single frame (see \Section{independent}), while the latter integrates this knowlege across frames. We first demonstrate how inter-frame regression can be interpreted as a Kalman Filter (KF) (see \Section{split}), highlight its shortcomings, and finally propose a \emph{joint} inter-/intra-frame regression. We show how this approach can be interpreted as an Iterative Extended Kalman Filter (IEKF)~(see \Section{joint}).
+%\begin{edit}
+%In \Section{offline}, we conclude by describing two \emph{offline} calibration procedures that will be used as baselines for comparisons to our online calibration solutions.    
+%\end{edit}
+
+
+
+\subsection{Intra-frame distribution $p(x_n|d_n)$}
 \label{sec:independent}
 \label{sec:intra}
-% 
-Given the point cloud $d_n$ at frame $n$, and an initialization of the hand pose from the previous frame $x_n^0 = x_{n - 1}^*$ we find an independent estimate of $x_n^*$ by local iterative optimization (a-la Levenberg) of the multi-objective energy function:
+The distribution $p(x_n|d_n)$ is, by Bayes' rule, proportional to the product of a data term and a prior $p(d_n|x_n)p(x_n)$, which is naturally related to the traditional energy formulations by identifying the negative log likelihood with the energy.  Consider the energy function
 % 
 \begin{equation}
-x_n^* = \argmin_{x_n} \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, x_n) 
+E(x_n) = \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, x_n) 
 \label{eq:energies}
 \end{equation}
 % 
@@ -58,7 +65,39 @@ The energy terms in the objective function are detailed in~\cite{tkach2016sphere
 \paragraph{Laplace approximation}
 % \subsection{Posterior distribution of parameters after taking a measurement into account}
 \label{sec:posterior}
-While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To derive our uncertainties, we start by converting the data terms \emph{d2m} and \emph{m2d} of \Equation{energies} into probabilistic form:
+Given $E$ as above, we can write
+\begin{equation}
+p(x_n|d_n) \propto \exp(-E(x_n)), 
+\label{eq:p_from_E}
+\end{equation}
+but to perform propagation, we will need a more compact form, for example a Gaussian approximation.   A natural choice is the Laplace approximation: a Gaussian with its mode at the maximizer of~(\ref{eq:p_from_E}), and covariance chosen to match a second-order expansion of~$E$ about that mode.
+The mode computation is the standard energy minimization
+\begin{equation}
+\star x_n = \argmin_{x_n} E(x_n)
+\label{eq:xmin}
+\end{equation}
+which can be solved by nonlinear optimization given an initialization $x_n^0$ (obtained from a discriminative method or from the solution of the previous time-step), and indeed this is the same minimization performed by current state-of-the-art hand trackers.
+The covariance matrix~$\star\Sigma_n$ of the Laplace approximation is the inverse of the Hessian of~$E$, and as we are using a Gauss-Newton solver, $E(x)$ is of the form $\|d_n - F(x_n)\|^2$, so we may make the G-N approximation of the Hessian in terms of the Jacobian of~$F$, yielding
+\begin{equation}
+{\star{\Sigma}_n} = \left(\tfrac{\partial \bar{F}(x^*)}{\partial x}^\top \tfrac{\partial \bar{F}(x^*)}{\partial x}\right)^{-1}.
+\end{equation}
+Thus, after processing the information in a frame $d_n$, the sought-after quadratic approximation of posterior distribution of model parameters is 
+%a \emph{normal} distribution $\mathcal{N}\left(x_n^*, \star\Sigma_n \right)$.
+%Its mean $x^*$ is the solution of the (iterative) optimization in \Equation{energies}; its covariance  $\star\Sigma_n$ is computed according to \Equation{taylor-hessian}, that is, from the Hessian of the objective function evaluated at the optimal solution~$x^*$.
+%Jacobians of the energy terms $\{E_{\text{d2m}}, E_{\text{m2d}}\} at the optimal solution.$ \AN{for $E_{\text{d2m}}$ Equation 6 is an approximation of the hessian, not jacobian, since E = F^T * F}
+\begin{align}
+\tilde{P}(x_n|d_n) \approx \mathcal{N}\left(\star{x}_n, \star{\Sigma}_n \right)
+\end{align}
+
+
+%
+%Rather than deriving this relationship via hard-coded rules,  we follow the ideas in ~\todo{\cite{?} and derive how this distribution can be approximated by a Gaussian  $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.} %\AN{How can one derive hard-coded rules?}
+% \AN{We use Laplace Appriximation to find a Gaussian distribution $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ that best approximates the posterior of the parameters optimized for the current frame  $\mathcal{D}_n$.}
+% We also discuss why a covariance matrix $\star{\Sigma}_n$, as opposed to per-measurement variances, is necessary
+% Through the example in , it is possible to notice the fundamental role of , as opposed to
+
+\iffalse
+%While the optimization problem in \Equation{energies} estimates pose/shape parameters, information regarding the confidence of the estimate is not directly available. To derive our uncertainties, we start by converting the data terms \emph{d2m} and \emph{m2d} of \Equation{energies} into probabilistic form:
 %
 %The data terms \emph{d2m} and \emph{m2d} can be written as posterior distributions: \AN{this is not a posterior distribution yes, and why distributions in plural?}
 % 
@@ -119,11 +158,7 @@ From \Equation{taylor}, using $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then
 \begin{align}
 \tilde{P}(d|x) = \exp\left(- \tfrac{1}{2}(x - x^*)^T {\star{\Sigma}}^{-1}  (x - x^*) \right) = \mathcal{N}\left(\star{x}, \star{\Sigma} \right)
 \end{align}
-%
-That is, after processing the information in a frame $d_n$, the sought-after quadratic approximation of posterior distribution of model parameters is a \emph{normal} distribution $\mathcal{N}\left(x_n^*, \star\Sigma_n \right)$.
-Its mean $x^*$ is the solution of the (iterative) optimization in \Equation{energies}; its covariance  $\star\Sigma_n$ is computed according to \Equation{taylor-hessian}, that is, from the Hessian of the objective function evaluated at the optimal solution~$x^*$.
-%Jacobians of the energy terms $\{E_{\text{d2m}}, E_{\text{m2d}}\} at the optimal solution.$ \AN{for $E_{\text{d2m}}$ Equation 6 is an approximation of the hessian, not jacobian, since E = F^T * F}
-
+\fi
 
 \input{tab/iekf-like}
 \input{fig/realtrack/item}
