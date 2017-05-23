@@ -13,7 +13,7 @@ As we illustrate in \Figure{intra} and \Figure{covariance}, the confidence in re
 Rather than manually picking a few frames in different poses as in~\cite{taylor2016joint}, we show how propagation of not just the shape estimate, but also its uncertainty alllows reliable calibration even if the initial poses fail entirely to constrain some shape dimensions.  Additionally, the temporal priors of previous work are easily incorporated in the LMKF formulation.
 
 \paragraph{Input data and shape model}
-The input data are a sequence of depth frames $\mathcal{D}_n$, which are segmented via a wristband~\cite{htrack} to produce a point cloud $d_n \subset \mathbb R^3$.   The pose vector in frame~$n$ is $\theta_n$, and our shape model $\mathcal{M}(\theta; \beta)$ is the sphere mesh of \citeN{tkach2016sphere}.   Shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \Figure{handmodel} and \cite{edoardo} in our additional material.
+The input data are a sequence of depth frames $\mathcal{D}_n$, which are segmented via a wristband~\cite{htrack} to produce a point cloud $d_n \subset \mathbb R^3$.   The pose vector in frame~$n$ is $\theta_n$, and our shape model $\mathcal{M}(\theta; \beta)$ is the sphere mesh of \citeN{tkach2016sphere}.   Shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \Figure{handmodel} and \cite{edoardo}.
 
 \paragraph{Estimation}
 Let $x_n = [\theta_n; \beta_n]$ denote the model {\em state}: the vector of coalesced pose and shape parameters at frame $n$.  
@@ -34,7 +34,7 @@ It is generally computationally intractable to estimate the parameters condition
 
 
 
-\subsection{Intra-frame distribution $p(x_n|d_n)$}
+\subsection{Intra-frame estimate $p(x_n|d_n)$}
 \label{sec:independent}
 \label{sec:intra}
 The distribution $p(x_n|d_n)$ is, by Bayes' rule, proportional to the product of a data term and a prior $p(d_n|x_n)p(x_n)$, which is naturally related to the traditional energy formulations by identifying the negative log likelihood with the energy.  Consider the energy function
@@ -162,21 +162,22 @@ From \Equation{taylor}, using $\tilde P(d|x) = \exp (\tilde{L}(x))$, we can then
 
 \input{tab/iekf-like}
 \input{fig/realtrack/item}
-\subsection{Split inter-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) | \mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ } 
-% \subsection{Merging independent measurements}
+\subsection{Split inter-frame estimate}% -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) | \mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ } 
 \label{sec:split}
-Given the probabilistic interpretation in \Section{independent}, a temporal regression over parameters can be obtained by cumulating the posterior distributions over the set of previous frames. This leads to the following pair of inductive update equations:
+The intra-frame distribution in \Section{independent} encodes the uncertainty in pose and shape solely due to the data in frame~$n$.  To aggregate information from previous frames, we would like a simple form of the distribution $p(x_n|d_{1..n}) $, for example a Gaussian:
+\begin{equation}
+p(x_n|d_{1..n}) \approx \mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)
+\end{equation}
+Then, given values of the parameters $\hat{x}_{n-1}, \hat{\Sigma}_{n-1}$ at the previous timestep, we must update them to incorporate the new information in frame $n$.   From above, this information is encoded in the normal distribution $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.  
+
+In addition, we need the temporal prior $p(x_n|x_{n-1})$.  As we are primarily interested in the shape components of $x$, let us assume a constant-position temporal prior $p(x_n|x_{n-1}) = \mathcal N(x_n | x_{n-1}, \gamma I)$.
+
+The update in {\em split inter-frame} is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF.  We write the update as a product
 % 
 \begin{align}
-\mathcal{N}(\hat{x}_1, \hat{\Sigma}_1) &= \mathcal{N}(\star{x}_1, \star{\Sigma}_1) \\
 \mathcal{N}(\hat{x}_n, \hat{\Sigma}_n) &= \mathcal{N}(\hat{x}_{n-1}, \hat{\Sigma}_{n-1}) \mathcal{N}(\star{x}_n, \star{\Sigma}_n)
 \end{align}
-% 
-\begin{edit}
-where $\star{x}_n$ refers to estimates from frame~$n$, while $\hat{x}_n$ represents the estimate of the parameters accumulated from the beginning of the sequence till frame $n$.
-\end{edit}
-% 
-By applying the product of Gaussians rule~\cite{petersen2008matrix}:
+By applying the product of Gaussians rule~\cite{petersen2008matrix}, we obtain update equations for $\hat{x}_n$ and $\hat{\Sigma}_n$:
 % 
 \begin{align}
 \begin{split}
@@ -188,10 +189,10 @@ By applying the product of Gaussians rule~\cite{petersen2008matrix}:
 \end{split}
 \end{align}
 % 
-In \Appendix{proof-kalman}, we shown how \Equation{combining} is equivalent to the~Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. This observation is fundamental as, under the same assumptions we make in \Appendix{kalman}, \cite[Pg. 7]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
-This optimization, which we refer to as \emph{split inter-frame} is arguably the simplest way of achieving an online parameter regression: by treating the results of the independent solve $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$ as the measurements in a KF.
+In \Appendix{proof-kalman}, we shown how \Equation{combining} is equivalent to the~Kalman Filter (KF) update equations in \Table{interframe}, with measurement $x_n^*$, and measurement noise covariance $\star\Sigma_n$. 
+%This observation is fundamental as, under the same assumptions we make in \Appendix{kalman}, \cite[Pg. 7]{maybeck1979stochastic} noted how a KF is provably \emph{optimal}.
 
-\subsection{Joint inter-frame regression -- $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$}
+\subsection{Joint inter-frame estimate}
 \label{sec:joint}
 % Note that the best-fitting parameters $x_n^*$ for the given the single input frame $d_n$ are computed using local LM optimization. Thus, it is crucial that optimization starts in a sensible region of parameters space.
 The optimization in \Tab{interframe} does not provide any information about the current estimate of the parameters $\hat{x}_n$ to the independent solve described in \Section{independent}. This could be problematic, as in this case \Eq{energies} does not leverage any temporal information aside from initialization, while relying on a sufficiently good initialization to compute $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$. 
@@ -207,25 +208,42 @@ The optimization in \Tab{interframe} does not provide any information about the 
 %\AN{Why do you discuss one potential way that we never use or refer to afterwards?}
 %
 We propose to coalesce the inter and intra frame optimization resulting in the \emph{joint} inter-frame regression scheme in~\Table{iekf-like}. 
-\begin{edit}
 The optimization in ~\Table{iekf-like} can be expressed in least-squares form, and embedded in \Equation{energies} through the term:
-\end{edit}
 % 
 \begin{equation}
 E_\text{iekf} = \| \hat{\Sigma}^{-1/2}_{n - 1}(x_n - \hat{x}_{n - 1})\|_2^2 
 \label{eq:iekflm}   
 \end{equation}
 %
-In \Appendix{ieif-lm} we demonstrate that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF) with measurement update $d_n$. 
-\begin{edit}
-To the best of our knowledge, this simple relationship between LM and IEKF in \Equation{iekflm} was unknown. In a practical setting, this observation creates a very simple way to encode IEKF-like behavior within existing LM optimization codebases.  \AF{A bit rich for me to say this, as it's mentioned at in p35 of ``Bundle Adjustment: A modern synthesis'', and I've said it a few times at summer schools etc since http://www.bmva.org/meetings.d/04/17nov/prog.pdf ...}
-\end{edit}
-
+In \Appendix{ieif-lm} we link this update to LM \cite{Skoglund15}, demonstrating that optimizing the objective in~\Table{iekf-like} with a Levenberg-Marquardt method is equivalent to an Iterated Extended Kalman Filter (IEKF) with measurement update $d_n$.   In a practical setting, this observation creates a very simple way to encode IEKF-like behavior within existing LM optimization codebases.  
 
 % \AN{Thus in \Appendix{ieif-lm} we have proven that adding a  $E_\text{iekf}$ to a standard LM sum of energies optimization (that is used in our field all the time) turns the entire system into Iterated Extended Kalman Filter. If you already have an LM system, this can be literally coded in hours at most including debug time :). To our knowledge, this trick was not known/used before. }
 %Notice how this optimization, representing our online tracking/modeling system, jointly considers the measurement $d_n$ as %well as past estimates $\mathcal{N}(\hat{x}_n, \hat{\Sigma}_n)$.
 
 \input{fig/interreal/item}
+
+\subsection{Joint multiframe (batch/offline) estimate}
+\label{sec:batch}
+\label{sec:offline}
+While we focus on an online/streaming algorithm, we also describe an offline baseline calibration procedure -- inspired by the work of~\cite{taylor2014user} -- where multiple frames in the input sequence are simultaneously considered. To achieve this, \Equation{energies} is modified to consider $N$ frames, each with its own pose parameters $\theta_n$, but with the same underlying shape $\beta$, resulting in what we refer to as \emph{\OfflineHard{}} calibration:
+% 
+\begin{equation}
+\argmin_{\beta, \{\theta_n\} } \sum_{n=1}^N \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, [\theta_n, \beta]) 
+\label{eq:offlinehard}
+\end{equation}
+% 
+Such optimization is initialized with a single $\beta^0$, and in our experiments, we noticed how this resulted in reduced convergence performance and a propensity for the optimization to fall into local minimas. 
+
+Therefore, we introduce the \emph{\OfflineSoft{}} calibration, where the constraint that a single $\beta$ should be optimized is enforced through a soft penalty:
+% 
+\begin{equation}
+\argmin_{\beta, \{\theta_n\} } \sum_{n=1}^N \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, [\theta_n, \beta_n]) + \omega_{\beta} \sum_{n=1}^N \| \beta_n - \beta \|^2
+\label{eq:offlinesoft}
+\end{equation}
+%
+The initializations $\beta_n^0$ is derived from the intra-frame optimization of \Equation{energies}, while the penalty weight is set to a large value ($\small \omega_{\beta}=10e4$). The advantage of \OfflineSoft{} over \OfflineHard{} can be clearly observed in \Figure{evalnyu}, where the former achieves a performance comparable to the one of the (overfitting) intra-frame optimization. Finally, note that in practice we do not consider every frame as this large problem would not fit into memory, but instead we sub-sample at a $\approx 1/20$ rate, the same subsampling is used for our online solution to avoid a bias in the comparisons. 
+% \AN{This sounds like our online algorithm runs only every 20th frame. THIS IS NOT THE CASE. KF and IEKF measurements are taken every 20th frame to satisfy independent measurements assumption of the Kalman filter. The neighboring frames are not independent, they are too similar to each other.}
+% \AT{see github issue }
 
 \subsection{Shape regularizers}
 \label{sec:shapeprior}
@@ -257,26 +275,3 @@ For example to avoid middle and index fingers from permuting, one such constrain
 \begin{equation*}
 \chi_0(\beta) \| \beta_\text{idx-base-x} - \beta_\text{idx-base-rad} - \beta_\text{mid-base-x} + \beta_\text{mid-base-rad} \|_2^2
 \end{equation*}
-
-\subsection{Offline calibration}
-\label{sec:batch}
-\label{sec:offline}
-While we focus on an online/streaming algorithm, we also describe an offline baseline calibration procedure -- inspired by the work of~\cite{taylor2014user} -- where multiple frames in the input sequence are simultaneously considered. To achieve this, \Equation{energies} is modified to consider $N$ frames, each with its own pose parameters $\theta_n$, but with the same underlying shape $\beta$, resulting in what we refer to as \emph{\OfflineHard{}} calibration:
-% 
-\begin{equation}
-\argmin_{\beta, \{\theta_n\} } \sum_{n=1}^N \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, [\theta_n, \beta]) 
-\label{eq:offlinehard}
-\end{equation}
-% 
-Such optimization is initialized with a single $\beta^0$, and in our experiments, we noticed how this resulted in reduced convergence performance and a propensity for the optimization to fall into local minimas. 
-
-Therefore, we introduce the \emph{\OfflineSoft{}} calibration, where the constraint that a single $\beta$ should be optimized is enforced through a soft penalty:
-% 
-\begin{equation}
-\argmin_{\beta, \{\theta_n\} } \sum_{n=1}^N \sum_{\tau \in \mathcal{T}} E_{\tau}(d_n, [\theta_n, \beta_n]) + \omega_{\beta} \sum_{n=1}^N \| \beta_n - \beta \|^2
-\label{eq:offlinesoft}
-\end{equation}
-%
-The initializations $\beta_n^0$ is derived from the intra-frame optimization of \Equation{energies}, while the penalty weight is set to a large value ($\small \omega_{\beta}=10e4$). The advantage of \OfflineSoft{} over \OfflineHard{} can be clearly observed in \Figure{evalnyu}, where the former achieves a performance comparable to the one of the (overfitting) intra-frame optimization. Finally, note that in practice we do not consider every frame as this large problem would not fit into memory, but instead we sub-sample at a $\approx 1/20$ rate, the same subsampling is used for our online solution to avoid a bias in the comparisons. 
-% \AN{This sounds like our online algorithm runs only every 20th frame. THIS IS NOT THE CASE. KF and IEKF measurements are taken every 20th frame to satisfy independent measurements assumption of the Kalman filter. The neighboring frames are not independent, they are too similar to each other.}
-% \AT{see github issue }
