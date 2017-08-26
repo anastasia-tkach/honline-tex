@@ -11,8 +11,7 @@ As we illustrate in \Figure{intra} and \Figure{covariance}, the confidence in re
 Rather than manually picking a few frames in different poses as in~\cite{taylor2016joint}, we show how propagation of not just the shape estimate, but also its uncertainty allows reliable calibration even if the initial poses fail entirely to constrain some shape dimensions.  Additionally, the temporal priors of previous work are easily incorporated in the LMKF formulation.
 
 \input{fig/inter/item}
-\input{fig/covariance/item}
-
+\input{tab/kf-like}
 \paragraph{Input data and shape model}
 The input data are a sequence of depth frames $\mathcal{D}_n$, which are segmented via a wristband~\cite{htrack} to produce a point cloud $d_n \subset \mathbb R^3$.   The pose vector in frame~$n$ is $\theta_n$, and our shape model $\mathcal{M}(\theta; \beta)$ is the sphere mesh of \citeN{tkach2016sphere}.   Shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \Figure{handmodel} and \cite{edoardo}.
 
@@ -33,7 +32,7 @@ It is generally computationally intractable to estimate the parameters condition
 %In \Section{offline}, we conclude by describing two \emph{offline} calibration procedures that will be used as baselines for comparisons to our online calibration solutions.    
 %\end{edit}
 
-
+% \vspace{2in}
 
 \subsection{Per-frame estimate -- $p(x_n|d_n)$}
 \label{sec:independent}
@@ -62,7 +61,6 @@ Where the terms $\mathcal{T}$ ensure that:
 \end{equation*}
 The energy terms in the objective function are detailed in~\cite{tkach2016sphere} and~\cite{htrack}, with the exception of \emph{shape-prior} and \emph{shape-valid} that are discussed in \Section{shapeprior}.
 % 
-\input{tab/kf-like}
 % \paragraph{Laplace approximation}
 % \subsection{Posterior distribution of parameters after taking a measurement into account}
 % \label{sec:posterior}
@@ -93,6 +91,7 @@ Thus, after processing the information in a frame $d_n$, the sought-after quadra
 \end{align}
 so the ``per-frame'' posterior parameters are $\hat x_n = \star x_n, \hat\Sigma_n = \star\Sigma_n$.
 
+\input{fig/covariance/item}
 
 %
 %Rather than deriving this relationship via hard-coded rules,  we follow the ideas in ~\todo{\cite{?} and derive how this distribution can be approximated by a Gaussian  $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.} %\AN{How can one derive hard-coded rules?}
@@ -242,7 +241,6 @@ To achieve this, \Equation{energies} is modified to consider $N$ frames, each wi
 % 
 Such optimization is initialized with a single $\beta^0$, and in our experiments, we noticed how this resulted in reduced convergence performance and a propensity for the optimization to fall into local minima. 
 
-\newpage
 \paragraph{Offline-Soft}
 Therefore, we introduce the \emph{\OfflineSoft{}} calibration, where the constraint that a single $\beta$ should be optimized is enforced through a soft penalty:
 % 

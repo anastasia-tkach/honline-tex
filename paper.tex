@@ -1,6 +1,6 @@
 % \documentclass[acmtog, review, anonymous]{acmart}
 % \documentclass[acmtog, anonymous]{acmart}
-\documentclass[acmtog, anonymous, review]{acmart}
+\documentclass[acmtog]{acmart}
 
 \acmJournal{TOG}
 \acmVolume{9}
@@ -10,10 +10,10 @@
 \acmMonth{3}
 
 % Copyright
-\setcopyright{none}
+% \setcopyright{none}
 %\setcopyright{acmcopyright}
 %\setcopyright{acmlicensed}
-%\setcopyright{rightsretained}
+\setcopyright{rightsretained}
 %\setcopyright{usgov}
 %\setcopyright{usgovmixed}
 %\setcopyright{cagov}
@@ -40,11 +40,13 @@
 \input{sec/3_technical}
 \input{sec/4_evaluation}
 \input{sec/5_conclusions}
+\input{sec/6_acks}
 % % \input{sec/acks}
 \bibliographystyle{ACM-Reference-Format}
 % \nocite{*} %prints all citations (unreferenced)
+% \clearpage
 \bibliography{paper}
-\clearpage
+% \clearpage
 \input{sec/appendix}
 \clearpage
 \end{document}
