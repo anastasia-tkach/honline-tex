@@ -7,11 +7,13 @@
 We now describe our \emph{joint} calibration and tracking algorithm, which combines the Levenberg-style optimization of previous hand trackers with the uncertainty maintenance framework of Kalman filtering.   Previous hand tracking work has made use of temporal smoothing priors to propagate {\em pose} information from previous frames, without the use of filtering.  However this approach cannot be used for {\em shape} because it is so weakly constrained in any given frame, and because its temporal prior is so strong, as shape parameters are \emph{persistent} over time: we observe the same user performing in front of the camera for thousands of frames. However, sufficient information to estimate certain shape parameters is simply not available in certain frames. For example, by observing a straight finger like the one in \Figure{intra}-(left), it is difficult to estimate the length of a phalanx. Therefore, knowledge must be 
 gathered from a \emph{collection} of frames capturing the user in different poses. 
 
+\input{fig/inter/item}
+\input{fig/covariance/item}
 As we illustrate in \Figure{intra} and \Figure{covariance}, the confidence in regressed \emph{shape} parameters is conditional on the \emph{pose} of the current frame.
 Rather than manually picking a few frames in different poses as in~\cite{taylor2016joint}, we show how propagation of not just the shape estimate, but also its uncertainty allows reliable calibration even if the initial poses fail entirely to constrain some shape dimensions.  Additionally, the temporal priors of previous work are easily incorporated in the LMKF formulation.
 
-\input{fig/inter/item}
 \input{tab/kf-like}
+
 \paragraph{Input data and shape model}
 The input data are a sequence of depth frames $\mathcal{D}_n$, which are segmented via a wristband~\cite{htrack} to produce a point cloud $d_n \subset \mathbb R^3$.   The pose vector in frame~$n$ is $\theta_n$, and our shape model $\mathcal{M}(\theta; \beta)$ is the sphere mesh of \citeN{tkach2016sphere}.   Shape is encoded via scalar length parameters $\beta$ instead of sphere positions; see \Figure{handmodel} and \cite{edoardo}.
 
@@ -90,8 +92,6 @@ Thus, after processing the information in a frame $d_n$, the sought-after quadra
 \tilde{p}(x_n|d_n) \approx \mathcal{N}\left(\star{x}_n, \star{\Sigma}_n \right),
 \end{align}
 so the ``per-frame'' posterior parameters are $\hat x_n = \star x_n, \hat\Sigma_n = \star\Sigma_n$.
-
-\input{fig/covariance/item}
 
 %
 %Rather than deriving this relationship via hard-coded rules,  we follow the ideas in ~\todo{\cite{?} and derive how this distribution can be approximated by a Gaussian  $\mathcal{N}(\star{x}_n, \star{\Sigma}_n)$.} %\AN{How can one derive hard-coded rules?}

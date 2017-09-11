@@ -24,7 +24,7 @@ We can then define \textit{a priori} and \textit{a posteriori} estimate error co
 	P_n   &= \mathbb{E}[(x_n - \hat{x}_n)^T(x_n - \hat{x}_n)].
 \end{align}
 %
-The Kalman Filter (KF) estimates the latent state $x_n$ of a discrete control linear process by minimizing the \textit{a posteriori} error covariance. In particular it estimates the process through a \textit{predictor-corrector} approach: given a generic time $n$ the filter first estimates the process state (\textbf{time update equation}) and then obtains feedback in the form of noisy measurements (\textbf{measurement update equation}).
+The Kalman Filter (KF) estimates the latent state $x_n$ of a discrete control linear process by minimizing the \textit{a posteriori} error covariance. In particular it estimates the process through a \textit{predictor-corrector} approach: given a generic time $n$ the filter first estimates the process state (\textit{time update equation}) and then obtains feedback in the form of noisy measurements (\textit{measurement update equation}).
 % 
 \input{tab/ekalman}
 % 
