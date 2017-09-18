@@ -67,6 +67,7 @@ were too significantly wrong; in this regard, we believe discriminative pose re-
 % Note how per-frame calibration performs excellently, even outperforming Offline-Hard. This is because,  thanks to our carefully designed shape priors, per-frame calibration is quite robust; see \VideoReal{}. This is essential in cumulative calibration, as information can be effectively integrated only when a precise and confident measurement is available. Compared to per-frame calibration, our cumulative solutions can deal with more difficult sequences, where information with low confidence is simply discarded.
 % \end{edit}
 
+\input{fig/evalnyu/item}
 \begin{edit}
 Technically we could not display the per-frame algorithm performance in \Figure{synthetic}, since it does not provide a single final estimate of shape parameters. To do this, we employ the model parameters it estimated in the last frame of each sequence. In the last frame the error is low, as each frame is initialized with the values from the previous frame; see \VideoReal{}. Note how per-frame calibration performs excellently, even outperforming Offline-Hard. This is because, thanks to our carefully designed shape priors, per-frame calibration is quite robust; see \VideoReal{}. This is essential in cumulative calibration, as the true value of a parameter can be recovered only if accurate measurements are available in at least some poses. The per-frame algorithm should also not be mistaken for tracking algorithm (where shape parameters are fixed) which is twice more efficient (\revision{calibration executes at 30~Hz, while tracking executes at 60~Hz}) and, in general, much more robust.
 \end{edit}
@@ -90,7 +91,6 @@ Overall, on the sensed dataset our \emph{joint cumulative} calibration performs 
 % The general observation is that split algorithm is better to use when per-frame algorithm is doing well by itself and does not need a robustness boost from joint-cumulative.
 % Since during calibration stage of split-cumulative the measured value just comes from per-frame algorithm, the measurement are more independent, while joint-cumulative algorithm influences the measurement by giving additional information too them $\|\hat{\Sigma}_{n-1}^{-1/2} (x_n - \hat{x}_{n-1})\|_2^2$. Exactly this influence makes joint-cumulative algorithm more robust and better to use if the subjects are less cooperative (for example, on a dataset that was not created for calibration)\end{edit}.
 
-\input{fig/evalnyu/item}
 \subsection{Marker-based evaluation on $\texttt{NYU}$ dataset --
 \Fig{evalnyu}}
 \label{sec:evalnyu}

@@ -2,8 +2,9 @@
 %
 \input{tab/kalman}
 
-% \section{Appendix}
-\section{Overview on Kalman Filters}
+\section{Appendix}
+% \section{Overview on Kalman Filters}
+% \section{Overview on Kalman Filters}
 % In this section we will briefly introduce Kalman Filters focusing on how to apply them to our online shape calibration framework, and preparing the reader to the upcoming section in which we will re-interpret the algorithms introduced in \Section{technical} as Kalman Filters.
 %
 \paragraph{Kalman Filter (KF)} 
@@ -28,7 +29,7 @@ The Kalman Filter (KF) estimates the latent state $x_n$ of a discrete control li
 % 
 Let us now particularize the system above to our framework, where the latent state of our system corresponds to hand parameters and the measurement corresponds to the solution of \Equation{energies}.
 % 
-An estimate of the current hand parameters is given by the one of the previous time-step up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$, while the noisy measurement corresponds to the state itself, meaning that $J = I$ (note that in order to highlight the similarities to other Kalman filter formulations we will maintain the notation J). Our discrete-time process can simply be written in the following form, resulting in the update equations of \Table{kalman}; see \cite{welch1995introduction}:
+An estimate of the current hand parameters is given by the one of the previous time-step up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$, while the noisy measurement corresponds to the state itself, meaning that $J = I$ (note that in order to highlight the similarities to other Kalman filter formulations we will maintain the notation J). Our discrete-time process can simply be written in the following form, resulting in the equations of \Table{kalman}; see \cite{welch1995introduction}:
 % 
 \begin{align}
 x_n &= x_{n - 1} + w_{n - 1} \\
@@ -147,8 +148,10 @@ From \Equation{taylor}, using $\tilde p(d|x) = \exp (\tilde{L}(x))$, we can then
 %
 
 \input{tab/ieif.tex}
-\section{Derivations}
+% \section{Derivations}
 % \vspace{-\parskip}
+
+% \vspace{-.2in}
 \subsection{Derivation for \Section{split}}
 \label{app:proof-kalman}
 % \vspace{-\parskip}
