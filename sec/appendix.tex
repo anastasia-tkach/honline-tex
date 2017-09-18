@@ -26,19 +26,18 @@ We can then define \textit{a priori} and \textit{a posteriori} estimate error co
 %
 The Kalman Filter (KF) estimates the latent state $x_n$ of a discrete control linear process by minimizing the \textit{a posteriori} error covariance. In particular it estimates the process through a \textit{predictor-corrector} approach: given a generic time $n$ the filter first estimates the process state (\textit{time update equation}) and then obtains feedback in the form of noisy measurements (\textit{measurement update equation}).
 % 
-\input{tab/ekalman}
-% 
 Let us now particularize the system above to our framework, where the latent state of our system corresponds to hand parameters and the measurement corresponds to the solution of \Equation{energies}.
 % 
-An estimate of the current hand parameters is given by the one of the previous time-step up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$, while the noisy measurement corresponds to the state itself, meaning that $J = I$ (note that in order to highlight the similarities to other Kalman filter formulations we will maintain the notation J). Our discrete-time process can simply be written as
+An estimate of the current hand parameters is given by the one of the previous time-step up to Gaussian noise, that is $x_n = x_{n-1} + w_{n-1}$, while the noisy measurement corresponds to the state itself, meaning that $J = I$ (note that in order to highlight the similarities to other Kalman filter formulations we will maintain the notation J). Our discrete-time process can simply be written in the following form, resulting in the update equations of \Table{kalman}; see \cite{welch1995introduction}:
 % 
 \begin{align}
 x_n &= x_{n - 1} + w_{n - 1} \\
 z_n &= J x_n + v_n
 \end{align}
 % 
-resulting in the time/measurement updates in \Table{kalman}; see \cite{welch1995introduction}.
-
+% 
+\input{tab/ekalman}
+%
 \paragraph{Extended Kalman Filter (EKF)}
 % \label{app:ekf}
 The Extended Kalman Filter (EKF) extends the KF to the case in which the process to be estimated and/or the measurement relationship to the process are not linear:
@@ -88,7 +87,6 @@ The EKF performs well for systems with mildly nonlinear measurement functions, b
 \label{app:eif}
 In order to ease the derivations of the upcoming section let us observe that the EKF measurement updates can also be rewritten in the equivalent \emph{Extended Information Filter} form~\cite{optimal}; see \Table{eif}. We introduce this formulation in order to ease the upcoming derivations. Note that in order to do that we need to assume the measurement noise to be independent and identically distributed (i.i.d.) across samples, therefore $R=rI$ where $r\in \mathbb{R}^+$ and $I$ is the identity matrix. Further, similarly to EKF, we can write the iterated version of an EIF, as reported in \Table{ieif}.   
 
-\input{tab/ieif.tex}
 
 % \begin{DRAFT}
 % As the measurement function $F(\cdot)$ from \Appendix{ekf} is nonlinear, the following LM optimization takes several iterations to converge:
@@ -148,6 +146,7 @@ From \Equation{taylor}, using $\tilde p(d|x) = \exp (\tilde{L}(x))$, we can then
 \end{align}
 %
 
+\input{tab/ieif.tex}
 \section{Derivations}
 % \vspace{-\parskip}
 \subsection{Derivation for \Section{split}}
